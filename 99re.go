@@ -424,7 +424,7 @@ func downloadListImg() {
 
 // 保存列表图片
 func saveFile(filename string, bodyByte []byte) {
-	dir := "./upload/img/" + time.Now().Format("200601") + "/"
+	dir := "./upload/com99re/img/" + time.Now().Format("200601") + "/"
 	err = os.MkdirAll(dir, os.ModePerm)
 	if err != nil {
 		log.Fatal(err)
