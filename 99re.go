@@ -174,8 +174,6 @@ func init() {
 	// 创建表
 	if _, err := os.Stat(dbFile); os.IsNotExist(err) {
 		s, _ := ReadAll("./install/99re.sql")
-
-		// 创建表
 		_, err = db.Exec(string(s))
 		if err != nil {
 			panic(err)
@@ -188,7 +186,7 @@ func init() {
 func cron() {
 	for {
 		getListAll()
-		getContent()
+		// getContent()
 		time.Sleep(1 * time.Hour)
 	}
 }
@@ -313,12 +311,12 @@ func getContent() {
 // 抓取列表页 && 下载图片
 func getListAll() {
 	// 抓取列表页，入库
-	for page := 1; page <= 268; page++ {
-		getList(page)
-	}
+	// for page := 1; page <= 268; page++ {
+	// 	getList(page)
+	// }
 
 	// 下载列表页图片
-	// downloadListImg()
+	downloadListImg()
 }
 
 // 抓取列表页，入库
@@ -410,6 +408,13 @@ func downloadListImg() {
 		list = append(list, *data)
 	}
 
+	path := "/upload/com99re/img/preview/"
+	dir := "." + path
+	err = os.MkdirAll(dir, os.ModePerm)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	for _, row := range list {
 		bodyByte, err := HttpGet(row.ImgUrl)
 		if err != nil {
@@ -417,21 +422,27 @@ func downloadListImg() {
 			// panic(err)
 		}
 
+		// 存放文件名
 		filename := fmt.Sprintf("%x", md5.Sum([]byte(row.ImgUrl))) + filepath.Ext(row.ImgUrl)
-		saveFile(filename, bodyByte)
+		SaveFile(dir+filename, bodyByte)
+
+		// 更新
+		_, err = db.Update("Com99reImgList", dbs.H{
+			"ImgUrlNew": path + filename,
+		}, dbs.H{
+			"Pid": row.Pid,
+		})
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println("Update: ", row.Pid)
 	}
 }
 
 // 保存列表图片
-func saveFile(filename string, bodyByte []byte) {
-	dir := "./upload/com99re/img/" + time.Now().Format("200601") + "/"
-	err = os.MkdirAll(dir, os.ModePerm)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	fmt.Println(dir + filename)
-	f, err := os.OpenFile(dir+filename, os.O_CREATE|os.O_WRONLY, 0644)
+func SaveFile(filename string, bodyByte []byte) {
+	fmt.Println("Save: ", filename)
+	f, err := os.OpenFile(filename, os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		log.Fatal(err)
 	}
