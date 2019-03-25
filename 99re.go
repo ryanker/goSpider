@@ -22,6 +22,9 @@ import (
 var err error
 var db *dbs.DB
 
+var listNum int64
+var listNumRepeat int64
+
 type Com99reImgList struct {
 	Pid        int64
 	Url        string
@@ -186,10 +189,13 @@ func init() {
 
 func cron() {
 	for {
-		getListAll()         // 列表：抓取所有列表
+		getListAll() // 列表：抓取所有列表
+		fmt.Println("listNum:", listNum)
+		fmt.Println("listNumRepeat", listNumRepeat)
 		getContentAll()      // 内容：根据列表抓取所有内容
 		downloadListImg()    // 列表：根据列表下载列表图片
 		downloadContentImg() // 内容：根据内容下载内容图片
+		fmt.Println("done...")
 		time.Sleep(1 * time.Hour)
 	}
 }
@@ -452,6 +458,7 @@ func getList(page int) {
 		date := a.Find("span.data").Text()
 
 		// fmt.Println(url + " " + title)
+		listNum++
 
 		// 判断是否已经抓取过
 		url = "https://99a22.com" + url
@@ -460,6 +467,8 @@ func getList(page int) {
 			panic(err)
 		}
 		if n > 0 {
+			fmt.Println(url)
+			listNumRepeat++
 			return
 		}
 
