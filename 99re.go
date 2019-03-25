@@ -49,6 +49,7 @@ type Com99reImgPost struct {
 	CateHtml    string
 	Tags        string
 	TagsHtml    string
+	CommentHtml string
 	CreateDate  string
 }
 
@@ -192,8 +193,8 @@ func cron() {
 }
 
 func getContentAll() {
-	// getContent()
-	downloadContentImg()
+	getContent()
+	// downloadContentImg()
 }
 
 // 下载内容图片
@@ -355,6 +356,8 @@ func getContent() {
 		tags := eq4.Text()
 		tagsHtml, _ := eq4.Html()
 
+		commentHtml, _ := dom.Find("div.comments").Html()
+
 		// 判断是否已经抓取过
 		n, err := db.Count("Com99reImgPost", dbs.H{"url": row.Url})
 		if err != nil {
@@ -375,6 +378,7 @@ func getContent() {
 				"CateHtml":    Trim(cateHtml),
 				"Tags":        Trim(tags),
 				"TagsHtml":    Trim(tagsHtml),
+				"CommentHtml": Trim(commentHtml),
 			}, dbs.H{
 				"Pid": row.Pid,
 			})
@@ -401,6 +405,7 @@ func getContent() {
 			"CateHtml":    Trim(cateHtml),
 			"Tags":        Trim(tags),
 			"TagsHtml":    Trim(tagsHtml),
+			"CommentHtml": Trim(commentHtml),
 			"CreateDate":  time.Now().Format("2006-01-02 15:04:05"),
 		})
 		if err != nil {
@@ -578,7 +583,7 @@ func HttpGet(url string) (bodyByte []byte, err error) {
 
 func httpGet(url string) (bodyByte []byte, err error) {
 	var c = &http.Client{}
-	c.Timeout = 5 * time.Second
+	c.Timeout = 10 * time.Second
 
 	resp, err := c.Get(url)
 	if err != nil {

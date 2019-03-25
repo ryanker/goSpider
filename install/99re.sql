@@ -27,6 +27,7 @@ CREATE TABLE Com99reImgPost
   CateHtml    TEXT                  DEFAULT '',
   Tags        VARCHAR(255) NOT NULL DEFAULT '',
   TagsHtml    TEXT                  DEFAULT '',
+  CommentHtml TEXT                  DEFAULT '',
   CreateDate  DATETIME              DEFAULT CURRENT_TIMESTAMP
 );
 
