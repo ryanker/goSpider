@@ -3,7 +3,6 @@ package main
 import (
 	"../../dbs"
 	"fmt"
-	_ "github.com/mattn/go-sqlite3"
 	"os"
 	"time"
 )
@@ -22,7 +21,9 @@ func main() {
 	os.Remove("./test.db")
 
 	db, err = dbs.Open("./test.db")
-	checkErr(err)
+	if err != nil {
+		panic(err)
+	}
 	defer db.Close()
 
 	// 创建表
@@ -34,7 +35,9 @@ CREATE TABLE user
   name       TEXT             DEFAULT '',
   createDate DATETIME         DEFAULT CURRENT_TIMESTAMP
 );`)
-	checkErr(err)
+	if err != nil {
+		panic(err)
+	}
 
 	// 插入
 	uid, err := db.Insert("user", dbs.H{
@@ -42,7 +45,9 @@ CREATE TABLE user
 		"name":       "admin",
 		"createDate": time.Now().Format("2006-01-02 15:04:05"),
 	})
-	checkErr(err)
+	if err != nil {
+		panic(err)
+	}
 	fmt.Println("Insert: ", uid)
 
 	uid, err = db.Insert("user", dbs.H{
@@ -50,7 +55,9 @@ CREATE TABLE user
 		"name":       "admin2",
 		"createDate": time.Now().Format("2006-01-02 15:04:05"),
 	})
-	checkErr(err)
+	if err != nil {
+		panic(err)
+	}
 	fmt.Println("Insert: ", uid)
 
 	// 更新
@@ -60,12 +67,16 @@ CREATE TABLE user
 	}, dbs.H{
 		"uid": uid,
 	})
-	checkErr(err)
+	if err != nil {
+		panic(err)
+	}
 	fmt.Println("Update: ", n)
 
 	// 统计数量
 	n, err = db.Count("user", dbs.H{})
-	checkErr(err)
+	if err != nil {
+		panic(err)
+	}
 	fmt.Println("Count: ", n)
 
 	// ===========================================================================
@@ -88,17 +99,23 @@ CREATE TABLE user
 	err = db.Read("user", fields, *scanArr, dbs.H{
 		"uid": uid,
 	})
-	checkErr(err)
+	if err != nil {
+		panic(err)
+	}
 	u := *data
 	fmt.Printf("Read: %+v\n", u)
 
 	// 读取多条(到结构体)
 	rows, err := db.Find("user", fields, dbs.H{}, 1, 20)
-	checkErr(err)
+	if err != nil {
+		panic(err)
+	}
 	var list []User
 	for rows.Next() {
 		err = rows.Scan(*scanArr...)
-		checkErr(err)
+		if err != nil {
+			panic(err)
+		}
 		list = append(list, *data)
 	}
 	fmt.Println("List: ", list)
@@ -107,12 +124,8 @@ CREATE TABLE user
 	n, err = db.Delete("user", dbs.H{
 		"uid": uid,
 	})
-	checkErr(err)
-	fmt.Println("Delete: ", n)
-}
-
-func checkErr(err error) {
 	if err != nil {
 		panic(err)
 	}
+	fmt.Println("Delete: ", n)
 }
