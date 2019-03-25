@@ -106,7 +106,7 @@ CREATE TABLE user
 	fmt.Printf("Read: %+v\n", u)
 
 	// 读取多条(到结构体)
-	rows, err := db.Find("user", fields, dbs.H{}, 1, 20)
+	rows, err := db.Find("user", fields, dbs.H{}, dbs.H{}, 1, 20)
 	if err != nil {
 		panic(err)
 	}

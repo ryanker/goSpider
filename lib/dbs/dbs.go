@@ -92,7 +92,7 @@ func (db *DB) Count(table string, where H) (n int64, err error) {
 	return
 }
 
-func (db *DB) Find(table string, fields string, where H, page int64, pageSize int64) (rows *sql.Rows, err error) {
+func (db *DB) Find(table string, fields string, where H, order H, page int64, pageSize int64) (rows *sql.Rows, err error) {
 	rows, err = db.Query("SELECT " + fields + " FROM `" + table + "`")
 	if err != nil {
 		return
