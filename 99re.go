@@ -330,8 +330,8 @@ func getContent() {
 			log.Fatalln(err)
 		}
 
-		size := dom.Find("div.models-slider-big").Size()
-		fmt.Println("size: ", size)
+		size := dom.Find("div.models-slider-big").Find("img").Size()
+		fmt.Println("img size: ", size)
 
 		title, _ := dom.Find("div.wrap-title").Find("div.title").Html()
 		content, _ := dom.Find("div.models-slider-big").Html()
@@ -441,12 +441,9 @@ func getList(page int) {
 	}
 
 	size := dom.Find("div.thumb-content").Size()
-	fmt.Println("size: ", size)
+	fmt.Println("url size: ", size)
 
 	dom.Find("div.thumb-content").Each(func(i int, selection *goquery.Selection) {
-		// fmt.Println(selection.Text())
-		// fmt.Println(selection.Html())
-
 		a := selection.Find("a")
 		url, _ := a.Attr("href")
 		title, _ := a.Attr("title")
