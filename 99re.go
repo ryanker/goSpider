@@ -186,7 +186,7 @@ func init() {
 
 func cron() {
 	for {
-		// getListAll()
+		getListAll()
 		getContentAll()
 		time.Sleep(1 * time.Hour)
 	}
@@ -418,12 +418,12 @@ func getContent() {
 // 抓取列表页 && 下载图片
 func getListAll() {
 	// 抓取列表页，入库
-	// for page := 1; page <= 268; page++ {
-	// 	getList(page)
-	// }
+	for page := 1; page <= 268; page++ {
+		getList(page)
+	}
 
 	// 下载列表页图片
-	downloadListImg()
+	// downloadListImg()
 }
 
 // 抓取列表页，入库
