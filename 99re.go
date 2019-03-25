@@ -191,7 +191,7 @@ func cron() {
 	for {
 		getListAll() // 列表：抓取所有列表
 		fmt.Println("listNum:", listNum)
-		fmt.Println("listNumRepeat", listNumRepeat)
+		fmt.Println("listNumRepeat:", listNumRepeat)
 		getContentAll()      // 内容：根据列表抓取所有内容
 		downloadListImg()    // 列表：根据列表下载列表图片
 		downloadContentImg() // 内容：根据内容下载内容图片
@@ -248,7 +248,7 @@ func getContent() {
 		}
 
 		size := dom.Find("div.models-slider-big").Find("img").Size()
-		fmt.Println("img size: ", size)
+		fmt.Println("img size:", size)
 
 		title, _ := dom.Find("div.wrap-title").Find("div.title").Html()
 		content, _ := dom.Find("div.models-slider-big").Html()
@@ -302,7 +302,7 @@ func getContent() {
 			if err != nil {
 				panic(err)
 			}
-			fmt.Println("Update: ", row.Pid)
+			fmt.Println("Update:", row.Pid)
 			continue
 		}
 
@@ -328,7 +328,7 @@ func getContent() {
 		if err != nil {
 			panic(err)
 		}
-		fmt.Println("Insert: ", id)
+		fmt.Println("Insert:", id)
 	}
 }
 
@@ -380,7 +380,7 @@ func downloadContentImg() {
 
 		img := dom.Find("img")
 		size := img.Size()
-		fmt.Println("Pid: ", row.Pid, ", Size: ", size)
+		fmt.Println("Pid:", row.Pid, ", Size:", size)
 
 		img.Each(func(i int, selection *goquery.Selection) {
 			imgUrl, ok := selection.Attr("src")
@@ -446,7 +446,7 @@ func getList(page int) {
 	}
 
 	size := dom.Find("div.thumb-content").Size()
-	fmt.Println("url size: ", size)
+	fmt.Println("url size:", size)
 
 	dom.Find("div.thumb-content").Each(func(i int, selection *goquery.Selection) {
 		a := selection.Find("a")
@@ -485,7 +485,7 @@ func getList(page int) {
 		if err != nil {
 			panic(err)
 		}
-		fmt.Println("Insert: ", id)
+		fmt.Println("Insert:", id)
 	})
 }
 
@@ -546,13 +546,13 @@ func downloadListImg() {
 		if err != nil {
 			panic(err)
 		}
-		fmt.Println("Update: ", row.Pid)
+		fmt.Println("Update:", row.Pid)
 	}
 }
 
 // 保存列表图片
 func SaveFile(filename string, bodyByte []byte) {
-	fmt.Println("Save: ", filename)
+	fmt.Println("Save:", filename)
 	f, err := os.OpenFile(filename, os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		log.Fatal(err)
@@ -575,7 +575,7 @@ func ReadAll(filePth string) ([]byte, error) {
 
 func HttpGet(url string) (bodyByte []byte, err error) {
 	for i := 1; i <= 10; i++ {
-		fmt.Println(url, "times: ", i)
+		fmt.Println(url, "times:", i)
 		bodyByte, err = httpGet(url)
 		if err != nil {
 			time.Sleep(1)
