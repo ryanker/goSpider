@@ -185,9 +185,105 @@ func init() {
 
 func cron() {
 	for {
-		getListAll()
-		// getContent()
+		// getListAll()
+		getContentAll()
 		time.Sleep(1 * time.Hour)
+	}
+}
+
+func getContentAll() {
+	// getContent()
+	downloadContentImg()
+}
+
+// 下载内容图片
+func downloadContentImg() {
+	// 映射结构体
+	scanF := func() (ptr *Com99reImgPost, fields string, args *[]interface{}) {
+		row := Com99reImgPost{}
+		fields, scanArr := dbs.GetSqlRead(dbs.H{
+			"Pid":     &row.Pid,
+			"Content": &row.Content,
+		})
+		ptr = &row
+		args = &scanArr
+		return
+	}
+	data, fields, scanArr := scanF()
+
+	// 读取多条(到结构体)
+	rows, err := db.Find("Com99reImgPost", fields, dbs.H{}, dbs.H{}, 1, 20)
+	if err != nil {
+		panic(err)
+	}
+
+	var list []Com99reImgPost
+	for rows.Next() {
+		err = rows.Scan(*scanArr...)
+		if err != nil {
+			panic(err)
+		}
+		list = append(list, *data)
+	}
+
+	for _, row := range list {
+		parentPid := strconv.FormatInt(int64(row.Pid/1000), 10)
+		pid := strconv.FormatInt(row.Pid, 10)
+		path := "/upload/com99re/img/" + parentPid + "/" + pid + "/"
+		dir := "." + path
+		err = os.MkdirAll(dir, os.ModePerm)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		// 分析图片
+		dom, err := goquery.NewDocumentFromReader(strings.NewReader(row.Content))
+		if err != nil {
+			log.Fatalln(err)
+		}
+
+		img := dom.Find("img")
+		size := img.Size()
+		fmt.Println("Pid: ", row.Pid, ", Size: ", size)
+
+		img.Each(func(i int, selection *goquery.Selection) {
+			imgUrl, ok := selection.Attr("src")
+			if !ok {
+				panic(err)
+				// return
+			}
+
+			// 判断是否已经抓取过
+			n, err := db.Count("Com99reImgPostData", dbs.H{"ImgUrl": imgUrl})
+			if err != nil {
+				panic(err)
+			}
+			if n > 0 {
+				return
+			}
+
+			bodyByte, err := HttpGet(imgUrl)
+			if err != nil {
+				// panic(err)
+				return
+			}
+
+			// 存放文件
+			filename := fmt.Sprintf("%x", md5.Sum([]byte(imgUrl))) + filepath.Ext(imgUrl)
+			SaveFile(dir+filename, bodyByte)
+
+			// 插入
+			id, err := db.Insert("Com99reImgPostData", dbs.H{
+				"Pid":        row.Pid,
+				"ImgUrl":     imgUrl,
+				"imgUrlNew":  path + filename,
+				"CreateDate": time.Now().Format("2006-01-02 15:04:05"),
+			})
+			if err != nil {
+				panic(err)
+			}
+			fmt.Println("Data Insert, Pid:", row.Pid, ", id:", id)
+		})
 	}
 }
 
@@ -427,7 +523,7 @@ func downloadListImg() {
 			// panic(err)
 		}
 
-		// 存放文件名
+		// 存放文件
 		filename := fmt.Sprintf("%x", md5.Sum([]byte(row.ImgUrl))) + filepath.Ext(row.ImgUrl)
 		SaveFile(dir+filename, bodyByte)
 
@@ -468,7 +564,7 @@ func ReadAll(filePth string) ([]byte, error) {
 }
 
 func HttpGet(url string) (bodyByte []byte, err error) {
-	for i := 1; i <= 5; i++ {
+	for i := 1; i <= 10; i++ {
 		fmt.Println(url, "times: ", i)
 		bodyByte, err = httpGet(url)
 		if err != nil {
@@ -482,7 +578,7 @@ func HttpGet(url string) (bodyByte []byte, err error) {
 
 func httpGet(url string) (bodyByte []byte, err error) {
 	var c = &http.Client{}
-	c.Timeout = 10 * time.Second
+	c.Timeout = 5 * time.Second
 
 	resp, err := c.Get(url)
 	if err != nil {
