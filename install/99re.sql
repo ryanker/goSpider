@@ -1,39 +1,39 @@
-CREATE TABLE imgList
+CREATE TABLE Com99reImgList
 (
-  pid        INTEGER PRIMARY KEY AUTOINCREMENT,
-  url        VARCHAR(255) NOT NULL DEFAULT '',
-  title      VARCHAR(255) NOT NULL DEFAULT '',
-  imgUrl     VARCHAR(255) NOT NULL DEFAULT '',
-  imgUrlNew  VARCHAR(255) NOT NULL DEFAULT '',
-  imgNum     INTEGER      NOT NULL DEFAULT '0',
-  views      INTEGER      NOT NULL DEFAULT '0',
-  date       VARCHAR(255) NOT NULL DEFAULT '',
-  createDate DATETIME              DEFAULT CURRENT_TIMESTAMP
+  Pid        INTEGER PRIMARY KEY AUTOINCREMENT,
+  Url        VARCHAR(255) NOT NULL DEFAULT '',
+  Title      VARCHAR(255) NOT NULL DEFAULT '',
+  ImgUrl     VARCHAR(255) NOT NULL DEFAULT '',
+  ImgUrlNew  VARCHAR(255) NOT NULL DEFAULT '',
+  ImgNum     INTEGER      NOT NULL DEFAULT '0',
+  Views      INTEGER      NOT NULL DEFAULT '0',
+  Date       VARCHAR(255) NOT NULL DEFAULT '',
+  CreateDate DATETIME              DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE imgPost
+CREATE TABLE Com99reImgPost
 (
-  pid         INTEGER PRIMARY KEY AUTOINCREMENT,
-  url         VARCHAR(255) NOT NULL DEFAULT '',
-  title       VARCHAR(255) NOT NULL DEFAULT '',
-  content     TEXT                  DEFAULT '',
-  description VARCHAR(255) NOT NULL DEFAULT '',
-  imgNum      INTEGER      NOT NULL DEFAULT '0',
-  views       INTEGER      NOT NULL DEFAULT '0',
-  date        VARCHAR(255) NOT NULL DEFAULT '',
-  author      VARCHAR(255) NOT NULL DEFAULT '',
-  authorHtml  TEXT                  DEFAULT '',
-  cate        VARCHAR(255) NOT NULL DEFAULT '',
-  cateHtml    TEXT                  DEFAULT '',
-  tags        VARCHAR(255) NOT NULL DEFAULT '',
-  tagsHtml    TEXT                  DEFAULT '',
-  createDate  DATETIME              DEFAULT CURRENT_TIMESTAMP
+  Pid         INTEGER PRIMARY KEY AUTOINCREMENT,
+  Url         VARCHAR(255) NOT NULL DEFAULT '',
+  Title       VARCHAR(255) NOT NULL DEFAULT '',
+  Content     TEXT                  DEFAULT '',
+  Description VARCHAR(255) NOT NULL DEFAULT '',
+  ImgNum      INTEGER      NOT NULL DEFAULT '0',
+  Views       INTEGER      NOT NULL DEFAULT '0',
+  Date        VARCHAR(255) NOT NULL DEFAULT '',
+  Author      VARCHAR(255) NOT NULL DEFAULT '',
+  AuthorHtml  TEXT                  DEFAULT '',
+  Cate        VARCHAR(255) NOT NULL DEFAULT '',
+  CateHtml    TEXT                  DEFAULT '',
+  Tags        VARCHAR(255) NOT NULL DEFAULT '',
+  TagsHtml    TEXT                  DEFAULT '',
+  CreateDate  DATETIME              DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE imgPostData
+CREATE TABLE Com99reImgPostData
 (
   dataId     INTEGER PRIMARY KEY AUTOINCREMENT,
-  pid        INTEGER      NOT NULL DEFAULT '0',
+  Pid        INTEGER      NOT NULL DEFAULT '0',
   imgUrl     VARCHAR(255) NOT NULL DEFAULT '',
   imgUrlNew  VARCHAR(255) NOT NULL DEFAULT '',
   createDate DATETIME              DEFAULT CURRENT_TIMESTAMP
