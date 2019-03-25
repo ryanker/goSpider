@@ -234,46 +234,30 @@ func getContent() {
 		}
 
 		size := dom.Find("div.models-slider-big").Size()
-		fmt.Println(size)
+		fmt.Println("size: ", size)
 
 		title, _ := dom.Find("div.wrap-title").Find("div.title").Html()
 		content, _ := dom.Find("div.models-slider-big").Html()
 
 		u := dom.Find("ul.information").Find("span.value")
-		description := u.Eq(0).Text()
-		imgNum := u.Eq(1).Text()
+		views := u.Eq(0).Text()
+		date := u.Eq(1).Text()
 
-		d := dom.Find("div.description-block")
-		desc := d.Find("div.wrap-overflow")
-		views := desc.Eq(0).Find("div.desc-video").Text()
-		date := desc.Eq(1).Find("div.desc-video").Text()
+		desc := dom.Find("div.description-block").Find("div.wrap-overflow")
+		description := desc.Eq(0).Find("div.desc-video").Text()
+		imgNum := desc.Eq(1).Find("div.desc-video").Text()
+
 		eq2 := desc.Eq(2).Find("div.name-avtor-dwnl")
-		eq3 := desc.Eq(3)
-		eq4 := desc.Eq(4)
-
 		author := eq2.Text()
 		authorHtml, _ := eq2.Html()
 
+		eq3 := desc.Eq(3)
 		cate := eq3.Text()
 		cateHtml, _ := eq3.Html()
 
+		eq4 := desc.Eq(4)
 		tags := eq4.Text()
 		tagsHtml, _ := eq4.Html()
-
-		// fmt.Println(content)
-		// fmt.Println(title)
-		// fmt.Println(description)
-		// fmt.Println(imgNum)
-		// fmt.Println(views)
-		// fmt.Println(date)
-		// fmt.Println(author)
-		// fmt.Println(authorHtml)
-		// fmt.Println(cate)
-		// fmt.Println(cateHtml)
-		// fmt.Println(tags)
-		// fmt.Println(tagsHtml)
-		// fmt.Println(row.Url)
-		// os.Exit(1)
 
 		// 判断是否已经抓取过
 		n, err := db.Count("Com99reImgPost", dbs.H{"url": row.Url})
@@ -281,24 +265,46 @@ func getContent() {
 			panic(err)
 		}
 		if n > 0 {
-			return
+			// 更新
+			_, err = db.Update("Com99reImgPost", dbs.H{
+				"Title":       Trim(title),
+				"Content":     Trim(content),
+				"Description": Trim(description),
+				"ImgNum":      Trim(imgNum),
+				"Views":       Trim(views),
+				"Date":        Trim(date),
+				"Author":      Trim(author),
+				"AuthorHtml":  Trim(authorHtml),
+				"Cate":        Trim(cate),
+				"CateHtml":    Trim(cateHtml),
+				"Tags":        Trim(tags),
+				"TagsHtml":    Trim(tagsHtml),
+			}, dbs.H{
+				"Pid": row.Pid,
+			})
+			if err != nil {
+				panic(err)
+			}
+			fmt.Println("Update: ", row.Pid)
+			continue
 		}
 
 		// 插入
 		id, err := db.Insert("Com99reImgPost", dbs.H{
+			"Pid":         row.Pid,
 			"Url":         row.Url,
-			"Title":       trim(title),
-			"Content":     trim(content),
-			"Description": trim(description),
-			"ImgNum":      trim(imgNum),
-			"Views":       trim(views),
-			"Date":        trim(date),
-			"Author":      trim(author),
-			"AuthorHtml":  trim(authorHtml),
-			"Cate":        trim(cate),
-			"CateHtml":    trim(cateHtml),
-			"Tags":        trim(tags),
-			"TagsHtml":    trim(tagsHtml),
+			"Title":       Trim(title),
+			"Content":     Trim(content),
+			"Description": Trim(description),
+			"ImgNum":      Trim(imgNum),
+			"Views":       Trim(views),
+			"Date":        Trim(date),
+			"Author":      Trim(author),
+			"AuthorHtml":  Trim(authorHtml),
+			"Cate":        Trim(cate),
+			"CateHtml":    Trim(cateHtml),
+			"Tags":        Trim(tags),
+			"TagsHtml":    Trim(tagsHtml),
 			"CreateDate":  time.Now().Format("2006-01-02 15:04:05"),
 		})
 		if err != nil {
@@ -349,7 +355,6 @@ func getList(page int) {
 		date := a.Find("span.data").Text()
 
 		// fmt.Println(url + " " + title)
-		fmt.Println(url)
 
 		// 判断是否已经抓取过
 		url = "https://99a22.com" + url
@@ -489,6 +494,6 @@ func httpGet(url string) (bodyByte []byte, err error) {
 	return
 }
 
-func trim(s string) string {
+func Trim(s string) string {
 	return strings.Trim(s, " \t\r\n")
 }
