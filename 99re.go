@@ -399,7 +399,7 @@ func downloadContentImg() {
 			}
 
 			// 存放文件
-			filename := fmt.Sprintf("%x", md5.Sum([]byte(imgUrl))) + filepath.Ext(imgUrl)
+			filename := fmt.Sprintf("%v_%x", i+1, md5.Sum([]byte(imgUrl))) + filepath.Ext(imgUrl)
 			SaveFile(dir+filename, bodyByte)
 
 			// 插入
