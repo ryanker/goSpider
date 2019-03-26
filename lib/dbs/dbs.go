@@ -44,6 +44,10 @@ func (db *DB) Insert(table string, data H) (id int64, err error) {
 	}
 
 	id, err = res.LastInsertId()
+	if err != nil {
+		ErrorLogWrite(err, s, args...)
+		return
+	}
 	return
 }
 
@@ -65,6 +69,10 @@ func (db *DB) Delete(table string, where H) (n int64, err error) {
 	}
 
 	n, err = res.RowsAffected()
+	if err != nil {
+		ErrorLogWrite(err, s, args...)
+		return
+	}
 	return
 }
 

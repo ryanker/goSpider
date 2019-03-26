@@ -24,6 +24,7 @@ func main() {
 	dbs.LogFile = "./db.log"
 	dbs.ErrorLogFile = "./db.error.log"
 
+	// 打开数据库
 	db, err = dbs.Open("./test.db")
 	if err != nil {
 		panic(err)
