@@ -5,6 +5,7 @@ import (
 	"crypto/md5"
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
+	"github.com/cavaliercoder/grab"
 	"html/template"
 	"io/ioutil"
 	"log"
@@ -96,6 +97,7 @@ func main() {
 				"Url":        &row.Url,
 				"Title":      &row.Title,
 				"ImgUrl":     &row.ImgUrl,
+				"ImgUrlNew":  &row.ImgUrlNew,
 				"ImgNum":     &row.ImgNum,
 				"Views":      &row.Views,
 				"Date":       &row.Date,
@@ -108,7 +110,7 @@ func main() {
 		data, fields, scanArr := scanF()
 
 		// 读取多条(到结构体)
-		rows, err := db.Find("Com99reImgList", fields, dbs.H{}, dbs.H{}, 1, 20)
+		rows, err := db.Find("Com99reImgList", fields, dbs.H{}, "", 0, 0)
 		if err != nil {
 			c.JSON(http.StatusOK, gin.H{"code": "-1", "message": "读取数据库失败"})
 		}
@@ -135,13 +137,14 @@ func main() {
 				"Title":       &row.Title,
 				"Content":     &row.Content,
 				"Description": &row.Description,
-				// "ImgNum":      &row.ImgNum,
-				// "Views":       &row.Views,
-				"Date":       &row.Date,
-				"Author":     &row.Author,
-				"Cate":       &row.Cate,
-				"Tags":       &row.Tags,
-				"CreateDate": &row.CreateDate,
+				"ImgNum":      &row.ImgNum,
+				"Views":       &row.Views,
+				"Date":        &row.Date,
+				"Author":      &row.Author,
+				"Cate":        &row.Cate,
+				"Tags":        &row.Tags,
+				"CommentHtml": &row.CommentHtml,
+				"CreateDate":  &row.CreateDate,
 			})
 			ptr = &row
 			args = &scanArr
@@ -189,11 +192,11 @@ func init() {
 
 func cron() {
 	for {
-		getListAll() // 列表：抓取所有列表
-		fmt.Println("listNum:", listNum)
-		fmt.Println("listNumRepeat:", listNumRepeat)
-		getContentAll()      // 内容：根据列表抓取所有内容
-		downloadListImg()    // 列表：根据列表下载列表图片
+		// getListAll() // 列表：抓取所有列表
+		// fmt.Println("listNum:", listNum)
+		// fmt.Println("listNumRepeat:", listNumRepeat)
+		// getContentAll()      // 内容：根据列表抓取所有内容
+		// downloadListImg()    // 列表：根据列表下载列表图片
 		downloadContentImg() // 内容：根据内容下载内容图片
 		fmt.Println("done...")
 		time.Sleep(1 * time.Hour)
@@ -221,7 +224,7 @@ func getContent() {
 	data, fields, scanArr := scanF()
 
 	// 读取多条(到结构体)
-	rows, err := db.Find("Com99reImgList", fields, dbs.H{}, dbs.H{}, 1, 20)
+	rows, err := db.Find("Com99reImgList", fields, dbs.H{}, "", 0, 0)
 	if err != nil {
 		panic(err)
 	}
@@ -348,7 +351,7 @@ func downloadContentImg() {
 	data, fields, scanArr := scanF()
 
 	// 读取多条(到结构体)
-	rows, err := db.Find("Com99reImgPost", fields, dbs.H{}, dbs.H{}, 1, 20)
+	rows, err := db.Find("Com99reImgPost", fields, dbs.H{}, "", 0, 0)
 	if err != nil {
 		panic(err)
 	}
@@ -398,15 +401,18 @@ func downloadContentImg() {
 				return
 			}
 
-			bodyByte, err := HttpGet(imgUrl)
-			if err != nil {
-				// panic(err)
-				return
-			}
+			// bodyByte, err := HttpGet(imgUrl)
+			// if err != nil {
+			// 	// panic(err)
+			// 	return
+			// }
 
-			// 存放文件
+			// 存放文件名
 			filename := fmt.Sprintf("%v_%x", i+1, md5.Sum([]byte(imgUrl))) + filepath.Ext(imgUrl)
-			SaveFile(dir+filename, bodyByte)
+			// SaveFile(dir+filename, bodyByte)
+
+			// 下载文件
+			DownloadFile(imgUrl, dir+filename)
 
 			// 插入
 			id, err := db.Insert("Com99reImgPostData", dbs.H{
@@ -505,7 +511,7 @@ func downloadListImg() {
 	data, fields, scanArr := scanF()
 
 	// 读取多条(到结构体)
-	rows, err := db.Find("Com99reImgList", fields, dbs.H{}, dbs.H{}, 1, 20)
+	rows, err := db.Find("Com99reImgList", fields, dbs.H{}, "", 0, 0)
 	if err != nil {
 		panic(err)
 	}
@@ -527,15 +533,18 @@ func downloadListImg() {
 	}
 
 	for _, row := range list {
-		bodyByte, err := HttpGet(row.ImgUrl)
-		if err != nil {
-			continue
-			// panic(err)
-		}
+		// bodyByte, err := HttpGet(row.ImgUrl)
+		// if err != nil {
+		// 	continue
+		// 	// panic(err)
+		// }
 
-		// 存放文件
+		// 存放文件名
 		filename := fmt.Sprintf("%x", md5.Sum([]byte(row.ImgUrl))) + filepath.Ext(row.ImgUrl)
-		SaveFile(dir+filename, bodyByte)
+		// SaveFile(dir+filename, bodyByte)
+
+		// 下载文件
+		DownloadFile(row.ImgUrl, dir+filename)
 
 		// 更新
 		_, err = db.Update("Com99reImgList", dbs.H{
@@ -602,4 +611,42 @@ func httpGet(url string) (bodyByte []byte, err error) {
 
 func Trim(s string) string {
 	return strings.Trim(s, " \t\r\n")
+}
+
+func DownloadFile(url string, dst string) {
+	// create client
+	client := grab.NewClient()
+	req, _ := grab.NewRequest(dst, url)
+
+	// start download
+	fmt.Printf("Downloading %v...\n", req.URL())
+	resp := client.Do(req)
+	fmt.Printf("  %v\n", resp.HTTPResponse.Status)
+
+	// start UI loop
+	t := time.NewTicker(1 * time.Second)
+	defer t.Stop()
+
+Loop:
+	for {
+		select {
+		case <-t.C:
+			fmt.Printf("  transferred %v / %v bytes (%.2f%%)\n",
+				resp.BytesComplete(),
+				resp.Size,
+				100*resp.Progress())
+
+		case <-resp.Done:
+			// download is complete
+			break Loop
+		}
+	}
+
+	// check for errors
+	if err := resp.Err(); err != nil {
+		fmt.Fprintf(os.Stderr, "Download failed: %v\n", err)
+		os.Exit(1)
+	}
+
+	fmt.Printf("Download saved to %v \n", resp.Filename)
 }
