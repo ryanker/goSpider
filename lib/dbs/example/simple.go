@@ -20,6 +20,10 @@ var db *dbs.DB
 func main() {
 	os.Remove("./test.db")
 
+	// 开启日志
+	dbs.LogFile = "./db.log"
+	dbs.ErrorLogFile = "./db.error.log"
+
 	db, err = dbs.Open("./test.db")
 	if err != nil {
 		panic(err)
