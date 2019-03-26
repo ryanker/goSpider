@@ -53,7 +53,7 @@ CREATE TABLE user
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("Insert: ", uid)
+	fmt.Println("Insert:", uid)
 
 	uid, err = db.Insert("user", dbs.H{
 		"gid":        1,
@@ -63,7 +63,7 @@ CREATE TABLE user
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("Insert: ", uid)
+	fmt.Println("Insert:", uid)
 
 	// 更新
 	n, err := db.Update("user", dbs.H{
@@ -75,14 +75,14 @@ CREATE TABLE user
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("Update: ", n)
+	fmt.Println("Update:", n)
 
 	// 统计数量
 	n, err = db.Count("user", dbs.H{})
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("Count: ", n)
+	fmt.Println("Count:", n)
 
 	// ===========================================================================
 	// 映射结构体
@@ -123,7 +123,7 @@ CREATE TABLE user
 		}
 		list = append(list, *data)
 	}
-	fmt.Println("List: ", list)
+	fmt.Println("List:", list)
 
 	// 删除
 	n, err = db.Delete("user", dbs.H{
@@ -132,5 +132,5 @@ CREATE TABLE user
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("Delete: ", n)
+	fmt.Println("Delete:", n)
 }
