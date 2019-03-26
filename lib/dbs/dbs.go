@@ -197,7 +197,14 @@ func GetSqlWhere(where H) (whereStr string, args []interface{}) {
 	}
 	whereStr = " WHERE "
 	for k, v := range where {
-		whereStr += "`" + k + "`=? AND "
+		i := strings.Index(k, " ")
+		if i == -1 {
+			whereStr += "`" + k + "`=? AND "
+		} else {
+			key := k[:i]
+			symbol := strings.Trim(k[i:], " ")
+			whereStr += "`" + key + "`" + symbol + "? AND "
+		}
 		args = append(args, v)
 	}
 	whereStr = strings.TrimSuffix(whereStr, " AND ")
