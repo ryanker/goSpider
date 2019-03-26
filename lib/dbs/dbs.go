@@ -184,7 +184,13 @@ func GetSqlInsert(data H) (kStr, vStr string, args []interface{}) {
 
 func GetSqlUpdate(data H) (setStr string, args []interface{}) {
 	for k, v := range data {
-		setStr += "`" + k + "`=?, "
+		symbol := k[:1]
+		if symbol == "+" || symbol == "-" {
+			key := k[1:]
+			setStr += "`" + key + "`=`" + key + "`" + symbol + "?, "
+		} else {
+			setStr += "`" + k + "`=?, "
+		}
 		args = append(args, v)
 	}
 	setStr = strings.TrimSuffix(setStr, ", ")
