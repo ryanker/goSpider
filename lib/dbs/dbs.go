@@ -3,6 +3,7 @@ package dbs
 import (
 	"database/sql"
 	_ "github.com/mattn/go-sqlite3"
+	"strconv"
 	"strings"
 )
 
@@ -92,8 +93,21 @@ func (db *DB) Count(table string, where H) (n int64, err error) {
 	return
 }
 
-func (db *DB) Find(table string, fields string, where H, order H, page int64, pageSize int64) (rows *sql.Rows, err error) {
-	rows, err = db.Query("SELECT " + fields + " FROM `" + table + "`")
+func (db *DB) Find(table string, fields string, where H, order string, page int64, pageSize int64) (rows *sql.Rows, err error) {
+	whereStr, args := GetSqlWhere(where)
+	orderStr := ""
+	limitStr := ""
+	if order != "" {
+		orderStr = " ORDER BY " + order
+	}
+	if page > 0 && pageSize > 0 {
+		start := (page - 1) * pageSize
+		limitStr = " LIMIT " + strconv.FormatInt(start, 10) + "," + strconv.FormatInt(pageSize, 10)
+	} else if page == 0 && pageSize > 0 {
+		limitStr = " LIMIT " + strconv.FormatInt(pageSize, 10)
+	}
+	s := "SELECT " + fields + " FROM `" + table + "`" + whereStr + orderStr + limitStr
+	rows, err = db.Query(s, args...)
 	if err != nil {
 		return
 	}
