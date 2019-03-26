@@ -9,6 +9,7 @@ import (
 	"html/template"
 	"io/ioutil"
 	"log"
+	"math"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -59,7 +60,7 @@ type Com99reImgPost struct {
 
 type Com99reImgPostData struct {
 	DataId     int64
-	Pid        string
+	Pid        int64
 	ImgUrl     string
 	ImgUrlNew  string
 	CreateDate string
@@ -171,6 +172,10 @@ func main() {
 }
 
 func init() {
+	// 开启日志
+	dbs.LogFile = "./db.log"
+	dbs.ErrorLogFile = "./db.error.log"
+
 	dbFile := "./db/99re.db"
 	db, err = dbs.Open(dbFile)
 	if err != nil {
@@ -197,7 +202,8 @@ func cron() {
 		// fmt.Println("listNumRepeat:", listNumRepeat)
 		// getContentAll()      // 内容：根据列表抓取所有内容
 		// downloadListImg()    // 列表：根据列表下载列表图片
-		downloadContentImg() // 内容：根据内容下载内容图片
+		getPostDate() // 内容：根据内容生成图片附件数据
+		// downloadContentImg() // 内容：根据内容下载内容图片
 		fmt.Println("done...")
 		time.Sleep(1 * time.Hour)
 	}
@@ -335,8 +341,8 @@ func getContent() {
 	}
 }
 
-// 内容：根据内容下载内容图片
-func downloadContentImg() {
+// 内容：根据内容生成图片附件数据
+func getPostDate() {
 	// 映射结构体
 	scanF := func() (ptr *Com99reImgPost, fields string, args *[]interface{}) {
 		row := Com99reImgPost{}
@@ -366,15 +372,6 @@ func downloadContentImg() {
 	}
 
 	for _, row := range list {
-		parentPid := strconv.FormatInt(int64(row.Pid/1000), 10)
-		pid := strconv.FormatInt(row.Pid, 10)
-		path := "/upload/com99re/img/" + parentPid + "/" + pid + "/"
-		dir := "." + path
-		err = os.MkdirAll(dir, os.ModePerm)
-		if err != nil {
-			log.Fatal(err)
-		}
-
 		// 分析图片
 		dom, err := goquery.NewDocumentFromReader(strings.NewReader(row.Content))
 		if err != nil {
@@ -401,24 +398,11 @@ func downloadContentImg() {
 				return
 			}
 
-			// bodyByte, err := HttpGet(imgUrl)
-			// if err != nil {
-			// 	// panic(err)
-			// 	return
-			// }
-
-			// 存放文件名
-			filename := fmt.Sprintf("%v_%x", i+1, md5.Sum([]byte(imgUrl))) + filepath.Ext(imgUrl)
-			// SaveFile(dir+filename, bodyByte)
-
-			// 下载文件
-			DownloadFile(imgUrl, dir+filename)
-
 			// 插入
 			id, err := db.Insert("Com99reImgPostData", dbs.H{
-				"Pid":        row.Pid,
-				"ImgUrl":     imgUrl,
-				"imgUrlNew":  path + filename,
+				"Pid":    row.Pid,
+				"ImgUrl": imgUrl,
+				// "imgUrlNew":  path + filename,
 				"CreateDate": time.Now().Format("2006-01-02 15:04:05"),
 			})
 			if err != nil {
@@ -426,6 +410,72 @@ func downloadContentImg() {
 			}
 			fmt.Println("Data Insert, Pid:", row.Pid, ", id:", id)
 		})
+	}
+}
+
+// 内容：根据内容下载内容图片
+func downloadContentImg() {
+	// 映射结构体
+	scanF := func() (ptr *Com99reImgPostData, fields string, args *[]interface{}) {
+		row := Com99reImgPostData{}
+		fields, scanArr := dbs.GetSqlRead(dbs.H{
+			"DataId":    &row.DataId,
+			"Pid":       &row.Pid,
+			"ImgUrl":    &row.ImgUrl,
+			"ImgUrlNew": &row.ImgUrlNew,
+		})
+		ptr = &row
+		args = &scanArr
+		return
+	}
+	data, fields, scanArr := scanF()
+
+	// 统计数量
+	n, err := db.Count("Com99reImgPostData", dbs.H{})
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("PostData Count:", n)
+
+	pageSize := int64(1000)
+	maxPage := int64(math.Ceil(float64(n / pageSize)))
+
+	for page := int64(1); page <= maxPage; maxPage++ {
+		// 读取多条(到结构体)
+		rows, err := db.Find("Com99reImgPostData", fields, dbs.H{}, "DataId ASC", page, pageSize)
+		if err != nil {
+			panic(err)
+		}
+
+		var list []Com99reImgPostData
+		for rows.Next() {
+			err = rows.Scan(*scanArr...)
+			if err != nil {
+				panic(err)
+			}
+			list = append(list, *data)
+		}
+
+		for i, row := range list {
+			if row.ImgUrlNew != "" {
+				continue
+			}
+
+			parentPid := strconv.FormatInt(int64(row.Pid/1000), 10)
+			pid := strconv.FormatInt(row.Pid, 10)
+			path := "/upload/com99re/img/" + parentPid + "/" + pid + "/"
+			dir := "." + path
+			err = os.MkdirAll(dir, os.ModePerm)
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			// 存放文件名
+			filename := fmt.Sprintf("%v_%x", i+1, md5.Sum([]byte(row.ImgUrl))) + filepath.Ext(row.ImgUrl)
+
+			// 下载文件
+			DownloadFile(row.ImgUrl, dir+filename)
+		}
 	}
 }
 
