@@ -44,10 +44,14 @@
             <el-row>
                 <el-col :span="4" v-for="(v, index) in imgList" :key="index">
                     <el-card :body-style="{ padding: '0px' }" style="height:320px;padding:5px 0;text-align:center">
-                        <div style="height: 250px"><img :src="v.ImgUrl" style="height: 100%"></div>
+                        <div style="height: 250px">
+                            <a :href="'/read?Pid='+v.Pid" target="_blank">
+                                <img :src="v.ImgUrlNew ? v.ImgUrlNew : v.ImgUrl" style="height: 100%">
+                            </a>
+                        </div>
                         <div style="padding: 5px 0 0;">
+                            #{{ v.Pid }} | {{ v.Date }} | {{ v.Views }} | {{ v.ImgNum }}P<br>
                             <a :href="'/read?Pid='+v.Pid" target="_blank">{{ v.Title }}</a><br>
-                            #{{ v.Pid }} | {{ v.ImgNum }}P | {{ v.Date }} | {{ v.Views }}
                         </div>
                     </el-card>
                 </el-col>
