@@ -111,7 +111,7 @@ func main() {
 		data, fields, scanArr := scanF()
 
 		// 读取多条(到结构体)
-		rows, err := db.Find("Com99reImgList", fields, dbs.H{}, "", 0, 0)
+		rows, err := db.Find("Com99reImgList", fields, dbs.H{}, "", 1, 120)
 		if err != nil {
 			c.JSON(http.StatusOK, gin.H{"code": "-1", "message": "读取数据库失败"})
 		}
@@ -165,6 +165,42 @@ func main() {
 		c.JSON(http.StatusOK, gin.H{"code": "0", "data": *data})
 	})
 
+	r.GET("/img/dataRead", func(c *gin.Context) {
+		// 映射结构体
+		scanF := func() (ptr *Com99reImgPostData, fields string, args *[]interface{}) {
+			row := Com99reImgPostData{}
+			fields, scanArr := dbs.GetSqlRead(dbs.H{
+				"DataId":    &row.DataId,
+				"Pid":       &row.Pid,
+				"ImgUrl":    &row.ImgUrl,
+				"ImgUrlNew": &row.ImgUrlNew,
+			})
+			ptr = &row
+			args = &scanArr
+			return
+		}
+		data, fields, scanArr := scanF()
+
+		Pid := c.DefaultQuery("Pid", "")
+
+		// 读取多条(到结构体)
+		rows, err := db.Find("Com99reImgPostData", fields, dbs.H{"Pid": Pid}, "DataId ASC", 0, 200)
+		if err != nil {
+			c.JSON(http.StatusOK, gin.H{"code": "-1", "message": "读取数据库失败"})
+		}
+
+		var list []Com99reImgPostData
+		for rows.Next() {
+			err = rows.Scan(*scanArr...)
+			if err != nil {
+				panic(err)
+			}
+			list = append(list, *data)
+		}
+
+		c.JSON(http.StatusOK, gin.H{"code": "0", "list": list})
+	})
+
 	err := r.Run("0.0.0.0:8000")
 	if err != nil {
 		panic(err)
@@ -202,8 +238,8 @@ func cron() {
 		// fmt.Println("listNumRepeat:", listNumRepeat)
 		// getContentAll()      // 内容：根据列表抓取所有内容
 		// downloadListImg()    // 列表：根据列表下载列表图片
-		getPostDate() // 内容：根据内容生成图片附件数据
-		// downloadContentImg() // 内容：根据内容下载内容图片
+		// getPostDate() // 内容：根据内容生成图片附件数据
+		downloadContentImg() // 内容：根据内容下载内容图片
 		fmt.Println("done...")
 		time.Sleep(1 * time.Hour)
 	}
@@ -440,7 +476,7 @@ func downloadContentImg() {
 	pageSize := int64(1000)
 	maxPage := int64(math.Ceil(float64(n / pageSize)))
 
-	for page := int64(1); page <= maxPage; maxPage++ {
+	for page := int64(1); page <= maxPage; page++ {
 		// 读取多条(到结构体)
 		rows, err := db.Find("Com99reImgPostData", fields, dbs.H{}, "DataId ASC", page, pageSize)
 		if err != nil {
@@ -695,7 +731,7 @@ Loop:
 	// check for errors
 	if err := resp.Err(); err != nil {
 		fmt.Fprintf(os.Stderr, "Download failed: %v\n", err)
-		os.Exit(1)
+		// os.Exit(1)
 	}
 
 	fmt.Printf("Download saved to %v \n", resp.Filename)

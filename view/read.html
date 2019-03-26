@@ -43,7 +43,8 @@
         </el-header>
         <el-main style="text-align: center">
             <div>{{ d.Title }} ({{ d.ImgNum }}P)</div>
-            <div v-html="d.Content"></div>
+            <!--<div v-html="d.Content"></div>-->
+            <div v-for="v in imgList"><img :src="v.ImgUrlNew ? v.ImgUrlNew : v.ImgUrl"/></div>
         </el-main>
         <el-footer>@2019</el-footer>
     </el-container>
@@ -63,9 +64,11 @@
 			return {
 				menuActive: '1',
 				d: {},
+				imgList: {},
 			}
 		},
 		mounted() {
+			// 内容
 			axios.get('/img/read?Pid=' + Pid).then(res => {
 				const r = res.data;
 				if (!r) {
@@ -74,6 +77,22 @@
 					this.$message.error(r.message);
 				} else {
 					this.d = r.data || {}
+				}
+			}).catch((error) => {
+				console.log(error);
+				this.$message.error('服务器错误，请稍后再试');
+			});
+
+			// 内容图片
+			axios.get('/img/dataRead?Pid=' + Pid).then(res => {
+				const r = res.data;
+				if (!r) {
+					this.$message.error('服务器错误，请稍后再试');
+				} else if (r.code !== '0') {
+					this.$message.error(r.message);
+				} else {
+					this.imgList = r.list || {}
+					console.log(this.imgList)
 				}
 			}).catch((error) => {
 				console.log(error);
