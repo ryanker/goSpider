@@ -492,6 +492,7 @@ func downloadContentImg() {
 			list = append(list, *data)
 		}
 
+		reqs := make([]*grab.Request, 0)
 		for i, row := range list {
 			if row.ImgUrlNew != "" {
 				continue
@@ -510,7 +511,42 @@ func downloadContentImg() {
 			filename := fmt.Sprintf("%v_%x", i+1, md5.Sum([]byte(row.ImgUrl))) + filepath.Ext(row.ImgUrl)
 
 			// 下载文件
-			DownloadFile(row.ImgUrl, dir+filename)
+			// DownloadFile(row.ImgUrl, dir+filename)
+			req, err := grab.NewRequest(dir+filename, row.ImgUrl)
+			if err != nil {
+				fmt.Println("NewRequest error:", err.Error())
+				// panic(err)
+			}
+			req.Tag = row.DataId
+			reqs = append(reqs, req)
+		}
+
+		// start downloads with 5 workers
+		client := grab.NewClient()
+		respch := client.DoBatch(5, reqs...)
+
+		// check each response
+		for resp := range respch {
+			fmt.Printf("Downloaded %s to %s Size:%v DataId:%v\n",
+				resp.Request.URL(),
+				resp.Filename,
+				resp.Size,
+				resp.Request.Tag,
+			)
+			if err := resp.Err(); err != nil {
+				fmt.Printf("Error: %s\n", err.Error())
+				// panic(err)
+			} else {
+				// 更新
+				_, err = db.Update("Com99reImgPostData", dbs.H{
+					"ImgUrlNew": resp.Filename[1:],
+				}, dbs.H{
+					"DataId": resp.Request.Tag,
+				})
+				if err != nil {
+					panic(err)
+				}
+			}
 		}
 	}
 }
