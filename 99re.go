@@ -233,12 +233,12 @@ func init() {
 
 func cron() {
 	for {
-		// getListAll() // 列表：抓取所有列表
-		// fmt.Println("listNum:", listNum)
-		// fmt.Println("listNumRepeat:", listNumRepeat)
-		// getContentAll()      // 内容：根据列表抓取所有内容
-		// downloadListImg()    // 列表：根据列表下载列表图片
-		// getPostDate() // 内容：根据内容生成图片附件数据
+		getListAll() // 列表：抓取所有列表
+		fmt.Println("listNum:", listNum)
+		fmt.Println("listNumRepeat:", listNumRepeat)
+		getContentAll()      // 内容：根据列表抓取所有内容
+		downloadListImg()    // 列表：根据列表下载列表图片
+		getPostDate()        // 内容：根据内容生成图片附件数据
 		downloadContentImg() // 内容：根据内容下载内容图片
 		fmt.Println("done...")
 		time.Sleep(1 * time.Hour)
@@ -525,8 +525,28 @@ func downloadContentImg() {
 		client := grab.NewClient()
 		respch := client.DoBatch(5, reqs...)
 
+		// start UI loop
+		t := time.NewTicker(1 * time.Second)
+		defer t.Stop()
+
 		// check each response
 		for resp := range respch {
+		Loop:
+			for {
+				select {
+				case <-t.C:
+					fmt.Printf("Downloaded %s transferred %v / %v bytes (%.2f%%)\n",
+						resp.Request.URL(),
+						resp.BytesComplete(),
+						resp.Size,
+						100*resp.Progress())
+
+				case <-resp.Done:
+					// download is complete
+					break Loop
+				}
+			}
+
 			fmt.Printf("Downloaded %s to %s Size:%v DataId:%v\n",
 				resp.Request.URL(),
 				resp.Filename,
