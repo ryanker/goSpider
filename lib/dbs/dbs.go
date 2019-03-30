@@ -211,7 +211,7 @@ func GetSqlWhere(where H) (whereStr string, args []interface{}) {
 		} else {
 			key := k[:i]
 			symbol := strings.Trim(k[i:], " ")
-			whereStr += "`" + key + "`" + symbol + "? AND "
+			whereStr += "`" + key + "` " + symbol + " ? AND "
 		}
 		args = append(args, v)
 	}
