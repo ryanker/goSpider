@@ -7,27 +7,20 @@ import (
 	"../model"
 )
 
-func RuleCreate(c *gin.Context) {
-	m := model.Rule{}
+func RuleCateCreate(c *gin.Context) {
+	m := model.RuleCate{}
 	err := c.ShouldBind(&m)
 	if err != nil {
 		c.Message("-1", "参数不正确："+err.Error())
 		return
 	}
 
-	_, err = model.RuleCreate(dbs.H{
-		"CateId":        m.CateId,
-		"Name":          m.Name,
-		"Brief":         m.Brief,
-		"ListTable":     m.ListTable,
-		"ListUrl":       m.ListUrl,
-		"ListPageStart": m.ListPageStart,
-		"ListPageEnd":   m.ListPageEnd,
-		"ListPageSize":  m.ListPageSize,
-		"ListRange":     m.ListRange,
-		"ListRule":      m.ListRule,
-		"ContentTable":  m.ContentTable,
-		"ContentUrl":    m.ContentUrl,
+	_, err = model.RuleCateCreate(dbs.H{
+		"CateId":   m.CateId,
+		"Name":     m.Name,
+		"Brief":    m.Brief,
+		"Url":      m.Url,
+		"DateBase": m.DateBase,
 	})
 	if err != nil {
 		c.Message("-1", err.Error())
@@ -37,34 +30,27 @@ func RuleCreate(c *gin.Context) {
 	c.Message("0", "添加成功")
 }
 
-func RuleUpdate(c *gin.Context) {
-	m := model.Rule{}
+func RuleCateUpdate(c *gin.Context) {
+	m := model.RuleCate{}
 	err := c.ShouldBind(&m)
 	if err != nil {
 		c.Message("-1", "参数不正确："+err.Error())
 		return
 	}
 
-	_, err = model.RuleRead(m.Rid)
+	_, err = model.RuleCateRead(m.CateId)
 	if err != nil {
 		c.Message("-1", err.Error())
 		return
 	}
 
-	err = model.RuleUpdate(dbs.H{
-		"CateId":        m.CateId,
-		"Name":          m.Name,
-		"Brief":         m.Brief,
-		"ListTable":     m.ListTable,
-		"ListUrl":       m.ListUrl,
-		"ListPageStart": m.ListPageStart,
-		"ListPageEnd":   m.ListPageEnd,
-		"ListPageSize":  m.ListPageSize,
-		"ListRange":     m.ListRange,
-		"ListRule":      m.ListRule,
-		"ContentTable":  m.ContentTable,
-		"ContentUrl":    m.ContentUrl,
-	}, m.Rid)
+	err = model.RuleCateUpdate(dbs.H{
+		"CateId":   m.CateId,
+		"Name":     m.Name,
+		"Brief":    m.Brief,
+		"Url":      m.Url,
+		"DateBase": m.DateBase,
+	}, m.CateId)
 	if err != nil {
 		c.Message("-1", "更新数据库失败："+err.Error())
 		return
@@ -73,15 +59,15 @@ func RuleUpdate(c *gin.Context) {
 	c.Message("0", "修改成功")
 }
 
-func RuleRead(c *gin.Context) {
-	m := model.Rule{}
+func RuleCateRead(c *gin.Context) {
+	m := model.RuleCate{}
 	err := c.ShouldBind(&m)
 	if err != nil {
 		c.Message("-1", "参数不正确："+err.Error())
 		return
 	}
 
-	row, err := model.RuleRead(m.Rid)
+	row, err := model.RuleCateRead(m.CateId)
 	if err != nil {
 		c.Message("-1", err.Error())
 		return
@@ -90,15 +76,15 @@ func RuleRead(c *gin.Context) {
 	c.Message("0", "success", row)
 }
 
-func RuleDelete(c *gin.Context) {
-	m := model.Rule{}
+func RuleCateDelete(c *gin.Context) {
+	m := model.RuleCate{}
 	err := c.ShouldBind(&m)
 	if err != nil {
 		c.Message("-1", "参数不正确："+err.Error())
 		return
 	}
 
-	err = model.RuleDelete(m.Rid)
+	err = model.RuleCateDelete(m.CateId)
 	if err != nil {
 		c.Message("-1", err.Error())
 		return
@@ -107,8 +93,8 @@ func RuleDelete(c *gin.Context) {
 	c.Message("0", "删除成功")
 }
 
-func RuleList(c *gin.Context) {
-	m := model.Rule{}
+func RuleCateList(c *gin.Context) {
+	m := model.RuleCate{}
 	err := c.ShouldBind(&m)
 	if err != nil {
 		c.Message("-1", "参数不正确："+err.Error())
@@ -117,20 +103,17 @@ func RuleList(c *gin.Context) {
 
 	// 筛选条件
 	h := dbs.H{}
-	if m.CateId > 0 {
-		h["CateId"] = m.CateId
-	}
 	if m.Name != "" {
 		h["Name LIKE"] = m.Name
 	}
 
-	total, err := model.RuleCount(h)
+	total, err := model.RuleCateCount(h)
 	if err != nil {
 		c.Message("-1", err.Error())
 		return
 	}
 
-	list, err := model.RuleList(h, m.Page, 20)
+	list, err := model.RuleCateList(h, m.Page, 20)
 	if err != nil {
 		c.Message("-1", err.Error())
 		return
