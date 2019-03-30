@@ -55,6 +55,13 @@ func main() {
 	app.POST("/RuleCateDelete", api.RuleCateDelete)
 	app.POST("/RuleCateList", api.RuleCateList)
 
+	// RuleParam
+	app.POST("/RuleParamCreate", api.RuleParamCreate)
+	app.POST("/RuleParamUpdate", api.RuleParamUpdate)
+	app.POST("/RuleParamRead", api.RuleParamRead)
+	app.POST("/RuleParamDelete", api.RuleParamDelete)
+	app.POST("/RuleParamList", api.RuleParamList)
+
 	err = app.Run("0.0.0.0:8888")
 	if err != nil {
 		panic(err)
