@@ -1,10 +1,11 @@
 package main
 
 import (
-	"../../dbs"
 	"fmt"
 	"os"
 	"time"
+
+	"../../dbs"
 )
 
 type User struct {

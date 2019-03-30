@@ -3,12 +3,13 @@ package dbs
 import (
 	"database/sql"
 	"fmt"
-	_ "github.com/mattn/go-sqlite3"
 	"io"
 	"os"
 	"strconv"
 	"strings"
 	"time"
+
+	_ "github.com/mattn/go-sqlite3"
 )
 
 type DB struct {
@@ -138,18 +139,19 @@ func (db *DB) Count(table string, where H) (n int64, err error) {
 	return
 }
 
-func (db *DB) Find(table string, fields string, where H, order string, page int64, pageSize int64) (rows *sql.Rows, err error) {
+func (db *DB) Find(table, fields string, where H, order string, page, pageSize int64) (rows *sql.Rows, err error) {
 	whereStr, args := GetSqlWhere(where)
 	orderStr := ""
 	limitStr := ""
 	if order != "" {
 		orderStr = " ORDER BY " + order
 	}
-	if page > 0 && pageSize > 0 {
+	if page < 1 {
+		page = 1
+	}
+	if pageSize > 0 {
 		start := (page - 1) * pageSize
 		limitStr = " LIMIT " + strconv.FormatInt(start, 10) + "," + strconv.FormatInt(pageSize, 10)
-	} else if page == 0 && pageSize > 0 {
-		limitStr = " LIMIT " + strconv.FormatInt(pageSize, 10)
 	}
 	s := "SELECT " + fields + " FROM `" + table + "`" + whereStr + orderStr + limitStr
 	LogWrite(s, args...)
