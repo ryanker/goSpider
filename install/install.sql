@@ -46,7 +46,7 @@ CREATE TABLE RuleParam
   Rule       TEXT                  DEFAULT '',  -- 匹配规则
   ValueType  INTEGER      NOT NULL DEFAULT '0', -- 获取值类型， 1:Html 2:Text 3:Attr
   ValueAttr  VARCHAR(255) NOT NULL DEFAULT '',  -- 当为 Attr 时，需要指定具体哪个属性
-  FilterType VARCHAR(255) NOT NULL DEFAULT '',  -- 过滤规则，1:清理两端空白 2:正则替换
+  FilterType INTEGER      NOT NULL DEFAULT '0', -- 过滤规则，1:清理两端空白 2:正则替换
   FilterReg  VARCHAR(255) NOT NULL DEFAULT '',  -- 过滤正则
   Sort       INTEGER      NOT NULL DEFAULT '0', -- 排序
   IsDown     INTEGER      NOT NULL DEFAULT '0', -- 此字段是否需要下载
