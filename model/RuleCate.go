@@ -60,9 +60,17 @@ func RuleCateDelete(CateId int64) (err error) {
 	}
 
 	// todo: 删除相关数据
-	_, err = db.Delete("RuleCate", dbs.H{
-		"CateId": row.CateId,
-	})
+	_, err = db.Delete("Rule", dbs.H{"CateId": row.CateId})
+	if err != nil {
+		return
+	}
+
+	_, err = db.Delete("RuleParam", dbs.H{"CateId": row.CateId})
+	if err != nil {
+		return
+	}
+
+	_, err = db.Delete("RuleCate", dbs.H{"CateId": row.CateId})
 	return
 }
 

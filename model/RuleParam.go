@@ -9,6 +9,7 @@ import (
 type RuleParam struct {
 	Pid        int64
 	Rid        int64
+	CateId     int64
 	Type       int64
 	Field      string
 	FieldType  int64
@@ -27,6 +28,7 @@ func RuleParamMap() (ptr *RuleParam, fields string, args *[]interface{}) {
 	fields, scanArr := dbs.GetSqlRead(dbs.H{
 		"Pid":        &row.Pid,
 		"Rid":        &row.Rid,
+		"CateId":     &row.CateId,
 		"Type":       &row.Type,
 		"Field":      &row.Field,
 		"FieldType":  &row.FieldType,

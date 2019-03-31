@@ -40,6 +40,7 @@ CREATE TABLE RuleParam
 (
   Pid        INTEGER PRIMARY KEY AUTOINCREMENT, -- 参数ID
   Rid        INTEGER      NOT NULL DEFAULT '0', -- 规则ID
+  CateId     INTEGER      NOT NULL DEFAULT '0', -- 分类ID
   Type       INTEGER      NOT NULL DEFAULT '0', -- 参数类型 1:列表 2:内容
   Field      VARCHAR(255) NOT NULL DEFAULT '',  -- 存放字段名称
   FieldType  INTEGER      NOT NULL DEFAULT '0', -- 字段类型 1:INTEGER 2:VARCHAR 3:TEXT
