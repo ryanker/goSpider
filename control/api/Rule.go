@@ -29,7 +29,6 @@ func RuleCreate(c *gin.Context) {
 		"ListPageStart": m.ListPageStart,
 		"ListPageEnd":   m.ListPageEnd,
 		"ListPageSize":  m.ListPageSize,
-		"ListRange":     m.ListRange,
 		"ListRule":      m.ListRule,
 		"ContentUrl":    m.ContentUrl,
 	})
@@ -64,7 +63,6 @@ func RuleUpdate(c *gin.Context) {
 		"ListPageStart": m.ListPageStart,
 		"ListPageEnd":   m.ListPageEnd,
 		"ListPageSize":  m.ListPageSize,
-		"ListRange":     m.ListRange,
 		"ListRule":      m.ListRule,
 		"ContentUrl":    m.ContentUrl,
 	}, m.Rid)

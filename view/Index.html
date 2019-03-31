@@ -80,7 +80,7 @@
                     <el-table-column label="操作" width="150">
                         <template slot-scope="scope">
                             <el-tooltip effect="dark" content="添加规则" placement="top">
-                                <el-button type="primary" size="small" circle icon="el-icon-plus"
+                                <el-button type="success" size="small" circle icon="el-icon-plus"
                                            @click="createRuleDialog(scope.row)"/>
                             </el-tooltip>
                             <el-tooltip effect="dark" content="编辑分类" placement="top">
@@ -148,12 +148,6 @@
                         </el-form-item>
                         <el-form-item label="每页间隔">
                             <el-input-number v-model="ruleData.ListPageSize"/>
-                        </el-form-item>
-                        <el-form-item label="列表范围规则">
-                            <el-input v-model="ruleData.ListRange" placeholder="">
-                                <el-button slot="append" @click="ruleTest(ruleData.ListUrl, ruleData.ListRange)">测试
-                                </el-button>
-                            </el-input>
                         </el-form-item>
                         <el-form-item label="列表匹配规则">
                             <el-input v-model="ruleData.ListRule" placeholder="">

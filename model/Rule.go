@@ -17,7 +17,6 @@ type Rule struct {
 	ListPageStart int64
 	ListPageEnd   int64
 	ListPageSize  int64
-	ListRange     string
 	ListRule      string
 
 	ContentUrl string
@@ -39,7 +38,6 @@ func RuleMap() (ptr *Rule, fields string, args *[]interface{}) {
 		"ListPageStart": &row.ListPageStart,
 		"ListPageEnd":   &row.ListPageEnd,
 		"ListPageSize":  &row.ListPageSize,
-		"ListRange":     &row.ListRange,
 		"ListRule":      &row.ListRule,
 		"ContentUrl":    &row.ContentUrl,
 		"UpdateDate":    &row.UpdateDate,

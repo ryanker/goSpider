@@ -26,7 +26,6 @@ CREATE TABLE Rule
   ListPageStart INTEGER      NOT NULL DEFAULT '0', -- 列表开始页码
   ListPageEnd   INTEGER      NOT NULL DEFAULT '0', -- 列表结束页码
   ListPageSize  INTEGER      NOT NULL DEFAULT '0', -- 每页间隔，默认为1
-  ListRange     TEXT                  DEFAULT '',  -- 列表范围规则
   ListRule      TEXT                  DEFAULT '',  -- 列表规则
 
   ContentUrl    VARCHAR(255) NOT NULL DEFAULT '',  -- 内容测试网址
