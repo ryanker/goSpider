@@ -16,18 +16,23 @@ func RuleParamCreate(c *gin.Context) {
 	}
 
 	_, err = model.RuleParamCreate(dbs.H{
-		"Rid":        m.Rid,
-		"CateId":     m.CateId,
-		"Type":       m.Type,
-		"Field":      m.Field,
-		"FieldType":  m.FieldType,
-		"Rule":       m.Rule,
-		"ValueType":  m.ValueType,
-		"ValueAttr":  m.ValueAttr,
-		"FilterType": m.FilterType,
-		"FilterReg":  m.FilterReg,
-		"Sort":       m.Sort,
-		"IsDown":     m.IsDown,
+		"Rid":           m.Rid,
+		"CateId":        m.CateId,
+		"Type":          m.Type,
+		"Field":         m.Field,
+		"FieldType":     m.FieldType,
+		"Rule":          m.Rule,
+		"ValueType":     m.ValueType,
+		"ValueAttr":     m.ValueAttr,
+		"FilterType":    m.FilterType,
+		"FilterRegexp":  m.FilterRegexp,
+		"FilterRepl":    m.FilterRepl,
+		"Sort":          m.Sort,
+		"IsSearch":      m.IsSearch,
+		"DownType":      m.DownType,
+		"DownRule":      m.DownRule,
+		"DownValueType": m.DownValueType,
+		"DownValueAttr": m.DownValueAttr,
 	})
 	if err != nil {
 		c.Message("-1", err.Error())
@@ -52,15 +57,20 @@ func RuleParamUpdate(c *gin.Context) {
 	}
 
 	err = model.RuleParamUpdate(dbs.H{
-		"Field":      m.Field,
-		"FieldType":  m.FieldType,
-		"Rule":       m.Rule,
-		"ValueType":  m.ValueType,
-		"ValueAttr":  m.ValueAttr,
-		"FilterType": m.FilterType,
-		"FilterReg":  m.FilterReg,
-		"Sort":       m.Sort,
-		"IsDown":     m.IsDown,
+		"Field":         m.Field,
+		"FieldType":     m.FieldType,
+		"Rule":          m.Rule,
+		"ValueType":     m.ValueType,
+		"ValueAttr":     m.ValueAttr,
+		"FilterType":    m.FilterType,
+		"FilterRegexp":  m.FilterRegexp,
+		"FilterRepl":    m.FilterRepl,
+		"Sort":          m.Sort,
+		"IsSearch":      m.IsSearch,
+		"DownType":      m.DownType,
+		"DownRule":      m.DownRule,
+		"DownValueType": m.DownValueType,
+		"DownValueAttr": m.DownValueAttr,
 	}, m.Pid)
 	if err != nil {
 		c.Message("-1", "更新数据库失败："+err.Error())

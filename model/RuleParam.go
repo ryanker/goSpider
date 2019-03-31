@@ -7,39 +7,49 @@ import (
 )
 
 type RuleParam struct {
-	Pid        int64
-	Rid        int64
-	CateId     int64
-	Type       int64
-	Field      string
-	FieldType  int64
-	Rule       string
-	ValueType  int64
-	ValueAttr  string
-	FilterType int64
-	FilterReg  string
-	Sort       int64
-	IsDown     int64
-	CreateDate string
+	Pid           int64
+	Rid           int64
+	CateId        int64
+	Type          string
+	Field         string
+	FieldType     string
+	Rule          string
+	ValueType     string
+	ValueAttr     string
+	FilterType    string
+	FilterRegexp  string
+	FilterRepl    string
+	Sort          int64
+	IsSearch      int64
+	DownType      int64
+	DownRule      string
+	DownValueType string
+	DownValueAttr string
+	CreateDate    string
 }
 
 func RuleParamMap() (ptr *RuleParam, fields string, args *[]interface{}) {
 	row := RuleParam{}
 	fields, scanArr := dbs.GetSqlRead(dbs.H{
-		"Pid":        &row.Pid,
-		"Rid":        &row.Rid,
-		"CateId":     &row.CateId,
-		"Type":       &row.Type,
-		"Field":      &row.Field,
-		"FieldType":  &row.FieldType,
-		"Rule":       &row.Rule,
-		"ValueType":  &row.ValueType,
-		"ValueAttr":  &row.ValueAttr,
-		"FilterType": &row.FilterType,
-		"FilterReg":  &row.FilterReg,
-		"Sort":       &row.Sort,
-		"IsDown":     &row.IsDown,
-		"CreateDate": &row.CreateDate,
+		"Pid":           &row.Pid,
+		"Rid":           &row.Rid,
+		"CateId":        &row.CateId,
+		"Type":          &row.Type,
+		"Field":         &row.Field,
+		"FieldType":     &row.FieldType,
+		"Rule":          &row.Rule,
+		"ValueType":     &row.ValueType,
+		"ValueAttr":     &row.ValueAttr,
+		"FilterType":    &row.FilterType,
+		"FilterRegexp":  &row.FilterRegexp,
+		"FilterRepl":    &row.FilterRepl,
+		"Sort":          &row.Sort,
+		"IsSearch":      &row.IsSearch,
+		"DownType":      &row.DownType,
+		"DownRule":      &row.DownRule,
+		"DownValueType": &row.DownValueType,
+		"DownValueAttr": &row.DownValueAttr,
+		"CreateDate":    &row.CreateDate,
 	})
 	ptr = &row
 	args = &scanArr
