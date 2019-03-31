@@ -19,9 +19,6 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
-	if err = db.Ping(); err != nil {
-		panic(err)
-	}
 
 	// 文件不存在，则创建表
 	if _, err := os.Stat(dbFile); os.IsNotExist(err) {
@@ -30,5 +27,9 @@ func init() {
 		if err != nil {
 			panic(err)
 		}
+	}
+
+	if err = db.Ping(); err != nil {
+		panic(err)
 	}
 }
