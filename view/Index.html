@@ -54,9 +54,21 @@
                             <el-table :data="props.row.ruleList" border>
                                 <el-table-column label="规则名称" prop="Name"></el-table-column>
                                 <el-table-column label="规则备注" prop="Brief"></el-table-column>
-                                <el-table-column label="表名称" prop="ListTable"></el-table-column>
+                                <el-table-column label="表名称" prop="ListTable" width="150"></el-table-column>
                                 <el-table-column label="修改时间" prop="UpdateDate" width="180"></el-table-column>
                                 <el-table-column label="添加时间" prop="CreateDate" width="180"></el-table-column>
+                                <el-table-column label="操作" width="100">
+                                    <template slot-scope="scope">
+                                        <el-tooltip effect="dark" content="编辑规则" placement="top">
+                                            <el-button type="primary" size="small" circle icon="el-icon-edit"
+                                                       @click="updateRuleDialog(scope.row)"/>
+                                        </el-tooltip>
+                                        <el-tooltip effect="dark" content="编辑规则" placement="top">
+                                            <el-button type="danger" size="small" circle icon="el-icon-delete"
+                                                       @click="deleteRuleDialog(scope.row)"/>
+                                        </el-tooltip>
+                                    </template>
+                                </el-table-column>
                             </el-table>
                         </template>
                     </el-table-column>
@@ -71,11 +83,11 @@
                                 <el-button type="primary" size="small" circle icon="el-icon-plus"
                                            @click="createRuleDialog(scope.row)"/>
                             </el-tooltip>
-                            <el-tooltip effect="dark" content="编辑品牌" placement="top">
+                            <el-tooltip effect="dark" content="编辑分类" placement="top">
                                 <el-button type="primary" size="small" circle icon="el-icon-edit"
                                            @click="updateDialog(scope.row)"/>
                             </el-tooltip>
-                            <el-tooltip effect="dark" content="删除品牌" placement="top">
+                            <el-tooltip effect="dark" content="删除分类" placement="top">
                                 <el-button type="danger" size="small" circle icon="el-icon-delete"
                                            @click="deleteDialog(scope.row)"/>
                             </el-tooltip>
@@ -385,7 +397,7 @@
 			updateRuleDialog(row) {
 				this.ruleTitle = '编辑规则 -> ' + row.Name;
 				this.ruleUrl = '/RuleUpdate';
-				aPost('/RuleRead', {CateId: row.CateId}).then(r => {
+				aPost('/RuleRead', {Rid: row.Rid}).then(r => {
 					this.ruleData = r.data;
 					this.ruleDialogVisible = true;
 				}).catch(error => {
@@ -408,6 +420,19 @@
 							this.ruleButtonLoading = false;
 						})
 					}
+				})
+			},
+
+			// 删除
+			deleteRuleDialog(row) {
+				this.$confirm('删除不可逆, 是否继续? ', '提示', {type: 'warning'}).then(() => {
+					aPost('/RuleDelete', {Rid: row.Rid}).then(r => {
+						this.$message.success(r.message);
+						this.getList();
+					}).catch(error => {
+						this.$message.error(error);
+					})
+				}).catch(_ => {
 				})
 			},
 

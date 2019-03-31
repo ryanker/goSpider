@@ -80,9 +80,12 @@ func RuleDelete(Rid int64) (err error) {
 	}
 
 	// todo: 删除相关数据
-	_, err = db.Delete("Rule", dbs.H{
-		"Rid": row.Rid,
-	})
+	_, err = db.Delete("RuleParam", dbs.H{"Rid": row.Rid})
+	if err != nil {
+		return
+	}
+
+	_, err = db.Delete("Rule", dbs.H{"Rid": row.Rid})
 	return
 }
 
