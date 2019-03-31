@@ -16,7 +16,6 @@ func RuleCateCreate(c *gin.Context) {
 	}
 
 	_, err = model.RuleCateCreate(dbs.H{
-		"CateId":   m.CateId,
 		"Name":     m.Name,
 		"Brief":    m.Brief,
 		"Url":      m.Url,
@@ -45,7 +44,6 @@ func RuleCateUpdate(c *gin.Context) {
 	}
 
 	err = model.RuleCateUpdate(dbs.H{
-		"CateId":   m.CateId,
 		"Name":     m.Name,
 		"Brief":    m.Brief,
 		"Url":      m.Url,
