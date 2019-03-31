@@ -102,7 +102,7 @@ func RuleCateList(c *gin.Context) {
 	// 筛选条件
 	h := dbs.H{}
 	if m.Name != "" {
-		h["Name LIKE"] = m.Name
+		h["Name LIKE"] = "%" + m.Name + "%"
 	}
 
 	total, err := model.RuleCateCount(h)

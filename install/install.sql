@@ -7,7 +7,7 @@ CREATE TABLE RuleCate
 (
   CateId     INTEGER PRIMARY KEY AUTOINCREMENT, -- 分类ID
   Name       VARCHAR(255) NOT NULL DEFAULT '',  -- 分类名称
-  Brief      VARCHAR(255) NOT NULL DEFAULT '',  -- 分类简述
+  Brief      VARCHAR(255) NOT NULL DEFAULT '',  -- 分类备注
   Url        VARCHAR(255) NOT NULL DEFAULT '',  -- 目标网址
   DateBase   VARCHAR(255) NOT NULL DEFAULT '',  -- 数据库名（一个分类，一个库）
   CreateDate DATETIME              DEFAULT CURRENT_TIMESTAMP
@@ -19,9 +19,9 @@ CREATE TABLE Rule
   Rid           INTEGER PRIMARY KEY AUTOINCREMENT, -- 规则ID
   CateId        INTEGER      NOT NULL DEFAULT '0', -- 分类ID
   Name          VARCHAR(255) NOT NULL DEFAULT '',  -- 规则名称
-  Brief         VARCHAR(255) NOT NULL DEFAULT '',  -- 规则简述
+  Brief         VARCHAR(255) NOT NULL DEFAULT '',  -- 规则备注
 
-  ListTable     VARCHAR(255) NOT NULL DEFAULT '',  -- 列表表名称
+  ListTable     VARCHAR(255) NOT NULL DEFAULT '',  -- 表名称
   ListUrl       VARCHAR(255) NOT NULL DEFAULT '',  -- 抓取列表网址
   ListPageStart INTEGER      NOT NULL DEFAULT '0', -- 列表开始页码
   ListPageEnd   INTEGER      NOT NULL DEFAULT '0', -- 列表结束页码

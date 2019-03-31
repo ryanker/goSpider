@@ -52,6 +52,7 @@ func main() {
 	app.POST("/RuleRead", api.RuleRead)
 	app.POST("/RuleDelete", api.RuleDelete)
 	app.POST("/RuleList", api.RuleList)
+	app.POST("/RuleTest", api.RuleTest)
 
 	// RuleCate
 	app.POST("/RuleCateCreate", api.RuleCateCreate)

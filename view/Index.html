@@ -24,20 +24,6 @@
             line-height: 60px;
             text-align: center;
         }
-
-
-        .demo-table-expand {
-            font-size: 0;
-        }
-        .demo-table-expand label {
-            width: 90px;
-            color: #99a9bf;
-        }
-        .demo-table-expand .el-form-item {
-            margin-right: 0;
-            margin-bottom: 0;
-            width: 50%;
-        }
     </style>
 </head>
 <body>
@@ -46,74 +32,78 @@
         <el-container>
             <el-header>
                 <el-menu :default-active="menuActive" mode="horizontal">
-                    <el-menu-item index="1"><a href="/">首页</a></el-menu-item>
+                    <el-menu-item index="1"><a href="/">狗狗采集</a></el-menu-item>
                 </el-menu>
             </el-header>
             <el-main>
+                <!--搜索栏-->
                 <el-row>
-                    <el-input v-model="q.name" placeholder="请输入品牌" style="width:300px;margin-right:10px" class="mb-1">
+                    <el-input v-model="q.Name" placeholder="请输入分类" style="width:300px;margin-right:10px" class="mb-1">
                         <el-button slot="append" icon="el-icon-search" @click="searchClick"/>
                     </el-input>
-                    <el-button type="primary" class="mb-1" @click="createDialog">添加品牌</el-button>
-                    <el-button v-if="tableSelectData.length!==0" type="danger" class="mb-1" @click="batchDelete">删除品牌</el-button>
+                    <el-button type="primary" class="mb-1" @click="createDialog">添加分类</el-button>
+                    <el-button v-if="tableSelectData.length!==0" type="danger" class="mb-1" @click="batchDelete">删除分类
+                    </el-button>
                 </el-row>
 
-                <el-table :data="tableData">
+                <!--表格-->
+                <el-table v-loading="tableLoading" :data="tableData" default-expand-all @selection-change="tableSelect">
+                    <el-table-column type="selection" width="50"></el-table-column>
                     <el-table-column type="expand">
                         <template slot-scope="props">
-                            <el-form label-position="left" inline class="demo-table-expand">
-                                <el-form-item label="商品名称">
-                                    <span>{{ props.row.name }}</span>
-                                </el-form-item>
-                                <el-form-item label="所属店铺">
-                                    <span>{{ props.row.shop }}</span>
-                                </el-form-item>
-                                <el-form-item label="商品 ID">
-                                    <span>{{ props.row.id }}</span>
-                                </el-form-item>
-                                <el-form-item label="店铺 ID">
-                                    <span>{{ props.row.shopId }}</span>
-                                </el-form-item>
-                                <el-form-item label="商品分类">
-                                    <span>{{ props.row.category }}</span>
-                                </el-form-item>
-                                <el-form-item label="店铺地址">
-                                    <span>{{ props.row.address }}</span>
-                                </el-form-item>
-                                <el-form-item label="商品描述">
-                                    <span>{{ props.row.desc }}</span>
-                                </el-form-item>
-                            </el-form>
+                            <el-table :data="props.row.ruleList" border>
+                                <el-table-column label="规则名称" prop="Name"></el-table-column>
+                                <el-table-column label="规则备注" prop="Brief"></el-table-column>
+                                <el-table-column label="表名称" prop="ListTable"></el-table-column>
+                                <el-table-column label="修改时间" prop="UpdateDate" width="180"></el-table-column>
+                                <el-table-column label="添加时间" prop="CreateDate" width="180"></el-table-column>
+                            </el-table>
                         </template>
                     </el-table-column>
-                    <el-table-column label="商品 ID" prop="id"></el-table-column>
-                    <el-table-column label="商品名称" prop="name"></el-table-column>
-                    <el-table-column label="描述" prop="desc"></el-table-column>
+                    <el-table-column label="分类名称" prop="Name"></el-table-column>
+                    <el-table-column label="分类备注" prop="Brief"></el-table-column>
+                    <el-table-column label="目标网址" prop="Url"></el-table-column>
+                    <el-table-column label="数据库名" prop="DateBase" width="150"></el-table-column>
+                    <el-table-column label="添加时间" prop="CreateDate" width="180"></el-table-column>
+                    <el-table-column label="操作" width="150">
+                        <template slot-scope="scope">
+                            <el-tooltip effect="dark" content="添加规则" placement="top">
+                                <el-button type="primary" size="small" circle icon="el-icon-plus"
+                                           @click="createRuleDialog(scope.row)"/>
+                            </el-tooltip>
+                            <el-tooltip effect="dark" content="编辑品牌" placement="top">
+                                <el-button type="primary" size="small" circle icon="el-icon-edit"
+                                           @click="updateDialog(scope.row)"/>
+                            </el-tooltip>
+                            <el-tooltip effect="dark" content="删除品牌" placement="top">
+                                <el-button type="danger" size="small" circle icon="el-icon-delete"
+                                           @click="deleteDialog(scope.row)"/>
+                            </el-tooltip>
+                        </template>
+                    </el-table-column>
                 </el-table>
 
-
                 <!--分页-->
-                <el-row type="flex" class="mt-1" justify="end">
-                    <el-pagination v-if="tableTotal > 0" :current-page="q.page" :page-size="20" :total="tableTotal" background layout="total, prev, pager, next, jumper" @current-change="tableCurrentChange"/>
+                <el-row type="flex" justify="end" style="margin-top:15px">
+                    <el-pagination v-if="tableTotal > 0" :current-page="q.Page" :page-size="20" :total="tableTotal"
+                                   background layout="total, prev, pager, next, jumper"
+                                   @current-change="tableCurrentChange"/>
                 </el-row>
 
-                <!--对话框-->
-                <el-dialog :visible.sync="formDialogVisible" :title="formTitle" width="60%">
+                <!--对话框: 分类-->
+                <el-dialog :visible.sync="formDialogVisible" :title="formTitle" fullscreen>
                     <el-form ref="formData" :model="formData" label-width="130px" style="width:95%">
-                        <el-form-item label="品牌状态">
-                            <el-radio-group v-model="formData.status">
-                                <el-radio :label="1">前台显示</el-radio>
-                                <el-radio :label="2">前台隐藏</el-radio>
-                            </el-radio-group>
+                        <el-form-item label="分类名称">
+                            <el-input v-model="formData.Name" placeholder=""/>
                         </el-form-item>
-                        <el-form-item label="品牌名称">
-                            <el-input v-model="formData.name" placeholder=""/>
+                        <el-form-item label="分类备注">
+                            <el-input v-model="formData.Brief" placeholder=""/>
                         </el-form-item>
-                        <el-form-item label="品牌简介">
-                            <el-input v-model="formData.brief" placeholder=""/>
+                        <el-form-item label="目标网址">
+                            <el-input v-model="formData.Url" placeholder=""/>
                         </el-form-item>
-                        <el-form-item label="排列顺序">
-                            <el-input-number v-model="formData.rank" :min="1" label="排列顺序"/>
+                        <el-form-item label="数据库名">
+                            <el-input v-model="formData.DateBase" placeholder=""/>
                         </el-form-item>
                         <el-form-item>
                             <el-button :loading="formButtonLoading" type="primary" @click="formSubmit">确认</el-button>
@@ -121,214 +111,317 @@
                     </el-form>
                 </el-dialog>
 
-                <el-row>
-                    <el-col :span="4" v-for="(v, index) in imgList" :key="index">
-                        <el-card :body-style="{ padding: '0px' }" style="height:320px;padding:5px 0;text-align:center">
-                            <div style="height: 250px">
-                                <a :href="'/read?Pid='+v.Pid" target="_blank">
-                                    <img :src="v.ImgUrlNew ? v.ImgUrlNew : v.ImgUrl" style="height: 100%">
-                                </a>
-                            </div>
-                            <div style="padding: 5px 0 0;">
-                                #{{ v.Pid }} | {{ v.Date }} | {{ v.Views }} | {{ v.ImgNum }}P<br>
-                                <a :href="'/read?Pid='+v.Pid" target="_blank">{{ v.Title }}</a><br>
-                            </div>
-                        </el-card>
-                    </el-col>
-                </el-row>
+                <!--对话框: 规则-->
+                <el-dialog :visible.sync="ruleDialogVisible" :title="ruleTitle" fullscreen>
+                    <el-form ref="ruleData" :model="ruleData" label-width="130px" style="width:95%">
+                        <el-form-item label="采集规则名称">
+                            <el-input v-model="ruleData.Name" placeholder=""/>
+                        </el-form-item>
+                        <el-form-item label="采集规则备注">
+                            <el-input v-model="ruleData.Brief" placeholder=""/>
+                        </el-form-item>
+                        <el-form-item label="表名称">
+                            <el-input v-model="ruleData.ListTable" placeholder=""/>
+                        </el-form-item>
+                        <el-form-item label="抓取列表网址">
+                            <el-input v-model="ruleData.ListUrl" placeholder="">
+                                <el-button slot="append" @click="ruleTest(ruleData.ListUrl, '')">测试</el-button>
+                            </el-input>
+                        </el-form-item>
+                        <el-form-item label="列表开始页码">
+                            <el-input-number v-model="ruleData.ListPageStart"/>
+                        </el-form-item>
+                        <el-form-item label="列表结束页码">
+                            <el-input-number v-model="ruleData.ListPageEnd"/>
+                        </el-form-item>
+                        <el-form-item label="每页间隔">
+                            <el-input-number v-model="ruleData.ListPageSize"/>
+                        </el-form-item>
+                        <el-form-item label="列表范围规则">
+                            <el-input v-model="ruleData.ListRange" placeholder="">
+                                <el-button slot="append" @click="ruleTest(ruleData.ListUrl, ruleData.ListRange)">测试
+                                </el-button>
+                            </el-input>
+                        </el-form-item>
+                        <el-form-item label="列表匹配规则">
+                            <el-input v-model="ruleData.ListRule" placeholder="">
+                                <el-button slot="append" @click="searchClick">测试</el-button>
+                            </el-input>
+                        </el-form-item>
+                        <el-form-item label="内容测试网址">
+                            <el-input v-model="ruleData.ContentUrl" placeholder=""/>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-button :loading="ruleButtonLoading" type="primary" @click="formRuleSubmit">确认
+                            </el-button>
+                        </el-form-item>
+                    </el-form>
+                </el-dialog>
+
+                <!--对话框: 匹配Html-->
+                <el-dialog title="规则匹配测试" :visible.sync="ruleTestDialog" fullscreen>
+                    <el-input type="textarea" autosize placeholder="玩命抓取匹配中..." v-model="ruleTestHtml">
+                    </el-input>
+                </el-dialog>
             </el-main>
             <el-footer>@2019</el-footer>
         </el-container>
     </template>
-
 </div>
 </body>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.7/vue.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.5.4/index.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/js-cookie/2.2.0/js.cookie.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/blueimp-md5/2.10.0/js/md5.min.js"></script>
 <script>
+	function aPost(url, params) {
+		return new Promise((resolve, reject) => {
+			axios.post(url, params).then(res => {
+				const r = res.data;
+				if (!r) {
+					// console.log('data: ' + r);
+					reject('服务器错误，请稍后再试');
+				} else if (r.code !== '0') {
+					// console.log('message: ' + r.message);
+					reject(r.message || '服务器错误，请稍后再试');
+				} else {
+					resolve(r)
+				}
+			}).catch(error => {
+				console.log(error);
+				reject('服务器错误，请稍后再试');
+			})
+		})
+	}
+
 	new Vue({
 		el: '#app',
 		data() {
 			return {
 				menuActive: '1',
-				imgList: [],
 
 				tableLoading: false,
 				tableTotal: 0,
-				// tableData: [],
+				tableData: [],
 				tableSelectData: [], // 列表选中列
 
 				q: {
-					status: '1' || '',
-					name: '' || '',
-					page: 1
+					Name: '',
+					Page: 1
 				},
-
 
 				// 选项卡
 				tabsData: [
-					{ name: '', label: '全部' },
-					{ name: '1', label: '前台显示' },
-					{ name: '2', label: '前台隐藏' }
+					{name: '', label: '全部'},
+					{name: '1', label: '前台显示'},
+					{name: '2', label: '前台隐藏'}
 				],
 
-				// 创建关注合约
+				// 分类: 添加&编辑
 				formTitle: '',
 				formUrl: '',
 				formDialogVisible: false,
 				formButtonLoading: false,
 				formData: {},
 
-				tableData: [{
-					id: '12987122',
-					name: '好滋好味鸡蛋仔',
-					category: '江浙小吃、小吃零食',
-					desc: '荷兰优质淡奶，奶香浓而不腻',
-					address: '上海市普陀区真北路',
-					shop: '王小虎夫妻店',
-					shopId: '10333'
-				}, {
-					id: '12987123',
-					name: '好滋好味鸡蛋仔',
-					category: '江浙小吃、小吃零食',
-					desc: '荷兰优质淡奶，奶香浓而不腻',
-					address: '上海市普陀区真北路',
-					shop: '王小虎夫妻店',
-					shopId: '10333'
-				}, {
-					id: '12987125',
-					name: '好滋好味鸡蛋仔',
-					category: '江浙小吃、小吃零食',
-					desc: '荷兰优质淡奶，奶香浓而不腻',
-					address: '上海市普陀区真北路',
-					shop: '王小虎夫妻店',
-					shopId: '10333'
-				}, {
-					id: '12987126',
-					name: '好滋好味鸡蛋仔',
-					category: '江浙小吃、小吃零食',
-					desc: '荷兰优质淡奶，奶香浓而不腻',
-					address: '上海市普陀区真北路',
-					shop: '王小虎夫妻店',
-					shopId: '10333'
-				}]
+				// 规则: 添加&编辑
+				ruleTitle: '',
+				ruleUrl: '',
+				ruleDialogVisible: false,
+				ruleButtonLoading: false,
+				ruleData: {},
+
+				ruleTestDialog: false,
+				ruleTestHtml: '',
 			}
 		},
 		mounted() {
-
+			this.getList();
 		},
 		methods: {
 			// 搜索
 			searchClick() {
-				this.q.status = ''
-				this.q.page = 1
-				this.getList()
+				this.q.Page = 1;
+				this.getList();
 			},
 
 			// 对话框: 添加
 			createDialog() {
-				this.formTitle = '添加品牌';
-				this.formUrl = '/admin/brand/create';
-				this.formData = {
-					status: 1,
-					name: '',
-					brief: '',
-					rank: 100
-				};
+				this.formTitle = '添加分类';
+				this.formUrl = '/RuleCateCreate';
+				this.formData = {};
 				this.formDialogVisible = true;
+			},
+
+			// 对话框: 编辑
+			updateDialog(row) {
+				this.formTitle = '编辑分类';
+				this.formUrl = '/RuleCateUpdate';
+				aPost('/RuleCateRead', {CateId: row.CateId}).then(r => {
+					this.formData = r.data;
+					this.formDialogVisible = true;
+				}).catch(error => {
+					this.$message.error(error)
+				})
 			},
 
 			// 提交
 			formSubmit() {
 				this.$refs.formData.validate(valid => {
 					if (valid) {
-						this.formButtonLoading = true
-						aPost(API + this.formUrl, this.formData).then(r => {
-							this.$message.success(r.message)
-							this.formButtonLoading = false
-							this.formDialogVisible = false
+						this.formButtonLoading = true;
+						aPost(this.formUrl, this.formData).then(r => {
+							this.$message.success(r.message);
+							this.formButtonLoading = false;
+							this.formDialogVisible = false;
+
+							this.q.Name = '';
+							this.q.Page = 1;
 							this.getList()
 						}).catch(error => {
-							this.$message.error(error)
-							this.formButtonLoading = false
+							this.$message.error(error);
+							this.formButtonLoading = false;
 						})
 					}
 				})
 			},
 
+			// 批量选择
+			tableSelect(val) {
+				this.tableSelectData = val;
+			},
+
 			// 批量删除
 			batchDelete() {
-				this.$confirm('删除选中的品牌不可逆, 是否继续? ', '提示', {
+				this.$confirm('删除选中的分类不可逆, 是否继续? ', '提示', {
 					type: 'warning'
 				}).then(() => {
-					!(async() => {
-						const failDate = [] // 记录失败
+					!(async () => {
+						const failDate = []; // 记录失败
 						for (const k in this.tableSelectData) {
-							const v = this.tableSelectData[k]
-							await aPost(API + '/admin/brand/delete', { brandId: v.brandId }).catch(error => {
-								failDate.push({ brandId: v.brandId, error: error })
-								this.$message.error(error)
+							const v = this.tableSelectData[k];
+							await aPost('/RuleCateDelete', {CateId: v.CateId}).catch(error => {
+								failDate.push({CateId: v.CateId, error: error});
+								this.$message.error(error);
 							})
 						}
 
 						if (failDate.length > 0) {
-							this.$message.error('删除失败 ' + failDate.length + ' 次')
+							this.$message.error('删除失败 ' + failDate.length + ' 次');
 						} else {
-							this.$message.success('删除成功')
-							this.getList()
+							this.$message.success('删除成功');
+							this.getList();
 						}
 					})()
 				}).catch(_ => {
 				})
 			},
 
-
 			// 删除
 			deleteDialog(row) {
-				this.$confirm('删除不可逆, 是否继续? ', '提示', { type: 'warning' }).then(() => {
-					aPost(API + '/admin/brand/delete', { brandId: row.brandId }).then(r => {
-						this.$message.success(r.message)
-						this.getList()
+				this.$confirm('删除不可逆, 是否继续? ', '提示', {type: 'warning'}).then(() => {
+					aPost('/RuleCateDelete', {CateId: row.CateId}).then(r => {
+						this.$message.success(r.message);
+						this.getList();
 					}).catch(error => {
-						this.$message.error(error)
+						this.$message.error(error);
 					})
 				}).catch(_ => {
 				})
 			},
 
 			// 分页
-			tableCurrentChange(val) {
-				this.q.page = val
-				this.getList()
+			tableCurrentChange(page) {
+				this.q.Page = page;
+				this.getList();
 			},
 
 			// 获取列表
 			getList() {
 				this.tableLoading = true;
-				axios.post('/RuleCateList', {
-					page: 1
-				}).then(res => {
-					const r = res.data;
-					if (!r) {
-						this.$message.error('服务器错误，请稍后再试');
-					} else if (r.code !== '0') {
-						this.$message.error(r.message);
-					} else {
-						this.imgList = r.list || [];
-						this.tableData = r.list;
-						this.tableTotal = r.total;
-						this.tableLoading = false;
-					}
-				}).catch((error) => {
-					console.log(error);
-					this.$message.error('服务器错误，请稍后再试');
+				aPost('/RuleCateList', this.q).then(r => {
+					const list = [];
+					r.list && r.list.map(v => {
+						list.push(Object.assign(v, {
+							ruleList: [],
+						}))
+					});
+					this.tableData = list;
+					this.tableTotal = r.total || 0;
+					this.tableLoading = false;
+
+					this.ruleList();
+				}).catch(error => {
+					this.$message.error(error);
 				});
-			}
-        }
+			},
+
+			// ======================== 采集规则相关功能 ========================
+			// 展示采集规则列表
+			ruleList() {
+				this.tableData.map(row => {
+					aPost('/RuleList', {CateId: row.CateId}).then(r => {
+						row.ruleList = r.list || [];
+					}).catch(error => {
+						this.$message.error(error);
+					});
+				});
+			},
+
+			// 对话框: 添加
+			createRuleDialog(row) {
+				this.ruleTitle = '添加规则 -> ' + row.Name;
+				this.ruleUrl = '/RuleCreate';
+				this.ruleData = {
+					CateId: row.CateId,
+					ListPageStart: 1,
+					ListPageEnd: 10,
+					ListPageSize: 1,
+				};
+				this.ruleDialogVisible = true;
+			},
+
+			// 对话框: 编辑
+			updateRuleDialog(row) {
+				this.ruleTitle = '编辑规则 -> ' + row.Name;
+				this.ruleUrl = '/RuleUpdate';
+				aPost('/RuleRead', {CateId: row.CateId}).then(r => {
+					this.ruleData = r.data;
+					this.ruleDialogVisible = true;
+				}).catch(error => {
+					this.$message.error(error)
+				})
+			},
+
+			// 提交
+			formRuleSubmit() {
+				this.$refs.ruleData.validate(valid => {
+					if (valid) {
+						this.ruleButtonLoading = true;
+						aPost(this.ruleUrl, this.ruleData).then(r => {
+							this.$message.success(r.message);
+							this.ruleButtonLoading = false;
+							this.ruleDialogVisible = false;
+							this.getList()
+						}).catch(error => {
+							this.$message.error(error);
+							this.ruleButtonLoading = false;
+						})
+					}
+				})
+			},
+
+			// 测试规则
+			ruleTest(Url, Rule) {
+				this.ruleTestDialog = true;
+				this.ruleTestHtml = '';
+				aPost('/RuleTest', {Url: Url, Rule: Rule}).then(r => {
+					this.ruleTestHtml = r.html || '匹配数据为空';
+				}).catch(error => {
+					this.$message.error(error)
+				})
+			},
+		}
 	})
 </script>
 </body>
