@@ -3,8 +3,8 @@ package api
 import (
 	"github.com/xiuno/gin"
 
-	"../lib/dbs"
-	"../model"
+	"../../lib/dbs"
+	"../../model"
 )
 
 func RuleCateCreate(c *gin.Context) {

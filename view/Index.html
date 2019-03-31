@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>狗狗采集</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.5.4/theme-chalk/index.css">
+    <style>
+        body {
+            margin: 0;
+        }
+
+        .el-header {
+            min-height: 60px;
+            padding: 0;
+        }
+
+        .el-main {
+            min-height: 160px;
+        }
+
+        .el-footer {
+            line-height: 60px;
+            text-align: center;
+        }
+
+
+        .demo-table-expand {
+            font-size: 0;
+        }
+        .demo-table-expand label {
+            width: 90px;
+            color: #99a9bf;
+        }
+        .demo-table-expand .el-form-item {
+            margin-right: 0;
+            margin-bottom: 0;
+            width: 50%;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <template>
+        <el-container>
+            <el-header>
+                <el-menu :default-active="menuActive" mode="horizontal">
+                    <el-menu-item index="1"><a href="/">首页</a></el-menu-item>
+                </el-menu>
+            </el-header>
+            <el-main>
+                <el-row>
+                    <el-input v-model="q.name" placeholder="请输入品牌" style="width:300px;margin-right:10px" class="mb-1">
+                        <el-button slot="append" icon="el-icon-search" @click="searchClick"/>
+                    </el-input>
+                    <el-button type="primary" class="mb-1" @click="createDialog">添加品牌</el-button>
+                    <el-button v-if="tableSelectData.length!==0" type="danger" class="mb-1" @click="batchDelete">删除品牌</el-button>
+                </el-row>
+
+                <el-table :data="tableData">
+                    <el-table-column type="expand">
+                        <template slot-scope="props">
+                            <el-form label-position="left" inline class="demo-table-expand">
+                                <el-form-item label="商品名称">
+                                    <span>{{ props.row.name }}</span>
+                                </el-form-item>
+                                <el-form-item label="所属店铺">
+                                    <span>{{ props.row.shop }}</span>
+                                </el-form-item>
+                                <el-form-item label="商品 ID">
+                                    <span>{{ props.row.id }}</span>
+                                </el-form-item>
+                                <el-form-item label="店铺 ID">
+                                    <span>{{ props.row.shopId }}</span>
+                                </el-form-item>
+                                <el-form-item label="商品分类">
+                                    <span>{{ props.row.category }}</span>
+                                </el-form-item>
+                                <el-form-item label="店铺地址">
+                                    <span>{{ props.row.address }}</span>
+                                </el-form-item>
+                                <el-form-item label="商品描述">
+                                    <span>{{ props.row.desc }}</span>
+                                </el-form-item>
+                            </el-form>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="商品 ID" prop="id"></el-table-column>
+                    <el-table-column label="商品名称" prop="name"></el-table-column>
+                    <el-table-column label="描述" prop="desc"></el-table-column>
+                </el-table>
+
+
+                <!--分页-->
+                <el-row type="flex" class="mt-1" justify="end">
+                    <el-pagination v-if="tableTotal > 0" :current-page="q.page" :page-size="20" :total="tableTotal" background layout="total, prev, pager, next, jumper" @current-change="tableCurrentChange"/>
+                </el-row>
+
+                <!--对话框-->
+                <el-dialog :visible.sync="formDialogVisible" :title="formTitle" width="60%">
+                    <el-form ref="formData" :model="formData" label-width="130px" style="width:95%">
+                        <el-form-item label="品牌状态">
+                            <el-radio-group v-model="formData.status">
+                                <el-radio :label="1">前台显示</el-radio>
+                                <el-radio :label="2">前台隐藏</el-radio>
+                            </el-radio-group>
+                        </el-form-item>
+                        <el-form-item label="品牌名称">
+                            <el-input v-model="formData.name" placeholder=""/>
+                        </el-form-item>
+                        <el-form-item label="品牌简介">
+                            <el-input v-model="formData.brief" placeholder=""/>
+                        </el-form-item>
+                        <el-form-item label="排列顺序">
+                            <el-input-number v-model="formData.rank" :min="1" label="排列顺序"/>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-button :loading="formButtonLoading" type="primary" @click="formSubmit">确认</el-button>
+                        </el-form-item>
+                    </el-form>
+                </el-dialog>
+
+                <el-row>
+                    <el-col :span="4" v-for="(v, index) in imgList" :key="index">
+                        <el-card :body-style="{ padding: '0px' }" style="height:320px;padding:5px 0;text-align:center">
+                            <div style="height: 250px">
+                                <a :href="'/read?Pid='+v.Pid" target="_blank">
+                                    <img :src="v.ImgUrlNew ? v.ImgUrlNew : v.ImgUrl" style="height: 100%">
+                                </a>
+                            </div>
+                            <div style="padding: 5px 0 0;">
+                                #{{ v.Pid }} | {{ v.Date }} | {{ v.Views }} | {{ v.ImgNum }}P<br>
+                                <a :href="'/read?Pid='+v.Pid" target="_blank">{{ v.Title }}</a><br>
+                            </div>
+                        </el-card>
+                    </el-col>
+                </el-row>
+            </el-main>
+            <el-footer>@2019</el-footer>
+        </el-container>
+    </template>
+
+</div>
+</body>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.7/vue.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.5.4/index.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/js-cookie/2.2.0/js.cookie.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/blueimp-md5/2.10.0/js/md5.min.js"></script>
+<script>
+	new Vue({
+		el: '#app',
+		data() {
+			return {
+				menuActive: '1',
+				imgList: [],
+
+				tableLoading: false,
+				tableTotal: 0,
+				// tableData: [],
+				tableSelectData: [], // 列表选中列
+
+				q: {
+					status: '1' || '',
+					name: '' || '',
+					page: 1
+				},
+
+
+				// 选项卡
+				tabsData: [
+					{ name: '', label: '全部' },
+					{ name: '1', label: '前台显示' },
+					{ name: '2', label: '前台隐藏' }
+				],
+
+				// 创建关注合约
+				formTitle: '',
+				formUrl: '',
+				formDialogVisible: false,
+				formButtonLoading: false,
+				formData: {},
+
+				tableData: [{
+					id: '12987122',
+					name: '好滋好味鸡蛋仔',
+					category: '江浙小吃、小吃零食',
+					desc: '荷兰优质淡奶，奶香浓而不腻',
+					address: '上海市普陀区真北路',
+					shop: '王小虎夫妻店',
+					shopId: '10333'
+				}, {
+					id: '12987123',
+					name: '好滋好味鸡蛋仔',
+					category: '江浙小吃、小吃零食',
+					desc: '荷兰优质淡奶，奶香浓而不腻',
+					address: '上海市普陀区真北路',
+					shop: '王小虎夫妻店',
+					shopId: '10333'
+				}, {
+					id: '12987125',
+					name: '好滋好味鸡蛋仔',
+					category: '江浙小吃、小吃零食',
+					desc: '荷兰优质淡奶，奶香浓而不腻',
+					address: '上海市普陀区真北路',
+					shop: '王小虎夫妻店',
+					shopId: '10333'
+				}, {
+					id: '12987126',
+					name: '好滋好味鸡蛋仔',
+					category: '江浙小吃、小吃零食',
+					desc: '荷兰优质淡奶，奶香浓而不腻',
+					address: '上海市普陀区真北路',
+					shop: '王小虎夫妻店',
+					shopId: '10333'
+				}]
+			}
+		},
+		mounted() {
+
+		},
+		methods: {
+			// 搜索
+			searchClick() {
+				this.q.status = ''
+				this.q.page = 1
+				this.getList()
+			},
+
+			// 对话框: 添加
+			createDialog() {
+				this.formTitle = '添加品牌';
+				this.formUrl = '/admin/brand/create';
+				this.formData = {
+					status: 1,
+					name: '',
+					brief: '',
+					rank: 100
+				};
+				this.formDialogVisible = true;
+			},
+
+			// 提交
+			formSubmit() {
+				this.$refs.formData.validate(valid => {
+					if (valid) {
+						this.formButtonLoading = true
+						aPost(API + this.formUrl, this.formData).then(r => {
+							this.$message.success(r.message)
+							this.formButtonLoading = false
+							this.formDialogVisible = false
+							this.getList()
+						}).catch(error => {
+							this.$message.error(error)
+							this.formButtonLoading = false
+						})
+					}
+				})
+			},
+
+			// 批量删除
+			batchDelete() {
+				this.$confirm('删除选中的品牌不可逆, 是否继续? ', '提示', {
+					type: 'warning'
+				}).then(() => {
+					!(async() => {
+						const failDate = [] // 记录失败
+						for (const k in this.tableSelectData) {
+							const v = this.tableSelectData[k]
+							await aPost(API + '/admin/brand/delete', { brandId: v.brandId }).catch(error => {
+								failDate.push({ brandId: v.brandId, error: error })
+								this.$message.error(error)
+							})
+						}
+
+						if (failDate.length > 0) {
+							this.$message.error('删除失败 ' + failDate.length + ' 次')
+						} else {
+							this.$message.success('删除成功')
+							this.getList()
+						}
+					})()
+				}).catch(_ => {
+				})
+			},
+
+
+			// 删除
+			deleteDialog(row) {
+				this.$confirm('删除不可逆, 是否继续? ', '提示', { type: 'warning' }).then(() => {
+					aPost(API + '/admin/brand/delete', { brandId: row.brandId }).then(r => {
+						this.$message.success(r.message)
+						this.getList()
+					}).catch(error => {
+						this.$message.error(error)
+					})
+				}).catch(_ => {
+				})
+			},
+
+			// 分页
+			tableCurrentChange(val) {
+				this.q.page = val
+				this.getList()
+			},
+
+			// 获取列表
+			getList() {
+				this.tableLoading = true;
+				axios.post('/RuleCateList', {
+					page: 1
+				}).then(res => {
+					const r = res.data;
+					if (!r) {
+						this.$message.error('服务器错误，请稍后再试');
+					} else if (r.code !== '0') {
+						this.$message.error(r.message);
+					} else {
+						this.imgList = r.list || [];
+						this.tableData = r.list;
+						this.tableTotal = r.total;
+						this.tableLoading = false;
+					}
+				}).catch((error) => {
+					console.log(error);
+					this.$message.error('服务器错误，请稍后再试');
+				});
+			}
+        }
+	})
+</script>
+</body>
+</html>

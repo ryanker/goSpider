@@ -8,7 +8,8 @@ import (
 
 	"github.com/xiuno/gin"
 
-	"./api"
+	"./control/api"
+	"./control/front"
 )
 
 func main() {
@@ -41,6 +42,10 @@ func main() {
 	})
 	app.LoadHTMLGlob("./view/*")
 
+	// ========== Front ==========
+	app.GET("/", front.Index)
+
+	// ========== Api ==========
 	// Rule
 	app.POST("/RuleCreate", api.RuleCreate)
 	app.POST("/RuleUpdate", api.RuleUpdate)
