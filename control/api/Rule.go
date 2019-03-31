@@ -20,7 +20,7 @@ func RuleCreate(c *gin.Context) {
 		return
 	}
 
-	_, err = model.RuleCreate(dbs.H{
+	Rid, err := model.RuleCreate(dbs.H{
 		"CateId":        m.CateId,
 		"Name":          m.Name,
 		"Brief":         m.Brief,
@@ -37,7 +37,7 @@ func RuleCreate(c *gin.Context) {
 		return
 	}
 
-	c.Message("0", "添加成功")
+	c.Message("0", "添加成功", gin.H{"Rid": Rid})
 }
 
 func RuleUpdate(c *gin.Context) {

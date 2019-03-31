@@ -127,6 +127,9 @@ func RuleParamList(c *gin.Context) {
 	if m.Rid > 0 {
 		h["Rid"] = m.Rid
 	}
+	if m.Type != "" {
+		h["Type"] = m.Type
+	}
 
 	total, err := model.RuleParamCount(h)
 	if err != nil {

@@ -24,6 +24,10 @@
             line-height: 60px;
             text-align: center;
         }
+
+        .el-form-item__content .el-table td, .el-form-item__content .el-table th {
+            line-height: 23px;
+        }
     </style>
 </head>
 <body>
@@ -61,9 +65,9 @@
                                     <template slot-scope="scope">
                                         <el-tooltip effect="dark" content="编辑规则" placement="top">
                                             <el-button type="primary" size="small" circle icon="el-icon-edit"
-                                                       @click="updateRuleDialog(scope.row)"/>
+                                                       @click="updateRuleDialog(scope.row, 1)"/>
                                         </el-tooltip>
-                                        <el-tooltip effect="dark" content="编辑规则" placement="top">
+                                        <el-tooltip effect="dark" content="删除规则" placement="top">
                                             <el-button type="danger" size="small" circle icon="el-icon-delete"
                                                        @click="deleteRuleDialog(scope.row)"/>
                                         </el-tooltip>
@@ -124,47 +128,201 @@
                 </el-dialog>
 
                 <!--对话框: 规则-->
-                <el-dialog :visible.sync="ruleDialogVisible" :title="ruleTitle" fullscreen>
+                <el-dialog :visible.sync="ruleDialogVisible" :title="ruleTitle" fullscreen @close="getList">
+                    <el-steps :active="stepsActive" align-center style="margin-bottom:15px">
+                        <el-step title="基本信息"></el-step>
+                        <el-step title="列表规则"></el-step>
+                        <el-step title="内容规则"></el-step>
+                    </el-steps>
                     <el-form ref="ruleData" :model="ruleData" label-width="130px" style="width:95%">
-                        <el-form-item label="采集规则名称">
-                            <el-input v-model="ruleData.Name" placeholder=""/>
+                        <div v-if="stepsActive==='1'">
+                            <el-form-item label="采集规则名称">
+                                <el-input v-model="ruleData.Name" placeholder=""/>
+                            </el-form-item>
+                            <el-form-item label="采集规则备注">
+                                <el-input v-model="ruleData.Brief" placeholder=""/>
+                            </el-form-item>
+                            <el-form-item label="表名称">
+                                <el-input v-model="ruleData.ListTable" placeholder=""/>
+                            </el-form-item>
+                            <el-form-item>
+                                <el-button :disabled="ruleButtonDisabled" type="primary" @click="formRuleSubmit(2)">
+                                    下一步
+                                </el-button>
+                            </el-form-item>
+                        </div>
+                        <div v-if="stepsActive==='2'">
+                            <el-form-item label="抓取列表网址">
+                                <el-input v-model="ruleData.ListUrl" placeholder="">
+                                    <el-button slot="append" @click="ruleTest(ruleData.ListUrl, '')">测试</el-button>
+                                </el-input>
+                            </el-form-item>
+                            <el-form-item label="列表开始页码">
+                                <el-input-number v-model="ruleData.ListPageStart"/>
+                            </el-form-item>
+                            <el-form-item label="列表结束页码">
+                                <el-input-number v-model="ruleData.ListPageEnd"/>
+                            </el-form-item>
+                            <el-form-item label="每页间隔">
+                                <el-input-number v-model="ruleData.ListPageSize"/>
+                            </el-form-item>
+                            <el-form-item label="列表匹配规则">
+                                <el-input v-model="ruleData.ListRule" placeholder="">
+                                    <el-button slot="append" @click="searchClick">测试</el-button>
+                                </el-input>
+                            </el-form-item>
+                            <el-form-item label="匹配参数">
+                                <el-table :data="ruleParams" border>
+                                    <el-table-column label="字段名称" prop="Field"></el-table-column>
+                                    <el-table-column label="字段备注" prop="Brief"></el-table-column>
+                                    <el-table-column label="字段类型" prop="FieldType"></el-table-column>
+                                    <el-table-column label="排序" prop="Sort" width="80"></el-table-column>
+                                    <el-table-column label="添加时间" prop="CreateDate" width="180"></el-table-column>
+                                    <el-table-column label="操作" width="100">
+                                        <template slot-scope="scope">
+                                            <el-tooltip effect="dark" content="编辑规则" placement="top">
+                                                <el-button type="primary" size="small" circle icon="el-icon-edit"
+                                                           @click="updateRuleParamDialog(scope.row)"/>
+                                            </el-tooltip>
+                                            <el-tooltip effect="dark" content="编辑规则" placement="top">
+                                                <el-button type="danger" size="small" circle icon="el-icon-delete"
+                                                           @click="deleteRuleParamDialog(scope.row)"/>
+                                            </el-tooltip>
+                                        </template>
+                                    </el-table-column>
+                                </el-table>
+                                <el-button size="mini" round @click="createRuleParamDialog(ruleData, 'List')">添加字段
+                                </el-button>
+                            </el-form-item>
+                            <el-form-item>
+                                <el-button type="primary" @click="stepsActive='1'">上一步</el-button>
+                                <el-button :disabled="ruleButtonDisabled" type="primary" @click="formRuleSubmit(3)">下一步
+                                </el-button>
+                            </el-form-item>
+                        </div>
+                        <div v-if="stepsActive==='3'">
+                            <el-form-item label="内容测试网址">
+                                <el-input v-model="ruleData.ContentUrl" placeholder=""/>
+                            </el-form-item>
+                            <el-form-item label="匹配参数">
+                                <el-table :data="ruleParams" border>
+                                    <el-table-column label="字段名称" prop="Field"></el-table-column>
+                                    <el-table-column label="字段备注" prop="Brief"></el-table-column>
+                                    <el-table-column label="字段类型" prop="FieldType"></el-table-column>
+                                    <el-table-column label="排序" prop="Sort" width="80"></el-table-column>
+                                    <el-table-column label="添加时间" prop="CreateDate" width="180"></el-table-column>
+                                    <el-table-column label="操作" width="100">
+                                        <template slot-scope="scope">
+                                            <el-tooltip effect="dark" content="编辑规则" placement="top">
+                                                <el-button type="primary" size="small" circle icon="el-icon-edit"
+                                                           @click="updateRuleParamDialog(scope.row)"/>
+                                            </el-tooltip>
+                                            <el-tooltip effect="dark" content="编辑规则" placement="top">
+                                                <el-button type="danger" size="small" circle icon="el-icon-delete"
+                                                           @click="deleteRuleParamDialog(scope.row)"/>
+                                            </el-tooltip>
+                                        </template>
+                                    </el-table-column>
+                                </el-table>
+                                <el-button size="mini" round @click="createRuleParamDialog(ruleData, 'Content')">添加字段
+                                </el-button>
+                            </el-form-item>
+                            <el-form-item>
+                                <el-button type="primary" @click="stepsActive='2'">上一步</el-button>
+                                <el-button :disabled="ruleButtonDisabled" type="primary" @click="formRuleSubmit(1)">保存
+                                </el-button>
+                            </el-form-item>
+                        </div>
+                    </el-form>
+                </el-dialog>
+
+                <!--对话框: 参数-->
+                <el-dialog :visible.sync="ruleParamDialogVisible" :title="ruleParamTitle" fullscreen>
+                    <el-form ref="ruleParamData" :model="ruleParamData" label-width="130px" style="width:95%">
+                        <el-form-item label="字段名称">
+                            <el-input v-model="ruleParamData.Field" placeholder=""/>
                         </el-form-item>
-                        <el-form-item label="采集规则备注">
-                            <el-input v-model="ruleData.Brief" placeholder=""/>
+                        <el-form-item label="字段类型">
+                            <el-radio-group v-model="ruleParamData.FieldType">
+                                <el-radio label="INTEGER">INTEGER</el-radio>
+                                <el-radio label="VARCHAR">VARCHAR</el-radio>
+                                <el-radio label="TEXT">TEXT</el-radio>
+                            </el-radio-group>
                         </el-form-item>
-                        <el-form-item label="表名称">
-                            <el-input v-model="ruleData.ListTable" placeholder=""/>
+                        <el-form-item label="字段备注">
+                            <el-input v-model="ruleParamData.Brief" placeholder=""/>
                         </el-form-item>
-                        <el-form-item label="抓取列表网址">
-                            <el-input v-model="ruleData.ListUrl" placeholder="">
-                                <el-button slot="append" @click="ruleTest(ruleData.ListUrl, '')">测试</el-button>
+                        <el-form-item label="匹配规则">
+                            <el-input v-model="ruleParamData.Rule" placeholder="">
+                                <el-button slot="append" @click="ruleParamTest(ruleParamData.Rule)">测试</el-button>
                             </el-input>
                         </el-form-item>
-                        <el-form-item label="列表开始页码">
-                            <el-input-number v-model="ruleData.ListPageStart"/>
+                        <el-form-item label="获取类型">
+                            <el-radio-group v-model="ruleParamData.ValueType">
+                                <el-radio label="Html">Html</el-radio>
+                                <el-radio label="Text">Text</el-radio>
+                                <el-radio label="Attr">Attr</el-radio>
+                            </el-radio-group>
                         </el-form-item>
-                        <el-form-item label="列表结束页码">
-                            <el-input-number v-model="ruleData.ListPageEnd"/>
+                        <el-form-item label="获取属性" v-if="ruleParamData.ValueType==='Attr'">
+                            <el-input v-model="ruleParamData.ValueAttr"/>
                         </el-form-item>
-                        <el-form-item label="每页间隔">
-                            <el-input-number v-model="ruleData.ListPageSize"/>
+                        <el-form-item label="过滤规则">
+                            <el-radio-group v-model="ruleParamData.FilterType">
+                                <el-radio label="Trim">清理两端空白</el-radio>
+                                <el-radio label="Reg">正则替换</el-radio>
+                            </el-radio-group>
                         </el-form-item>
-                        <el-form-item label="列表匹配规则">
-                            <el-input v-model="ruleData.ListRule" placeholder="">
-                                <el-button slot="append" @click="searchClick">测试</el-button>
-                            </el-input>
+                        <div v-if="ruleParamData.FilterType==='Reg'">
+                            <el-form-item label="过滤正则">
+                                <el-input v-model="ruleParamData.FilterRegexp"/>
+                            </el-form-item>
+                            <el-form-item label="正则结果">
+                                <el-input v-model="ruleParamData.FilterRepl"/>
+                            </el-form-item>
+                        </div>
+                        <el-form-item label="排序">
+                            <el-input-number v-model="ruleParamData.Sort" placeholder=""/>
                         </el-form-item>
-                        <el-form-item label="内容测试网址">
-                            <el-input v-model="ruleData.ContentUrl" placeholder=""/>
+                        <el-form-item label="是否可搜索">
+                            <el-radio-group v-model="ruleParamData.IsSearch">
+                                <el-radio :label="0">否</el-radio>
+                                <el-radio :label="1">是</el-radio>
+                            </el-radio-group>
                         </el-form-item>
+                        <el-form-item label="下载类型">
+                            <el-radio-group v-model="ruleParamData.DownType">
+                                <el-radio :label="0">不用下载</el-radio>
+                                <el-radio :label="1">直接下载</el-radio>
+                                <el-radio :label="2">规则下载</el-radio>
+                            </el-radio-group>
+                        </el-form-item>
+                        <div v-if="ruleParamData.DownType===2">
+                            <el-form-item label="下载地址匹配规则">
+                                <el-input v-model="ruleParamData.DownRule" placeholder="">
+                                    <el-button slot="append" @click="ruleParamTest(ruleParamData.DownRule)">测试
+                                    </el-button>
+                                </el-input>
+                            </el-form-item>
+                            <el-form-item label="下载地址获取类型">
+                                <el-radio-group v-model="ruleParamData.DownValueType">
+                                    <el-radio label="Text">Text</el-radio>
+                                    <el-radio label="Attr">Attr</el-radio>
+                                </el-radio-group>
+                            </el-form-item>
+                            <el-form-item label="下载地址获取属性" v-if="ruleParamData.DownValueType==='Attr'">
+                                <el-input v-model="ruleParamData.DownValueAttr" placeholder=""/>
+                            </el-form-item>
+                        </div>
                         <el-form-item>
-                            <el-button :loading="ruleButtonLoading" type="primary" @click="formRuleSubmit">确认
+                            <el-button :disabled="ruleParamButtonDisabled" type="primary" @click="formRuleParamSubmit">
+                                确认
                             </el-button>
                         </el-form-item>
                     </el-form>
                 </el-dialog>
 
-                <!--对话框: 匹配Html-->
+                <!--对话框: 规则匹配测试-->
                 <el-dialog title="规则匹配测试" :visible.sync="ruleTestDialog" fullscreen>
                     <el-input type="textarea" autosize placeholder="玩命抓取匹配中..." v-model="ruleTestHtml">
                     </el-input>
@@ -205,6 +363,7 @@
 		data() {
 			return {
 				menuActive: '1',
+				stepsActive: '1',
 
 				tableLoading: false,
 				tableTotal: 0,
@@ -234,11 +393,23 @@
 				ruleTitle: '',
 				ruleUrl: '',
 				ruleDialogVisible: false,
-				ruleButtonLoading: false,
+				ruleButtonDisabled: false,
 				ruleData: {},
+				ruleParams: [],
+				ruleParamsPost: {
+					Rid: 0,
+					Type: 'List',
+				},
 
 				ruleTestDialog: false,
 				ruleTestHtml: '',
+
+				// 参数: 添加&编辑
+				ruleParamTitle: '',
+				ruleParamUrl: '',
+				ruleParamDialogVisible: false,
+				ruleParamButtonDisabled: false,
+				ruleParamData: {},
 			}
 		},
 		mounted() {
@@ -363,10 +534,16 @@
 			},
 
 			// ======================== 采集规则相关功能 ========================
-			// 展示采集规则列表
+			// 列表
 			ruleList() {
 				this.tableData.map(row => {
 					aPost('/RuleList', {CateId: row.CateId}).then(r => {
+						const list = [];
+						r.list && r.list.map(v => {
+							list.push(Object.assign(v, {
+								paramList: [],
+							}))
+						});
 						row.ruleList = r.list || [];
 					}).catch(error => {
 						this.$message.error(error);
@@ -376,6 +553,7 @@
 
 			// 对话框: 添加
 			createRuleDialog(row) {
+				this.stepsActive = '1';
 				this.ruleTitle = '添加规则 -> ' + row.Name;
 				this.ruleUrl = '/RuleCreate';
 				this.ruleData = {
@@ -388,7 +566,8 @@
 			},
 
 			// 对话框: 编辑
-			updateRuleDialog(row) {
+			updateRuleDialog(row, stepsActive) {
+				if (stepsActive) this.stepsActive = stepsActive + '';
 				this.ruleTitle = '编辑规则 -> ' + row.Name;
 				this.ruleUrl = '/RuleUpdate';
 				aPost('/RuleRead', {Rid: row.Rid}).then(r => {
@@ -400,18 +579,39 @@
 			},
 
 			// 提交
-			formRuleSubmit() {
+			formRuleSubmit(val) {
 				this.$refs.ruleData.validate(valid => {
 					if (valid) {
-						this.ruleButtonLoading = true;
+						this.ruleButtonDisabled = true;
 						aPost(this.ruleUrl, this.ruleData).then(r => {
-							this.$message.success(r.message);
-							this.ruleButtonLoading = false;
-							this.ruleDialogVisible = false;
-							this.getList()
+							this.ruleButtonDisabled = false;
+
+							if (r.Rid) {
+								// 添加时需要返回 Rid，并重新编辑
+								this.ruleData.Rid = r.Rid;
+								this.updateRuleDialog(this.ruleData);
+							} else if (this.stepsActive === '3') {
+								// 最后一步才关闭对话框
+								this.$message.success(r.message);
+								this.ruleDialogVisible = false;
+								this.getList();
+								return;
+							}
+
+							// 显示所在步骤
+							this.stepsActive = val + '';
+
+							// 加载规则参数列表
+							if (this.stepsActive === '2') {
+								this.ruleParamsPost = {Rid: this.ruleData.Rid, Type: 'List'};
+								this.ruleParamList();
+							} else if (this.stepsActive === '3') {
+								this.ruleParamsPost = {Rid: this.ruleData.Rid, Type: 'Content'};
+								this.ruleParamList();
+							}
 						}).catch(error => {
+							this.ruleButtonDisabled = false;
 							this.$message.error(error);
-							this.ruleButtonLoading = false;
 						})
 					}
 				})
@@ -438,6 +638,81 @@
 					this.ruleTestHtml = r.html || '匹配数据为空';
 				}).catch(error => {
 					this.$message.error(error)
+				})
+			},
+
+			// ======================== 采集规则参数相关功能 ========================
+			// 列表
+			ruleParamList() {
+				this.ruleParams = [];
+				aPost('/RuleParamList', this.ruleParamsPost).then(r => {
+					this.ruleParams = r.list || [];
+				}).catch(error => {
+					this.$message.error(error);
+				});
+			},
+
+			// 对话框: 添加
+			createRuleParamDialog(row, type) {
+				this.ruleParamTitle = '添加参数';
+				this.ruleParamUrl = '/RuleParamCreate';
+				this.ruleParamData = {
+					Rid: row.Rid,
+					CateId: row.CateId,
+					Type: type,
+					FieldType: 'INTEGER',
+					ValueType: 'Html',
+					FilterType: 'Trim',
+					Sort: 1,
+					IsSearch: 0,
+					DownType: 0,
+					DownRule: 'a',
+					DownValueType: 'Attr',
+					DownValueAttr: 'href',
+				};
+				this.ruleParamDialogVisible = true;
+			},
+
+			// 对话框: 编辑
+			updateRuleParamDialog(row) {
+				this.ruleParamTitle = '添加参数';
+				this.ruleParamUrl = '/RuleParamUpdate';
+				aPost('/RuleParamRead', {Pid: row.Pid}).then(r => {
+					this.ruleParamData = r.data;
+					this.ruleParamDialogVisible = true;
+				}).catch(error => {
+					this.$message.error(error)
+				})
+			},
+
+			// 提交
+			formRuleParamSubmit() {
+				this.$refs.ruleParamData.validate(valid => {
+					if (valid) {
+						this.ruleParamButtonDisabled = true;
+						aPost(this.ruleParamUrl, this.ruleParamData).then(r => {
+							this.$message.success(r.message);
+							this.ruleParamButtonDisabled = false;
+							this.ruleParamDialogVisible = false;
+							this.ruleParamList()
+						}).catch(error => {
+							this.$message.error(error);
+							this.ruleParamButtonDisabled = false;
+						})
+					}
+				})
+			},
+
+			// 删除
+			deleteRuleParamDialog(row) {
+				this.$confirm('删除不可逆, 是否继续? ', '提示', {type: 'warning'}).then(() => {
+					aPost('/RuleParamDelete', {Pid: row.Pid}).then(r => {
+						this.$message.success(r.message);
+						this.ruleParamList();
+					}).catch(error => {
+						this.$message.error(error);
+					})
+				}).catch(_ => {
 				})
 			},
 		}

@@ -98,7 +98,7 @@ func RuleParamCount(h dbs.H) (n int64, err error) {
 
 func RuleParamList(h dbs.H, page, pageSize int64) (list []RuleParam, err error) {
 	data, fields, scanArr := RuleParamMap()
-	rows, err := db.Find("RuleParam", fields, h, "Pid DESC", page, pageSize)
+	rows, err := db.Find("RuleParam", fields, h, "Pid ASC", page, pageSize)
 	if err != nil {
 		return
 	}
