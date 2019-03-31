@@ -26,7 +26,6 @@ func RuleCreate(c *gin.Context) {
 		"ListPageSize":  m.ListPageSize,
 		"ListRange":     m.ListRange,
 		"ListRule":      m.ListRule,
-		"ContentTable":  m.ContentTable,
 		"ContentUrl":    m.ContentUrl,
 	})
 	if err != nil {
@@ -62,7 +61,6 @@ func RuleUpdate(c *gin.Context) {
 		"ListPageSize":  m.ListPageSize,
 		"ListRange":     m.ListRange,
 		"ListRule":      m.ListRule,
-		"ContentTable":  m.ContentTable,
 		"ContentUrl":    m.ContentUrl,
 	}, m.Rid)
 	if err != nil {

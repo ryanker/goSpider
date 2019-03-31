@@ -11,6 +11,7 @@ type RuleParam struct {
 	Rid        int64
 	Type       int64
 	Field      string
+	FieldType  int64
 	Rule       string
 	ValueType  int64
 	ValueAttr  string
@@ -28,6 +29,7 @@ func RuleParamMap() (ptr *RuleParam, fields string, args *[]interface{}) {
 		"Rid":        &row.Rid,
 		"Type":       &row.Type,
 		"Field":      &row.Field,
+		"FieldType":  &row.FieldType,
 		"Rule":       &row.Rule,
 		"ValueType":  &row.ValueType,
 		"ValueAttr":  &row.ValueAttr,

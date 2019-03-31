@@ -20,8 +20,7 @@ type Rule struct {
 	ListRange     string
 	ListRule      string
 
-	ContentTable string
-	ContentUrl   string
+	ContentUrl string
 
 	UpdateDate string
 	CreateDate string
@@ -42,7 +41,6 @@ func RuleMap() (ptr *Rule, fields string, args *[]interface{}) {
 		"ListPageSize":  &row.ListPageSize,
 		"ListRange":     &row.ListRange,
 		"ListRule":      &row.ListRule,
-		"ContentTable":  &row.ContentTable,
 		"ContentUrl":    &row.ContentUrl,
 		"UpdateDate":    &row.UpdateDate,
 		"CreateDate":    &row.CreateDate,
