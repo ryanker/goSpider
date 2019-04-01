@@ -1,11 +1,6 @@
 package api
 
 import (
-	"fmt"
-	"io/ioutil"
-	"net/http"
-
-	"github.com/PuerkitoBio/goquery"
 	"github.com/xiuno/gin"
 
 	"../../lib/dbs"
@@ -138,51 +133,4 @@ func RuleList(c *gin.Context) {
 	}
 
 	c.Message("0", "success", gin.H{"total": total, "list": list})
-}
-
-func RuleTest(c *gin.Context) {
-	m := struct {
-		Url  string
-		Rule string
-	}{}
-	err := c.ShouldBind(&m)
-	if err != nil {
-		c.Message("-1", "参数不正确: "+err.Error())
-		return
-	}
-
-	res, err := http.Get(m.Url)
-	if err != nil {
-		c.Message("-1", "抓取页面失败: "+err.Error())
-		return
-	}
-	defer res.Body.Close()
-
-	if res.StatusCode != 200 {
-		c.Message("-1", fmt.Sprintf("抓取页面页面状态出错: %d %s", res.StatusCode, res.Status))
-		return
-	}
-
-	// 如果没有匹配规则，则直接返回HTML
-	if m.Rule == "" {
-		b, _ := ioutil.ReadAll(res.Body)
-		c.Message("0", "success", gin.H{"html": string(b)})
-		return
-	}
-
-	// 加载HTML代码
-	doc, err := goquery.NewDocumentFromReader(res.Body)
-	if err != nil {
-		c.Message("-1", "不是正确的HTML页面: "+err.Error())
-		return
-	}
-
-	// 匹配代码
-	html, err := doc.Find(m.Rule).Html()
-	if err != nil {
-		c.Message("-1", "匹配代码失败: "+err.Error())
-		return
-	}
-
-	c.Message("0", "success", gin.H{"html": html})
 }

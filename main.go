@@ -46,13 +46,18 @@ func main() {
 	app.GET("/", front.Index)
 
 	// ========== Api ==========
+	// HttpGet
+	app.POST("/HttpGetPage", api.HttpGetPage)
+	app.POST("/HttpGetList", api.HttpGetList)
+	app.POST("/HttpGetListRule", api.HttpGetListRule)
+	app.POST("/HttpGetContentRule", api.HttpGetContentRule)
+
 	// Rule
 	app.POST("/RuleCreate", api.RuleCreate)
 	app.POST("/RuleUpdate", api.RuleUpdate)
 	app.POST("/RuleRead", api.RuleRead)
 	app.POST("/RuleDelete", api.RuleDelete)
 	app.POST("/RuleList", api.RuleList)
-	app.POST("/RuleTest", api.RuleTest)
 
 	// RuleCate
 	app.POST("/RuleCateCreate", api.RuleCateCreate)
