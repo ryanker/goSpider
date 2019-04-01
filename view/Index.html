@@ -650,7 +650,7 @@
 				})
 			},
 
-            // 返回列表规则
+			// 返回列表规则
 			returnStepsActive2() {
 				this.stepsActive = '2';
 				this.ruleParamsPost = {Rid: this.ruleData.Rid, Type: 'List'};
@@ -702,6 +702,9 @@
 						ParamRule: this.ruleParamData.Rule,
 						ValueType: this.ruleParamData.ValueType,
 						ValueAttr: this.ruleParamData.ValueAttr,
+						FilterType: this.ruleParamData.FilterType,
+						FilterRegexp: this.ruleParamData.FilterRegexp,
+						FilterRepl: this.ruleParamData.FilterRepl,
 					}).then(r => {
 						this.ruleTestHtml = r.html || '匹配数据为空';
 					}).catch(error => {
@@ -717,6 +720,9 @@
 						ParamRule: this.ruleParamData.Rule,
 						ValueType: this.ruleParamData.ValueType,
 						ValueAttr: this.ruleParamData.ValueAttr,
+						FilterType: this.ruleParamData.FilterType,
+						FilterRegexp: this.ruleParamData.FilterRegexp,
+						FilterRepl: this.ruleParamData.FilterRepl,
 					}).then(r => {
 						this.ruleTestHtml = r.html || '匹配数据为空';
 					}).catch(error => {

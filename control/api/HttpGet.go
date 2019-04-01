@@ -1,6 +1,7 @@
 package api
 
 import (
+	"regexp"
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
@@ -71,11 +72,14 @@ func HttpGetList(c *gin.Context) {
 // 3.匹配列表页规则的单个字段
 func HttpGetListRule(c *gin.Context) {
 	m := struct {
-		Url       string
-		ListRule  string
-		ParamRule string
-		ValueType string
-		ValueAttr string
+		Url          string
+		ListRule     string
+		ParamRule    string
+		ValueType    string
+		ValueAttr    string
+		FilterType   string
+		FilterRegexp string
+		FilterRepl   string
 	}{}
 	err := c.ShouldBind(&m)
 	if err != nil {
@@ -108,16 +112,26 @@ func HttpGetListRule(c *gin.Context) {
 		value, _ = doc2.Html()
 	}
 
+	if m.FilterType == "Trim" {
+		value = misc.Trim(value)
+	} else if m.FilterType == "Reg" {
+		re := regexp.MustCompile(m.FilterRegexp)
+		value = re.ReplaceAllString(value, m.FilterRepl)
+	}
+
 	c.Message("0", "success", gin.H{"html": value})
 }
 
 // 4.匹配内容页规则的单个字段
 func HttpGetContentRule(c *gin.Context) {
 	m := struct {
-		Url       string
-		ParamRule string
-		ValueType string
-		ValueAttr string
+		Url          string
+		ParamRule    string
+		ValueType    string
+		ValueAttr    string
+		FilterType   string
+		FilterRegexp string
+		FilterRepl   string
 	}{}
 	err := c.ShouldBind(&m)
 	if err != nil {
@@ -148,6 +162,13 @@ func HttpGetContentRule(c *gin.Context) {
 		value, _ = doc2.Attr(m.ValueAttr)
 	} else {
 		value, _ = doc2.Html()
+	}
+
+	if m.FilterType == "Trim" {
+		value = misc.Trim(value)
+	} else if m.FilterType == "Reg" {
+		re := regexp.MustCompile(m.FilterRegexp)
+		value = re.ReplaceAllString(value, m.FilterRepl)
 	}
 
 	c.Message("0", "success", gin.H{"html": value})
