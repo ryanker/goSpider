@@ -55,13 +55,17 @@ func HttpGetList(c *gin.Context) {
 		return
 	}
 
+	// 数量
+	size := doc.Find(m.ListRule).Size()
+
+	// 列表
 	var htmlList []interface{}
 	doc.Find(m.ListRule).Each(func(i int, s *goquery.Selection) {
 		html, _ := s.Html()
 		htmlList = append(htmlList, html)
 	})
 
-	c.Message("0", "success", gin.H{"htmlList": htmlList})
+	c.Message("0", "success", gin.H{"size": size, "htmlList": htmlList})
 }
 
 // 3.匹配列表页规则的单个字段
@@ -70,6 +74,8 @@ func HttpGetListRule(c *gin.Context) {
 		Url       string
 		ListRule  string
 		ParamRule string
+		ValueType string
+		ValueAttr string
 	}{}
 	err := c.ShouldBind(&m)
 	if err != nil {
@@ -90,13 +96,19 @@ func HttpGetListRule(c *gin.Context) {
 		return
 	}
 
-	html, err := doc.Find(m.ListRule).Find(m.ParamRule).Html()
-	if err != nil {
-		c.Message("-1", "匹配代码失败: "+err.Error())
-		return
+	doc2 := doc.Find(m.ListRule).Find(m.ParamRule).Eq(0)
+	value := ""
+	if m.ValueType == "Html" {
+		value, _ = doc2.Html()
+	} else if m.ValueType == "Text" {
+		value = doc2.Text()
+	} else if m.ValueType == "Attr" {
+		value, _ = doc2.Attr(m.ValueAttr)
+	} else {
+		value, _ = doc2.Html()
 	}
 
-	c.Message("0", "success", gin.H{"html": html})
+	c.Message("0", "success", gin.H{"html": value})
 }
 
 // 4.匹配内容页规则的单个字段
@@ -104,6 +116,8 @@ func HttpGetContentRule(c *gin.Context) {
 	m := struct {
 		Url       string
 		ParamRule string
+		ValueType string
+		ValueAttr string
 	}{}
 	err := c.ShouldBind(&m)
 	if err != nil {
@@ -124,11 +138,17 @@ func HttpGetContentRule(c *gin.Context) {
 		return
 	}
 
-	html, err := doc.Find(m.ParamRule).Html()
-	if err != nil {
-		c.Message("-1", "匹配代码失败: "+err.Error())
-		return
+	doc2 := doc.Find(m.ParamRule).Eq(0)
+	value := ""
+	if m.ValueType == "Html" {
+		value, _ = doc2.Html()
+	} else if m.ValueType == "Text" {
+		value = doc2.Text()
+	} else if m.ValueType == "Attr" {
+		value, _ = doc2.Attr(m.ValueAttr)
+	} else {
+		value, _ = doc2.Html()
 	}
 
-	c.Message("0", "success", gin.H{"html": html})
+	c.Message("0", "success", gin.H{"html": value})
 }

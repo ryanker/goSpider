@@ -52,7 +52,13 @@ func HttpGet(url string) (bodyByte []byte, err error) {
 	c := &http.Client{}
 	c.Timeout = 20 * time.Second // 请求网页，20秒足够
 
-	resp, err := c.Get(url)
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return
+	}
+
+	req.Header.Set("User-Agent", "Mozilla/5.0 AppleWebKit/537.36 Chrome/73.0.3683.86 Safari/537.36")
+	resp, err := c.Do(req)
 	if err != nil {
 		return
 	}

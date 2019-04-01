@@ -154,7 +154,7 @@
                         <div v-if="stepsActive==='2'">
                             <el-form-item label="抓取列表网址">
                                 <el-input v-model="ruleData.ListUrl" placeholder="">
-                                    <el-button slot="append" @click="ruleTest(ruleData.ListUrl, '')">测试</el-button>
+                                    <el-button slot="append" @click="TestListUrl">测试</el-button>
                                 </el-input>
                             </el-form-item>
                             <el-form-item label="列表开始页码">
@@ -168,7 +168,7 @@
                             </el-form-item>
                             <el-form-item label="列表匹配规则">
                                 <el-input v-model="ruleData.ListRule" placeholder="">
-                                    <el-button slot="append" @click="searchClick">测试</el-button>
+                                    <el-button slot="append" @click="TestListRule">测试</el-button>
                                 </el-input>
                             </el-form-item>
                             <el-form-item label="匹配参数">
@@ -202,7 +202,9 @@
                         </div>
                         <div v-if="stepsActive==='3'">
                             <el-form-item label="内容测试网址">
-                                <el-input v-model="ruleData.ContentUrl" placeholder=""/>
+                                <el-input v-model="ruleData.ContentUrl" placeholder="">
+                                    <el-button slot="append" @click="TestContentUrl">测试</el-button>
+                                </el-input>
                             </el-form-item>
                             <el-form-item label="匹配参数">
                                 <el-table :data="ruleParams" border>
@@ -228,7 +230,7 @@
                                 </el-button>
                             </el-form-item>
                             <el-form-item>
-                                <el-button type="primary" @click="stepsActive='2'">上一步</el-button>
+                                <el-button type="primary" @click="returnStepsActive2">上一步</el-button>
                                 <el-button :disabled="ruleButtonDisabled" type="primary" @click="formRuleSubmit(1)">保存
                                 </el-button>
                             </el-form-item>
@@ -244,9 +246,9 @@
                         </el-form-item>
                         <el-form-item label="字段类型">
                             <el-radio-group v-model="ruleParamData.FieldType">
-                                <el-radio label="INTEGER">INTEGER</el-radio>
-                                <el-radio label="VARCHAR">VARCHAR</el-radio>
-                                <el-radio label="TEXT">TEXT</el-radio>
+                                <el-radio label="INTEGER">INTEGER(数字)</el-radio>
+                                <el-radio label="VARCHAR">VARCHAR(小文本)</el-radio>
+                                <el-radio label="TEXT">TEXT(大文本)</el-radio>
                             </el-radio-group>
                         </el-form-item>
                         <el-form-item label="字段备注">
@@ -254,7 +256,7 @@
                         </el-form-item>
                         <el-form-item label="匹配规则">
                             <el-input v-model="ruleParamData.Rule" placeholder="">
-                                <el-button slot="append" @click="ruleParamTest(ruleParamData.Rule)">测试</el-button>
+                                <el-button slot="append" @click="TestRuleParam">测试</el-button>
                             </el-input>
                         </el-form-item>
                         <el-form-item label="获取类型">
@@ -322,9 +324,24 @@
                     </el-form>
                 </el-dialog>
 
-                <!--对话框: 规则匹配测试-->
-                <el-dialog title="规则匹配测试" :visible.sync="ruleTestDialog" fullscreen>
-                    <el-input type="textarea" autosize placeholder="玩命抓取匹配中..." v-model="ruleTestHtml">
+                <!--对话框: 测试规则匹配-->
+                <el-dialog title="测试规则匹配" :visible.sync="ruleTestDialog" fullscreen>
+                    <el-input v-model="ruleTestUrl" disabled>
+                        <template slot="prepend">抓取页面</template>
+                    </el-input>
+                    <el-input v-if="ruleTestHtmlList.length === 0" type="textarea"
+                              autosize="{minRows: 5, maxRows:10000}" placeholder="玩命抓取中..."
+                              v-model="ruleTestHtml" style="margin-top: 20px">
+                    </el-input>
+
+                    <!--列表单独展示样式-->
+                    <el-input v-if="ruleTestHtmlList.length > 0" v-model="ruleTestHtmlList.length" disabled
+                              style="margin-top: 20px">
+                        <template slot="prepend">匹配数量</template>
+                    </el-input>
+                    <el-input v-for="item in ruleTestHtmlList" type="textarea" autosize="{minRows: 5, maxRows:10000}"
+                              placeholder="玩命抓取中..."
+                              v-model="item" style="margin-top: 20px">
                     </el-input>
                 </el-dialog>
             </el-main>
@@ -401,15 +418,18 @@
 					Type: 'List',
 				},
 
-				ruleTestDialog: false,
-				ruleTestHtml: '',
-
 				// 参数: 添加&编辑
 				ruleParamTitle: '',
 				ruleParamUrl: '',
 				ruleParamDialogVisible: false,
 				ruleParamButtonDisabled: false,
 				ruleParamData: {},
+
+				// 抓取页面测试
+				ruleTestDialog: false,
+				ruleTestUrl: '',
+				ruleTestHtml: '',
+				ruleTestHtmlList: [],
 			}
 		},
 		mounted() {
@@ -630,14 +650,91 @@
 				})
 			},
 
-			// 测试规则
-			ruleTest(Url, Rule) {
+            // 返回列表规则
+			returnStepsActive2() {
+				this.stepsActive = '2';
+				this.ruleParamsPost = {Rid: this.ruleData.Rid, Type: 'List'};
+				this.ruleParamList();
+			},
+
+			// ======================== 抓取测试 ========================
+			// 测试列表页
+			TestListUrl() {
 				this.ruleTestDialog = true;
+				this.ruleTestUrl = this.ruleData.ListUrl.replace(/{page}/g, this.ruleData.ListPageStart);
 				this.ruleTestHtml = '';
-				aPost('/RuleTest', {Url: Url, Rule: Rule}).then(r => {
+				this.ruleTestHtmlList = [];
+				aPost('/HttpGetPage', {Url: this.ruleTestUrl}).then(r => {
 					this.ruleTestHtml = r.html || '匹配数据为空';
 				}).catch(error => {
-					this.$message.error(error)
+					this.$message.error(error);
+				})
+			},
+
+			// 测试列表页匹配
+			TestListRule() {
+				this.ruleTestDialog = true;
+				this.ruleTestUrl = this.ruleData.ListUrl.replace(/{page}/g, this.ruleData.ListPageStart);
+				this.ruleTestHtml = '';
+				this.ruleTestHtmlList = [];
+				aPost('/HttpGetList', {Url: this.ruleTestUrl, ListRule: this.ruleData.ListRule}).then(r => {
+					if (r.htmlList) {
+						this.ruleTestHtmlList = r.htmlList;
+					} else {
+						this.ruleTestHtml = '匹配数据为空';
+					}
+				}).catch(error => {
+					this.$message.error(error);
+				})
+			},
+
+			// 测试字段匹配
+			TestRuleParam() {
+				this.ruleTestDialog = true;
+				if (this.ruleParamData.Type === 'List') {
+					// 列表参数匹配
+					this.ruleTestUrl = this.ruleData.ListUrl.replace(/{page}/g, this.ruleData.ListPageStart);
+					this.ruleTestHtml = '';
+					this.ruleTestHtmlList = [];
+					aPost('/HttpGetListRule', {
+						Url: this.ruleTestUrl,
+						ListRule: this.ruleData.ListRule,
+						ParamRule: this.ruleParamData.Rule,
+						ValueType: this.ruleParamData.ValueType,
+						ValueAttr: this.ruleParamData.ValueAttr,
+					}).then(r => {
+						this.ruleTestHtml = r.html || '匹配数据为空';
+					}).catch(error => {
+						this.$message.error(error);
+					})
+				} else if (this.ruleParamData.Type === 'Content') {
+					// 内容参数匹配
+					this.ruleTestUrl = this.ruleData.ContentUrl;
+					this.ruleTestHtml = '';
+					this.ruleTestHtmlList = [];
+					aPost('/HttpGetContentRule', {
+						Url: this.ruleTestUrl,
+						ParamRule: this.ruleParamData.Rule,
+						ValueType: this.ruleParamData.ValueType,
+						ValueAttr: this.ruleParamData.ValueAttr,
+					}).then(r => {
+						this.ruleTestHtml = r.html || '匹配数据为空';
+					}).catch(error => {
+						this.$message.error(error);
+					})
+				}
+			},
+
+			// 测试内容页
+			TestContentUrl() {
+				this.ruleTestDialog = true;
+				this.ruleTestUrl = this.ruleData.ContentUrl;
+				this.ruleTestHtml = '';
+				this.ruleTestHtmlList = [];
+				aPost('/HttpGetPage', {Url: this.ruleTestUrl}).then(r => {
+					this.ruleTestHtml = r.html || '匹配数据为空';
+				}).catch(error => {
+					this.$message.error(error);
 				})
 			},
 
@@ -660,7 +757,7 @@
 					Rid: row.Rid,
 					CateId: row.CateId,
 					Type: type,
-					FieldType: 'INTEGER',
+					FieldType: 'VARCHAR',
 					ValueType: 'Html',
 					FilterType: 'Trim',
 					Sort: 1,
