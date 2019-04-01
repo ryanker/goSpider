@@ -51,6 +51,8 @@ func main() {
 	app.POST("/HttpGetList", api.HttpGetList)
 	app.POST("/HttpGetListRule", api.HttpGetListRule)
 	app.POST("/HttpGetContentRule", api.HttpGetContentRule)
+	app.POST("/HttpGetListRuleDown", api.HttpGetListRuleDown)
+	app.POST("/HttpGetContentRuleDown", api.HttpGetContentRuleDown)
 
 	// Rule
 	app.POST("/RuleCreate", api.RuleCreate)

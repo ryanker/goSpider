@@ -302,7 +302,7 @@
                         <div v-if="ruleParamData.DownType===2">
                             <el-form-item label="下载地址匹配规则">
                                 <el-input v-model="ruleParamData.DownRule" placeholder="">
-                                    <el-button slot="append" @click="ruleParamTest(ruleParamData.DownRule)">测试
+                                    <el-button slot="append" @click="TestRuleParamDown">测试
                                     </el-button>
                                 </el-input>
                             </el-form-item>
@@ -725,6 +725,63 @@
 						FilterRepl: this.ruleParamData.FilterRepl,
 					}).then(r => {
 						this.ruleTestHtml = r.html || '匹配数据为空';
+					}).catch(error => {
+						this.$message.error(error);
+					})
+				}
+			},
+
+			// 测试字段匹配规则下载
+			TestRuleParamDown() {
+				this.ruleTestDialog = true;
+				if (this.ruleParamData.Type === 'List') {
+					// 列表参数匹配
+					this.ruleTestUrl = this.ruleData.ListUrl.replace(/{page}/g, this.ruleData.ListPageStart);
+					this.ruleTestHtml = '';
+					this.ruleTestHtmlList = [];
+					aPost('/HttpGetListRuleDown', {
+						Url: this.ruleTestUrl,
+						ListRule: this.ruleData.ListRule,
+						ParamRule: this.ruleParamData.Rule,
+						ValueType: this.ruleParamData.ValueType,
+						ValueAttr: this.ruleParamData.ValueAttr,
+						FilterType: this.ruleParamData.FilterType,
+						FilterRegexp: this.ruleParamData.FilterRegexp,
+						FilterRepl: this.ruleParamData.FilterRepl,
+						DownRule: this.ruleParamData.DownRule,
+						DownValueType: this.ruleParamData.DownValueType,
+						DownValueAttr: this.ruleParamData.DownValueAttr,
+					}).then(r => {
+						if (r.htmlList) {
+							this.ruleTestHtmlList = r.htmlList;
+						} else {
+							this.ruleTestHtml = '匹配数据为空';
+						}
+					}).catch(error => {
+						this.$message.error(error);
+					})
+				} else if (this.ruleParamData.Type === 'Content') {
+					// 内容参数匹配
+					this.ruleTestUrl = this.ruleData.ContentUrl;
+					this.ruleTestHtml = '';
+					this.ruleTestHtmlList = [];
+					aPost('/HttpGetContentRuleDown', {
+						Url: this.ruleTestUrl,
+						ParamRule: this.ruleParamData.Rule,
+						ValueType: this.ruleParamData.ValueType,
+						ValueAttr: this.ruleParamData.ValueAttr,
+						FilterType: this.ruleParamData.FilterType,
+						FilterRegexp: this.ruleParamData.FilterRegexp,
+						FilterRepl: this.ruleParamData.FilterRepl,
+						DownRule: this.ruleParamData.DownRule,
+						DownValueType: this.ruleParamData.DownValueType,
+						DownValueAttr: this.ruleParamData.DownValueAttr,
+					}).then(r => {
+						if (r.htmlList) {
+							this.ruleTestHtmlList = r.htmlList;
+						} else {
+							this.ruleTestHtml = '匹配数据为空';
+						}
 					}).catch(error => {
 						this.$message.error(error);
 					})
