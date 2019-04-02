@@ -33,6 +33,8 @@ func RuleMap() (ptr *Rule, fields string, args *[]interface{}) {
 	fields, scanArr := dbs.GetSqlRead(dbs.H{
 		"Rid":           &row.Rid,
 		"CateId":        &row.CateId,
+		"Status":        &row.Status,
+		"IntervalHour":  &row.IntervalHour,
 		"Name":          &row.Name,
 		"Brief":         &row.Brief,
 		"ListTable":     &row.ListTable,
