@@ -1,23 +1,7 @@
--- 第一步：分类（采集哪个网站）
--- 第二步：规则名称
--- 第三步：抓取规则细节参数
-
--- 分类表
-CREATE TABLE RuleCate
-(
-  CateId     INTEGER PRIMARY KEY AUTOINCREMENT, -- 分类ID
-  Name       VARCHAR(255) NOT NULL DEFAULT '',  -- 分类名称
-  Brief      VARCHAR(255) NOT NULL DEFAULT '',  -- 分类备注
-  Url        VARCHAR(255) NOT NULL DEFAULT '',  -- 目标网址
-  DateBase   VARCHAR(255) NOT NULL DEFAULT '',  -- 数据库名（一个分类，一个库）
-  CreateDate DATETIME              DEFAULT CURRENT_TIMESTAMP
-);
-
 -- 规则表
 CREATE TABLE Rule
 (
   Rid           INTEGER PRIMARY KEY AUTOINCREMENT, -- 规则ID
-  CateId        INTEGER      NOT NULL DEFAULT '0', -- 分类ID
   Status        INTEGER      NOT NULL DEFAULT '0', -- 任务状态 1:关闭执行 2:执行一次 3:间隔执行
   IntervalHour  INTEGER      NOT NULL DEFAULT '0', -- 间隔执行时间(小时)
   Name          VARCHAR(255) NOT NULL DEFAULT '',  -- 规则名称
@@ -41,7 +25,6 @@ CREATE TABLE RuleParam
 (
   Pid           INTEGER PRIMARY KEY AUTOINCREMENT, -- 参数ID
   Rid           INTEGER      NOT NULL DEFAULT '0', -- 规则ID
-  CateId        INTEGER      NOT NULL DEFAULT '0', -- 分类ID
   Type          VARCHAR(255) NOT NULL DEFAULT '',  -- 参数类型 值:List Content
   Field         VARCHAR(255) NOT NULL DEFAULT '',  -- 字段名称
   FieldType     VARCHAR(255) NOT NULL DEFAULT '',  -- 字段类型 值:INTEGER VARCHAR TEXT

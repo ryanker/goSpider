@@ -16,7 +16,6 @@ func RuleCreate(c *gin.Context) {
 	}
 
 	Rid, err := model.RuleCreate(dbs.H{
-		"CateId":        m.CateId,
 		"Status":        1,
 		"Name":          m.Name,
 		"Brief":         m.Brief,
@@ -51,7 +50,6 @@ func RuleUpdate(c *gin.Context) {
 	}
 
 	err = model.RuleUpdate(dbs.H{
-		"CateId":        m.CateId,
 		"Name":          m.Name,
 		"Brief":         m.Brief,
 		"ListTable":     m.ListTable,
@@ -114,8 +112,8 @@ func RuleList(c *gin.Context) {
 
 	// 筛选条件
 	h := dbs.H{}
-	if m.CateId > 0 {
-		h["CateId"] = m.CateId
+	if m.Status > 0 {
+		h["Status"] = m.Status
 	}
 	if m.Name != "" {
 		h["Name LIKE"] = m.Name

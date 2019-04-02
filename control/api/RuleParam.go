@@ -17,7 +17,6 @@ func RuleParamCreate(c *gin.Context) {
 
 	_, err = model.RuleParamCreate(dbs.H{
 		"Rid":           m.Rid,
-		"CateId":        m.CateId,
 		"Type":          m.Type,
 		"Field":         m.Field,
 		"FieldType":     m.FieldType,

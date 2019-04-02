@@ -8,7 +8,6 @@ import (
 
 type Rule struct {
 	Rid          int64
-	CateId       int64
 	Status       int64
 	IntervalHour int64
 	Name         string
@@ -32,7 +31,6 @@ func RuleMap() (ptr *Rule, fields string, args *[]interface{}) {
 	row := Rule{}
 	fields, scanArr := dbs.GetSqlRead(dbs.H{
 		"Rid":           &row.Rid,
-		"CateId":        &row.CateId,
 		"Status":        &row.Status,
 		"IntervalHour":  &row.IntervalHour,
 		"Name":          &row.Name,
