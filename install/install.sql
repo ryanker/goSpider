@@ -7,7 +7,7 @@ CREATE TABLE Rule
   Name          VARCHAR(255) NOT NULL DEFAULT '',  -- 规则名称
   Brief         VARCHAR(255) NOT NULL DEFAULT '',  -- 规则备注
 
-  ListTable     VARCHAR(255) NOT NULL DEFAULT '',  -- 表名称
+  ListDateBase  VARCHAR(255) NOT NULL DEFAULT '',  -- 表名称
   ListUrl       VARCHAR(255) NOT NULL DEFAULT '',  -- 抓取列表网址
   ListPageStart INTEGER      NOT NULL DEFAULT '0', -- 列表开始页码
   ListPageEnd   INTEGER      NOT NULL DEFAULT '0', -- 列表结束页码

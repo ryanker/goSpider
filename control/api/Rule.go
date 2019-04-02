@@ -19,7 +19,7 @@ func RuleCreate(c *gin.Context) {
 		"Status":        1,
 		"Name":          m.Name,
 		"Brief":         m.Brief,
-		"ListTable":     m.ListTable,
+		"ListDateBase":  m.ListDateBase,
 		"ListUrl":       m.ListUrl,
 		"ListPageStart": m.ListPageStart,
 		"ListPageEnd":   m.ListPageEnd,
@@ -52,7 +52,7 @@ func RuleUpdate(c *gin.Context) {
 	err = model.RuleUpdate(dbs.H{
 		"Name":          m.Name,
 		"Brief":         m.Brief,
-		"ListTable":     m.ListTable,
+		"ListDateBase":  m.ListDateBase,
 		"ListUrl":       m.ListUrl,
 		"ListPageStart": m.ListPageStart,
 		"ListPageEnd":   m.ListPageEnd,
