@@ -28,6 +28,10 @@
         .el-form-item__content .el-table td, .el-form-item__content .el-table th {
             line-height: 23px;
         }
+
+        .mb-1 {
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 <body>
@@ -42,56 +46,29 @@
             <el-main>
                 <!--搜索栏-->
                 <el-row>
-                    <el-input v-model="q.Name" placeholder="请输入分类" style="width:300px;margin-right:10px" class="mb-1">
+                    <el-input v-model="q.Name" placeholder="请输入规则" style="width:300px;margin-right:10px" class="mb-1">
                         <el-button slot="append" icon="el-icon-search" @click="searchClick"/>
                     </el-input>
-                    <el-button type="primary" class="mb-1" @click="createDialog">添加分类</el-button>
-                    <el-button v-if="tableSelectData.length!==0" type="danger" class="mb-1" @click="batchDelete">删除分类
+                    <el-button type="primary" class="mb-1" @click="createDialog">添加规则</el-button>
+                    <el-button v-if="tableSelectData.length!==0" type="danger" class="mb-1" @click="batchDelete">删除规则
                     </el-button>
                 </el-row>
 
                 <!--表格-->
-                <el-table v-loading="tableLoading" :data="tableData" default-expand-all @selection-change="tableSelect">
+                <el-table v-loading="tableLoading" :data="tableData" border @selection-change="tableSelect">
                     <el-table-column type="selection" width="50"></el-table-column>
-                    <el-table-column type="expand">
-                        <template slot-scope="props">
-                            <el-table :data="props.row.ruleList" border>
-                                <el-table-column label="规则名称" prop="Name"></el-table-column>
-                                <el-table-column label="规则备注" prop="Brief"></el-table-column>
-                                <el-table-column label="表名称" prop="ListTable" width="150"></el-table-column>
-                                <el-table-column label="修改时间" prop="UpdateDate" width="180"></el-table-column>
-                                <el-table-column label="添加时间" prop="CreateDate" width="180"></el-table-column>
-                                <el-table-column label="操作" width="100">
-                                    <template slot-scope="scope">
-                                        <el-tooltip effect="dark" content="编辑规则" placement="top">
-                                            <el-button type="primary" size="small" circle icon="el-icon-edit"
-                                                       @click="updateRuleDialog(scope.row, 1)"/>
-                                        </el-tooltip>
-                                        <el-tooltip effect="dark" content="删除规则" placement="top">
-                                            <el-button type="danger" size="small" circle icon="el-icon-delete"
-                                                       @click="deleteRuleDialog(scope.row)"/>
-                                        </el-tooltip>
-                                    </template>
-                                </el-table-column>
-                            </el-table>
-                        </template>
-                    </el-table-column>
-                    <el-table-column label="分类名称" prop="Name"></el-table-column>
-                    <el-table-column label="分类备注" prop="Brief"></el-table-column>
-                    <el-table-column label="目标网址" prop="Url"></el-table-column>
-                    <el-table-column label="数据库名" prop="DateBase" width="150"></el-table-column>
+                    <el-table-column label="规则名称" prop="Name"></el-table-column>
+                    <el-table-column label="规则备注" prop="Brief"></el-table-column>
+                    <el-table-column label="数据库名称" prop="ListDateBase" width="150"></el-table-column>
+                    <el-table-column label="修改时间" prop="UpdateDate" width="180"></el-table-column>
                     <el-table-column label="添加时间" prop="CreateDate" width="180"></el-table-column>
-                    <el-table-column label="操作" width="150">
+                    <el-table-column label="操作" width="100">
                         <template slot-scope="scope">
-                            <el-tooltip effect="dark" content="添加规则" placement="top">
-                                <el-button type="success" size="small" circle icon="el-icon-plus"
-                                           @click="createRuleDialog(scope.row)"/>
-                            </el-tooltip>
-                            <el-tooltip effect="dark" content="编辑分类" placement="top">
+                            <el-tooltip effect="dark" content="编辑规则" placement="top">
                                 <el-button type="primary" size="small" circle icon="el-icon-edit"
-                                           @click="updateDialog(scope.row)"/>
+                                           @click="updateDialog(scope.row, 1)"/>
                             </el-tooltip>
-                            <el-tooltip effect="dark" content="删除分类" placement="top">
+                            <el-tooltip effect="dark" content="删除规则" placement="top">
                                 <el-button type="danger" size="small" circle icon="el-icon-delete"
                                            @click="deleteDialog(scope.row)"/>
                             </el-tooltip>
@@ -105,27 +82,6 @@
                                    background layout="total, prev, pager, next, jumper"
                                    @current-change="tableCurrentChange"/>
                 </el-row>
-
-                <!--对话框: 分类-->
-                <el-dialog :visible.sync="formDialogVisible" :title="formTitle" fullscreen>
-                    <el-form ref="formData" :model="formData" label-width="130px" style="width:95%">
-                        <el-form-item label="分类名称">
-                            <el-input v-model="formData.Name" placeholder=""/>
-                        </el-form-item>
-                        <el-form-item label="分类备注">
-                            <el-input v-model="formData.Brief" placeholder=""/>
-                        </el-form-item>
-                        <el-form-item label="目标网址">
-                            <el-input v-model="formData.Url" placeholder=""/>
-                        </el-form-item>
-                        <el-form-item label="数据库名">
-                            <el-input v-model="formData.DateBase" placeholder=""/>
-                        </el-form-item>
-                        <el-form-item>
-                            <el-button :loading="formButtonLoading" type="primary" @click="formSubmit">确认</el-button>
-                        </el-form-item>
-                    </el-form>
-                </el-dialog>
 
                 <!--对话框: 规则-->
                 <el-dialog :visible.sync="ruleDialogVisible" :title="ruleTitle" fullscreen @close="getList">
@@ -142,11 +98,11 @@
                             <el-form-item label="采集规则备注">
                                 <el-input v-model="ruleData.Brief" placeholder=""/>
                             </el-form-item>
-                            <el-form-item label="表名称">
-                                <el-input v-model="ruleData.ListTable" placeholder=""/>
+                            <el-form-item label="数据库名称">
+                                <el-input v-model="ruleData.ListDateBase" placeholder=""/>
                             </el-form-item>
                             <el-form-item>
-                                <el-button :disabled="ruleButtonDisabled" type="primary" @click="formRuleSubmit(2)">
+                                <el-button :disabled="ruleButtonDisabled" type="primary" @click="formSubmit(2)">
                                     下一步
                                 </el-button>
                             </el-form-item>
@@ -196,7 +152,7 @@
                             </el-form-item>
                             <el-form-item>
                                 <el-button type="primary" @click="stepsActive='1'">上一步</el-button>
-                                <el-button :disabled="ruleButtonDisabled" type="primary" @click="formRuleSubmit(3)">下一步
+                                <el-button :disabled="ruleButtonDisabled" type="primary" @click="formSubmit(3)">下一步
                                 </el-button>
                             </el-form-item>
                         </div>
@@ -219,7 +175,7 @@
                                                 <el-button type="primary" size="small" circle icon="el-icon-edit"
                                                            @click="updateRuleParamDialog(scope.row)"/>
                                             </el-tooltip>
-                                            <el-tooltip effect="dark" content="编辑参数" placement="top">
+                                            <el-tooltip effect="dark" content="删除参数" placement="top">
                                                 <el-button type="danger" size="small" circle icon="el-icon-delete"
                                                            @click="deleteRuleParamDialog(scope.row)"/>
                                             </el-tooltip>
@@ -231,7 +187,7 @@
                             </el-form-item>
                             <el-form-item>
                                 <el-button type="primary" @click="returnStepsActive2">上一步</el-button>
-                                <el-button :disabled="ruleButtonDisabled" type="primary" @click="formRuleSubmit(1)">保存
+                                <el-button :disabled="ruleButtonDisabled" type="primary" @click="formSubmit(1)">保存
                                 </el-button>
                             </el-form-item>
                         </div>
@@ -399,13 +355,6 @@
 					{name: '2', label: '前台隐藏'}
 				],
 
-				// 分类: 添加&编辑
-				formTitle: '',
-				formUrl: '',
-				formDialogVisible: false,
-				formButtonLoading: false,
-				formData: {},
-
 				// 规则: 添加&编辑
 				ruleTitle: '',
 				ruleUrl: '',
@@ -444,140 +393,10 @@
 
 			// 对话框: 添加
 			createDialog() {
-				this.formTitle = '添加分类';
-				this.formUrl = '/RuleCateCreate';
-				this.formData = {};
-				this.formDialogVisible = true;
-			},
-
-			// 对话框: 编辑
-			updateDialog(row) {
-				this.formTitle = '编辑分类';
-				this.formUrl = '/RuleCateUpdate';
-				aPost('/RuleCateRead', {CateId: row.CateId}).then(r => {
-					this.formData = r.data;
-					this.formDialogVisible = true;
-				}).catch(error => {
-					this.$message.error(error)
-				})
-			},
-
-			// 提交
-			formSubmit() {
-				this.$refs.formData.validate(valid => {
-					if (valid) {
-						this.formButtonLoading = true;
-						aPost(this.formUrl, this.formData).then(r => {
-							this.$message.success(r.message);
-							this.formButtonLoading = false;
-							this.formDialogVisible = false;
-
-							this.q.Name = '';
-							this.q.Page = 1;
-							this.getList()
-						}).catch(error => {
-							this.$message.error(error);
-							this.formButtonLoading = false;
-						})
-					}
-				})
-			},
-
-			// 批量选择
-			tableSelect(val) {
-				this.tableSelectData = val;
-			},
-
-			// 批量删除
-			batchDelete() {
-				this.$confirm('删除选中的分类不可逆, 是否继续? ', '提示', {
-					type: 'warning'
-				}).then(() => {
-					!(async () => {
-						const failDate = []; // 记录失败
-						for (const k in this.tableSelectData) {
-							const v = this.tableSelectData[k];
-							await aPost('/RuleCateDelete', {CateId: v.CateId}).catch(error => {
-								failDate.push({CateId: v.CateId, error: error});
-								this.$message.error(error);
-							})
-						}
-
-						if (failDate.length > 0) {
-							this.$message.error('删除失败 ' + failDate.length + ' 次');
-						} else {
-							this.$message.success('删除成功');
-							this.getList();
-						}
-					})()
-				}).catch(_ => {
-				})
-			},
-
-			// 删除
-			deleteDialog(row) {
-				this.$confirm('删除不可逆, 是否继续? ', '提示', {type: 'warning'}).then(() => {
-					aPost('/RuleCateDelete', {CateId: row.CateId}).then(r => {
-						this.$message.success(r.message);
-						this.getList();
-					}).catch(error => {
-						this.$message.error(error);
-					})
-				}).catch(_ => {
-				})
-			},
-
-			// 分页
-			tableCurrentChange(page) {
-				this.q.Page = page;
-				this.getList();
-			},
-
-			// 获取列表
-			getList() {
-				this.tableLoading = true;
-				aPost('/RuleCateList', this.q).then(r => {
-					const list = [];
-					r.list && r.list.map(v => {
-						list.push(Object.assign(v, {
-							ruleList: [],
-						}))
-					});
-					this.tableData = list;
-					this.tableTotal = r.total || 0;
-					this.tableLoading = false;
-
-					this.ruleList();
-				}).catch(error => {
-					this.$message.error(error);
-				});
-			},
-
-			// ======================== 采集规则相关功能 ========================
-			// 列表
-			ruleList() {
-				this.tableData.map(row => {
-					aPost('/RuleList', {CateId: row.CateId}).then(r => {
-						const list = [];
-						r.list && r.list.map(v => {
-							list.push(Object.assign(v, {
-								paramList: [],
-							}))
-						});
-						row.ruleList = r.list || [];
-					}).catch(error => {
-						this.$message.error(error);
-					});
-				});
-			},
-
-			// 对话框: 添加
-			createRuleDialog(row) {
 				this.stepsActive = '1';
-				this.ruleTitle = '添加规则 -> ' + row.Name;
+				this.ruleTitle = '添加规则';
 				this.ruleUrl = '/RuleCreate';
 				this.ruleData = {
-					CateId: row.CateId,
 					ListPageStart: 1,
 					ListPageEnd: 10,
 					ListPageSize: 1,
@@ -586,9 +405,9 @@
 			},
 
 			// 对话框: 编辑
-			updateRuleDialog(row, stepsActive) {
+			updateDialog(row, stepsActive) {
 				if (stepsActive) this.stepsActive = stepsActive + '';
-				this.ruleTitle = '编辑规则 -> ' + row.Name;
+				this.ruleTitle = '编辑规则';
 				this.ruleUrl = '/RuleUpdate';
 				aPost('/RuleRead', {Rid: row.Rid}).then(r => {
 					this.ruleData = r.data;
@@ -599,7 +418,7 @@
 			},
 
 			// 提交
-			formRuleSubmit(val) {
+			formSubmit(val) {
 				this.$refs.ruleData.validate(valid => {
 					if (valid) {
 						this.ruleButtonDisabled = true;
@@ -609,7 +428,7 @@
 							if (r.Rid) {
 								// 添加时需要返回 Rid，并重新编辑
 								this.ruleData.Rid = r.Rid;
-								this.updateRuleDialog(this.ruleData);
+								this.updateDialog(this.ruleData);
 							} else if (this.stepsActive === '3') {
 								// 最后一步才关闭对话框
 								this.$message.success(r.message);
@@ -634,11 +453,42 @@
 							this.$message.error(error);
 						})
 					}
+				});
+			},
+
+			// 批量选择
+			tableSelect(val) {
+				this.tableSelectData = val;
+			},
+
+			// 批量删除
+			batchDelete() {
+				this.$confirm('删除选中的规则不可逆, 是否继续? ', '提示', {
+					type: 'warning'
+				}).then(() => {
+					!(async () => {
+						const failDate = []; // 记录失败
+						for (const k in this.tableSelectData) {
+							const v = this.tableSelectData[k];
+							await aPost('/RuleDelete', {Rid: v.Rid}).catch(error => {
+								failDate.push({Rid: v.Rid, error: error});
+								this.$message.error(error);
+							})
+						}
+
+						if (failDate.length > 0) {
+							this.$message.error('删除失败 ' + failDate.length + ' 次');
+						} else {
+							this.$message.success('删除成功');
+							this.getList();
+						}
+					})()
+				}).catch(_ => {
 				})
 			},
 
 			// 删除
-			deleteRuleDialog(row) {
+			deleteDialog(row) {
 				this.$confirm('删除不可逆, 是否继续? ', '提示', {type: 'warning'}).then(() => {
 					aPost('/RuleDelete', {Rid: row.Rid}).then(r => {
 						this.$message.success(r.message);
@@ -647,7 +497,25 @@
 						this.$message.error(error);
 					})
 				}).catch(_ => {
-				})
+				});
+			},
+
+			// 分页
+			tableCurrentChange(page) {
+				this.q.Page = page;
+				this.getList();
+			},
+
+			// 获取列表
+			getList() {
+				this.tableLoading = true;
+				aPost('/RuleList', this.q).then(r => {
+					this.tableData = r.list || [];
+					this.tableTotal = r.total || 0;
+					this.tableLoading = false;
+				}).catch(error => {
+					this.$message.error(error);
+				});
 			},
 
 			// 返回列表规则
@@ -818,7 +686,6 @@
 				this.ruleParamUrl = '/RuleParamCreate';
 				this.ruleParamData = {
 					Rid: row.Rid,
-					CateId: row.CateId,
 					Type: type,
 					FieldType: 'VARCHAR',
 					ValueType: 'Html',
