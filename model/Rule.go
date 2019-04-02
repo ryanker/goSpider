@@ -7,10 +7,12 @@ import (
 )
 
 type Rule struct {
-	Rid    int64
-	CateId int64
-	Name   string
-	Brief  string
+	Rid          int64
+	CateId       int64
+	Status       int64
+	IntervalHour int64
+	Name         string
+	Brief        string
 
 	ListTable     string
 	ListUrl       string

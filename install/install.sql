@@ -18,6 +18,8 @@ CREATE TABLE Rule
 (
   Rid           INTEGER PRIMARY KEY AUTOINCREMENT, -- 规则ID
   CateId        INTEGER      NOT NULL DEFAULT '0', -- 分类ID
+  Status        INTEGER      NOT NULL DEFAULT '0', -- 任务状态 1:关闭执行 2:执行一次 3:间隔执行
+  IntervalHour  INTEGER      NOT NULL DEFAULT '0', -- 间隔执行时间(小时)
   Name          VARCHAR(255) NOT NULL DEFAULT '',  -- 规则名称
   Brief         VARCHAR(255) NOT NULL DEFAULT '',  -- 规则备注
 

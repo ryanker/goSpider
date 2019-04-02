@@ -17,6 +17,7 @@ func RuleCreate(c *gin.Context) {
 
 	Rid, err := model.RuleCreate(dbs.H{
 		"CateId":        m.CateId,
+		"Status":        1,
 		"Name":          m.Name,
 		"Brief":         m.Brief,
 		"ListTable":     m.ListTable,
