@@ -75,6 +75,9 @@ func main() {
 	app.POST("/RuleParamDelete", api.RuleParamDelete)
 	app.POST("/RuleParamList", api.RuleParamList)
 
+	// Database
+	app.POST("/DatabaseSet", api.DatabaseSet)
+
 	err = app.Run("0.0.0.0:8888")
 	if err != nil {
 		panic(err)
