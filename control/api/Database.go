@@ -57,11 +57,11 @@ func DatabaseSet(c *gin.Context) {
 func generateSql(Rid int64) (s string, err error) {
 	ListData, err := model.RuleParamList(dbs.H{"Rid": Rid, "Type": "List"}, 0, 0)
 	if err != nil {
-		return
+		return s, err
 	}
 	ContentData, err := model.RuleParamList(dbs.H{"Rid": Rid, "Type": "Content"}, 0, 0)
 	if err != nil {
-		return
+		return s, err
 	}
 
 	// List
@@ -130,44 +130,39 @@ CREATE TABLE ContentDownload
 }
 
 // 创建数据库
-func createDatabase(Type int64, DateBase string, s string) (err error) {
+func createDatabase(Type int64, DateBase string, s string) error {
 	dbFile := "./db/" + DateBase + ".db"
 	db, err := dbs.Open(dbFile)
 	if err != nil {
-		return
+		return err
 	}
 
 	// 文件不存在，则创建表
 	if Type == 1 {
-		_, err = db.Exec(s)
-		if err != nil {
-			return
+		if _, err = db.Exec(s); err != nil {
+			return err
 		}
 	} else if Type == 2 {
 		if _, err := os.Stat(dbFile); !os.IsNotExist(err) {
 			newPath := dbFile + "." + time.Now().Format("20060102_150405")
 			if err := os.Rename(dbFile, newPath); err != nil {
-				err = errors.New("备份数据库失败: " + err.Error())
-				return
+				return errors.New("备份数据库失败: " + err.Error())
 			}
 		}
 
-		_, err = db.Exec(s)
-		if err != nil {
-			return
+		if _, err = db.Exec(s); err != nil {
+			return err
 		}
 	} else if Type == 3 {
 		if _, err := os.Stat(dbFile); !os.IsNotExist(err) {
 			if err = os.Remove(dbFile); err != nil {
-				err = errors.New("删除文件失败: " + err.Error())
-				return
+				return errors.New("删除文件失败: " + err.Error())
 			}
 		}
 
-		_, err = db.Exec(s)
-		if err != nil {
-			return
+		if _, err = db.Exec(s); err != nil {
+			return err
 		}
 	}
-	return
+	return nil
 }
