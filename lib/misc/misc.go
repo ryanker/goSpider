@@ -9,6 +9,26 @@ import (
 	"time"
 )
 
+// 写入文件日志
+func FileLogWrite(FilePath string, format string, args ...interface{}) {
+	f, err := os.OpenFile(FilePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	str := fmt.Sprintf("%v | %v\n",
+		time.Now().Format("2006-01-02 15:04:05"),
+		fmt.Sprintf(format, args...),
+	)
+	if _, err := f.Write([]byte(str)); err != nil {
+		fmt.Println(err)
+	}
+
+	if err := f.Close(); err != nil {
+		fmt.Println(err)
+	}
+}
+
 // 打开文件
 func FileOpen(filePth string) ([]byte, error) {
 	f, err := os.Open(filePth)

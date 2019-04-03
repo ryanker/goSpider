@@ -57,9 +57,9 @@
                 <!--状态筛选-->
                 <el-radio-group v-model="q.Status" class="mb-1" @change="StatusChange">
                     <el-radio-button :label="0">全部</el-radio-button>
-                    <el-radio-button :label="1">关闭执行</el-radio-button>
-                    <el-radio-button :label="2">执行一次</el-radio-button>
-                    <el-radio-button :label="3">间隔执行</el-radio-button>
+                    <el-radio-button :label="1">关闭采集</el-radio-button>
+                    <el-radio-button :label="2">采集一次</el-radio-button>
+                    <el-radio-button :label="3">间隔采集</el-radio-button>
                 </el-radio-group>
 
                 <!--表格-->
@@ -108,9 +108,9 @@
 
                         <el-form-item label="任务状态">
                             <el-radio-group v-model="cronData.Status">
-                                <el-radio :label="1">关闭执行</el-radio>
-                                <el-radio :label="2">执行一次</el-radio>
-                                <el-radio :label="3">间隔执行</el-radio>
+                                <el-radio :label="1">关闭采集</el-radio>
+                                <el-radio :label="2">采集一次</el-radio>
+                                <el-radio :label="3">间隔采集</el-radio>
                             </el-radio-group>
                         </el-form-item>
                         <el-form-item label="间隔时间" v-if="cronData.Status===3">
