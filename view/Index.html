@@ -455,7 +455,7 @@
 			// 采集任务设置保存
 			cronDataSubmit() {
 				this.cronButtonDisabled = true;
-				aPost('/DatabaseSet', this.cronData).then(r => {
+				aPost('/DatabaseCreate', this.cronData).then(r => {
 					this.cronButtonDisabled = false;
 					this.$message.success(r.message);
 				}).catch(error => {

@@ -13,7 +13,7 @@ import (
 )
 
 // 数据库结构设置
-func DatabaseSet(c *gin.Context) {
+func DatabaseCreate(c *gin.Context) {
 	m := struct {
 		Rid  int64
 		Type int64

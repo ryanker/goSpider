@@ -69,7 +69,7 @@ func main() {
 	app.POST("/HttpGetContentRuleDown", api.HttpGetContentRuleDown)
 
 	// Database
-	app.POST("/DatabaseSet", api.DatabaseSet)
+	app.POST("/DatabaseCreate", api.DatabaseCreate)
 
 	err = app.Run("0.0.0.0:8888")
 	if err != nil {
