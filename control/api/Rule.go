@@ -17,6 +17,7 @@ func RuleCreate(c *gin.Context) {
 
 	Rid, err := model.RuleCreate(dbs.H{
 		"Status":        1,
+		"IntervalHour":  1,
 		"Name":          m.Name,
 		"Brief":         m.Brief,
 		"DateBase":      m.DateBase,
@@ -59,6 +60,32 @@ func RuleUpdate(c *gin.Context) {
 		"ListPageSize":  m.ListPageSize,
 		"ListRule":      m.ListRule,
 		"ContentUrl":    m.ContentUrl,
+	}, m.Rid)
+	if err != nil {
+		c.Message("-1", "更新数据库失败："+err.Error())
+		return
+	}
+
+	c.Message("0", "修改成功")
+}
+
+func RuleUpdateCron(c *gin.Context) {
+	m := model.Rule{}
+	err := c.ShouldBind(&m)
+	if err != nil {
+		c.Message("-1", "参数不正确："+err.Error())
+		return
+	}
+
+	_, err = model.RuleRead(m.Rid)
+	if err != nil {
+		c.Message("-1", err.Error())
+		return
+	}
+
+	err = model.RuleUpdate(dbs.H{
+		"Status":       m.Status,
+		"IntervalHour": m.IntervalHour,
 	}, m.Rid)
 	if err != nil {
 		c.Message("-1", "更新数据库失败："+err.Error())

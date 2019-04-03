@@ -49,6 +49,7 @@ func main() {
 	// Rule
 	app.POST("/RuleCreate", api.RuleCreate)
 	app.POST("/RuleUpdate", api.RuleUpdate)
+	app.POST("/RuleUpdateCron", api.RuleUpdateCron)
 	app.POST("/RuleRead", api.RuleRead)
 	app.POST("/RuleDelete", api.RuleDelete)
 	app.POST("/RuleList", api.RuleList)

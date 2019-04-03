@@ -98,13 +98,14 @@
                 <!--对话框: 任务-->
                 <el-dialog :visible.sync="cronDialogVisible" title="采集任务" fullscreen>
                     <el-form ref="cronData" :model="cronData" label-width="130px" style="width:95%">
-                        <el-form-item label="数据库" v-if="cronData.DataBaseType>0">
-                            <el-radio-group v-model="cronData.DataBaseType">
+                        <el-form-item label="数据库" v-if="cronDateBase.Type>0">
+                            <el-radio-group v-model="cronDateBase.Type">
                                 <el-radio :label="1">全新创建表</el-radio>
                                 <el-radio :label="2">备份旧数据</el-radio>
                                 <el-radio :label="3">删除旧数据</el-radio>
                             </el-radio-group>
                         </el-form-item>
+
                         <el-form-item label="任务状态">
                             <el-radio-group v-model="cronData.Status">
                                 <el-radio :label="1">关闭执行</el-radio>
@@ -113,7 +114,9 @@
                             </el-radio-group>
                         </el-form-item>
                         <el-form-item label="间隔时间" v-if="cronData.Status===3">
-                            <el-input-number v-model="cronData.IntervalHour"/>
+                            <el-input v-model="cronData.IntervalHour" style="width:200px">
+                                <el-button slot="append">小时</el-button>
+                            </el-input>
                         </el-form-item>
                         <el-form-item>
                             <el-button :disabled="cronButtonDisabled" type="primary" @click="cronDataSubmit">
@@ -393,6 +396,7 @@
 				cronDialogVisible: false,
 				cronButtonDisabled: false,
 				cronData: {},
+				cronDateBase: {},
 
 				// 规则: 添加&编辑
 				ruleTitle: '',
@@ -437,15 +441,20 @@
 				this.getList();
 			},
 
+			// ===================== 任务 =====================
 			// 采集任务
 			updateCronDialog(row) {
 				this.cronDialogVisible = true;
 				aPost('/RuleRead', {Rid: row.Rid}).then(r => {
-					this.cronData = {
-						Rid: r.data.Rid,
+					const d = r.data;
+					this.cronDateBase = {
+						Rid: d.Rid,
 						Type: 1,
-						Status: r.data.Status,
-						IntervalHour: r.data.IntervalHour,
+					};
+					this.cronData = {
+						Rid: d.Rid,
+						Status: d.Status,
+						IntervalHour: d.IntervalHour,
 					};
 				}).catch(error => {
 					this.$message.error(error)
@@ -455,15 +464,22 @@
 			// 采集任务设置保存
 			cronDataSubmit() {
 				this.cronButtonDisabled = true;
-				aPost('/DatabaseCreate', this.cronData).then(r => {
-					this.cronButtonDisabled = false;
-					this.$message.success(r.message);
+				aPost('/DatabaseCreate', this.cronDateBase).then(r => {
+					this.cronData.IntervalHour = Number(this.cronData.IntervalHour);
+					aPost('/RuleUpdateCron', this.cronData).then(r => {
+						this.cronButtonDisabled = false;
+						this.$message.success(r.message);
+					}).catch(error => {
+						this.cronButtonDisabled = false;
+						this.$message.error(error);
+					})
 				}).catch(error => {
 					this.cronButtonDisabled = false;
 					this.$message.error(error);
 				})
 			},
 
+			// ===================== 规则 =====================
 			// 对话框: 添加
 			createDialog() {
 				this.stepsActive = '1';
