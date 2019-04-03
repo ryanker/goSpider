@@ -46,14 +46,6 @@ func main() {
 	app.GET("/", front.Index)
 
 	// ========== Api ==========
-	// HttpGet
-	app.POST("/HttpGetPage", api.HttpGetPage)
-	app.POST("/HttpGetList", api.HttpGetList)
-	app.POST("/HttpGetListRule", api.HttpGetListRule)
-	app.POST("/HttpGetContentRule", api.HttpGetContentRule)
-	app.POST("/HttpGetListRuleDown", api.HttpGetListRuleDown)
-	app.POST("/HttpGetContentRuleDown", api.HttpGetContentRuleDown)
-
 	// Rule
 	app.POST("/RuleCreate", api.RuleCreate)
 	app.POST("/RuleUpdate", api.RuleUpdate)
@@ -67,6 +59,14 @@ func main() {
 	app.POST("/RuleParamRead", api.RuleParamRead)
 	app.POST("/RuleParamDelete", api.RuleParamDelete)
 	app.POST("/RuleParamList", api.RuleParamList)
+
+	// HttpGet
+	app.POST("/HttpGetPage", api.HttpGetPage)
+	app.POST("/HttpGetList", api.HttpGetList)
+	app.POST("/HttpGetListRule", api.HttpGetListRule)
+	app.POST("/HttpGetContentRule", api.HttpGetContentRule)
+	app.POST("/HttpGetListRuleDown", api.HttpGetListRuleDown)
+	app.POST("/HttpGetContentRuleDown", api.HttpGetContentRuleDown)
 
 	// Database
 	app.POST("/DatabaseSet", api.DatabaseSet)

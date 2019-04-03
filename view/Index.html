@@ -67,11 +67,15 @@
                     <el-table-column type="selection" width="50"></el-table-column>
                     <el-table-column label="规则名称" prop="Name"></el-table-column>
                     <el-table-column label="规则备注" prop="Brief"></el-table-column>
-                    <el-table-column label="数据库名称" prop="ListDateBase" width="150"></el-table-column>
+                    <el-table-column label="数据库名称" prop="DateBase" width="150"></el-table-column>
                     <el-table-column label="修改时间" prop="UpdateDate" width="180"></el-table-column>
                     <el-table-column label="添加时间" prop="CreateDate" width="180"></el-table-column>
-                    <el-table-column label="操作" width="100">
+                    <el-table-column label="操作" width="150">
                         <template slot-scope="scope">
+                            <el-tooltip effect="dark" content="采集任务" placement="top">
+                                <el-button type="success" size="small" circle icon="el-icon-caret-right"
+                                           @click="updateCronDialog(scope.row)"/>
+                            </el-tooltip>
                             <el-tooltip effect="dark" content="编辑规则" placement="top">
                                 <el-button type="primary" size="small" circle icon="el-icon-edit"
                                            @click="updateDialog(scope.row, 1)"/>
@@ -91,6 +95,34 @@
                                    @current-change="tableCurrentChange"/>
                 </el-row>
 
+                <!--对话框: 任务-->
+                <el-dialog :visible.sync="cronDialogVisible" title="采集任务" fullscreen>
+                    <el-form ref="cronData" :model="cronData" label-width="130px" style="width:95%">
+                        <el-form-item label="数据库" v-if="cronData.DataBaseType>0">
+                            <el-radio-group v-model="cronData.DataBaseType">
+                                <el-radio :label="1">全新创建表</el-radio>
+                                <el-radio :label="2">备份旧数据</el-radio>
+                                <el-radio :label="3">删除旧数据</el-radio>
+                            </el-radio-group>
+                        </el-form-item>
+                        <el-form-item label="任务状态">
+                            <el-radio-group v-model="cronData.Status">
+                                <el-radio :label="1">关闭执行</el-radio>
+                                <el-radio :label="2">执行一次</el-radio>
+                                <el-radio :label="3">间隔执行</el-radio>
+                            </el-radio-group>
+                        </el-form-item>
+                        <el-form-item label="间隔时间" v-if="cronData.Status===3">
+                            <el-input-number v-model="cronData.IntervalHour"/>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-button :disabled="cronButtonDisabled" type="primary" @click="cronDataSubmit">
+                                确认
+                            </el-button>
+                        </el-form-item>
+                    </el-form>
+                </el-dialog>
+
                 <!--对话框: 规则-->
                 <el-dialog :visible.sync="ruleDialogVisible" :title="ruleTitle" fullscreen @close="getList">
                     <el-steps :active="stepsActive" align-center style="margin-bottom:15px">
@@ -107,7 +139,7 @@
                                 <el-input v-model="ruleData.Brief" placeholder=""/>
                             </el-form-item>
                             <el-form-item label="数据库名称">
-                                <el-input v-model="ruleData.ListDateBase" placeholder=""/>
+                                <el-input v-model="ruleData.DateBase" placeholder=""/>
                             </el-form-item>
                             <el-form-item>
                                 <el-button :disabled="ruleButtonDisabled" type="primary" @click="formSubmit(2)">
@@ -357,6 +389,11 @@
 					Page: 1
 				},
 
+				// 任务: 编辑
+				cronDialogVisible: false,
+				cronButtonDisabled: false,
+				cronData: {},
+
 				// 规则: 添加&编辑
 				ruleTitle: '',
 				ruleUrl: '',
@@ -398,6 +435,33 @@
 				this.q.Status = val;
 				this.q.Page = 1;
 				this.getList();
+			},
+
+			// 采集任务
+			updateCronDialog(row) {
+				this.cronDialogVisible = true;
+				aPost('/RuleRead', {Rid: row.Rid}).then(r => {
+					this.cronData = {
+						Rid: r.data.Rid,
+						Type: 1,
+						Status: r.data.Status,
+						IntervalHour: r.data.IntervalHour,
+					};
+				}).catch(error => {
+					this.$message.error(error)
+				})
+			},
+
+			// 采集任务设置保存
+			cronDataSubmit() {
+				this.cronButtonDisabled = true;
+				aPost('/DatabaseSet', this.cronData).then(r => {
+					this.cronButtonDisabled = false;
+					this.$message.success(r.message);
+				}).catch(error => {
+					this.cronButtonDisabled = false;
+					this.$message.error(error);
+				})
 			},
 
 			// 对话框: 添加

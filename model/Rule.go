@@ -13,7 +13,7 @@ type Rule struct {
 	Name         string
 	Brief        string
 
-	ListDateBase  string
+	DateBase      string
 	ListUrl       string
 	ListPageStart int64
 	ListPageEnd   int64
@@ -35,7 +35,7 @@ func RuleMap() (ptr *Rule, fields string, args *[]interface{}) {
 		"IntervalHour":  &row.IntervalHour,
 		"Name":          &row.Name,
 		"Brief":         &row.Brief,
-		"ListDateBase":  &row.ListDateBase,
+		"DateBase":      &row.DateBase,
 		"ListUrl":       &row.ListUrl,
 		"ListPageStart": &row.ListPageStart,
 		"ListPageEnd":   &row.ListPageEnd,
