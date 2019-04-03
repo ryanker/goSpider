@@ -3,6 +3,7 @@ package api
 import (
 	"errors"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/xiuno/gin"
@@ -27,6 +28,10 @@ func DatabaseSet(c *gin.Context) {
 	row, err := model.RuleRead(m.Rid)
 	if err != nil {
 		c.Message("-1", "读取规则失败: "+err.Error())
+		return
+	}
+	if row.DateBase == "" || strings.ToLower(row.DateBase) == "data" {
+		c.Message("-1", "数据库名称错误")
 		return
 	}
 
