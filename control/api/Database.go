@@ -66,7 +66,7 @@ func generateSql(Rid int64) (s string, err error) {
 
 	// List
 	s += "CREATE TABLE List(\n"
-	s += "  `Id` INTEGER PRIMARY KEY AUTOINCREMENT,\n"
+	s += "  `ListId` INTEGER PRIMARY KEY AUTOINCREMENT,\n"
 	s += "  `Status` INTEGER NOT NULL DEFAULT '0',\n"
 	for _, v := range ListData {
 		Suffix := ""
@@ -84,7 +84,7 @@ func generateSql(Rid int64) (s string, err error) {
 
 	// Content
 	s += "CREATE TABLE Content(\n"
-	s += "  `Id` INTEGER PRIMARY KEY AUTOINCREMENT,\n"
+	s += "  `ContentId` INTEGER PRIMARY KEY AUTOINCREMENT,\n"
 	for _, v := range ContentData {
 		Suffix := ""
 		if v.FieldType == "INTEGER" {
@@ -103,6 +103,7 @@ func generateSql(Rid int64) (s string, err error) {
 	s += `CREATE TABLE ListDownload
 (
   Id           INTEGER PRIMARY KEY AUTOINCREMENT,
+  ListId       INTEGER      NOT NULL DEFAULT '0',
   Status       INTEGER      NOT NULL DEFAULT '0',
   Field        VARCHAR(255) NOT NULL DEFAULT '',
   OldUrl       VARCHAR(255) NOT NULL DEFAULT '',
@@ -116,6 +117,7 @@ func generateSql(Rid int64) (s string, err error) {
 CREATE TABLE ContentDownload
 (
   Id           INTEGER PRIMARY KEY AUTOINCREMENT,
+  ContentId    INTEGER      NOT NULL DEFAULT '0',
   Status       INTEGER      NOT NULL DEFAULT '0',
   Field        VARCHAR(255) NOT NULL DEFAULT '',
   OldUrl       VARCHAR(255) NOT NULL DEFAULT '',
