@@ -126,6 +126,22 @@ CREATE TABLE user
 	}
 	fmt.Println("List:", list)
 
+	// 读取多条(到 Map)
+	rows, err = db.Find("user", fields, dbs.H{}, "", 1, 20)
+	if err != nil {
+		panic(err)
+	}
+	var listMap []interface{}
+	for rows.Next() {
+		m := map[string]interface{}{}
+		err = dbs.MapScan(rows, m)
+		if err != nil {
+			panic(err)
+		}
+		listMap = append(listMap, m)
+	}
+	fmt.Println("List Map:", listMap)
+
 	// 删除
 	n, err = db.Delete("user", dbs.H{
 		"uid": uid,

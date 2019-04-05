@@ -164,6 +164,30 @@ func (db *DB) Find(table, fields string, where H, order string, page, pageSize i
 	return
 }
 
+// 绑定到 Map
+func MapScan(r *sql.Rows, dest map[string]interface{}) error {
+	columns, err := r.Columns()
+	if err != nil {
+		return err
+	}
+
+	values := make([]interface{}, len(columns))
+	for i := range values {
+		values[i] = new(interface{})
+	}
+
+	err = r.Scan(values...)
+	if err != nil {
+		return err
+	}
+
+	for i, column := range columns {
+		dest[column] = *(values[i].(*interface{}))
+	}
+
+	return r.Err()
+}
+
 func GetSqlRead(dest H) (fStr string, scanArr []interface{}) {
 	for k, v := range dest {
 		fStr += "`" + k + "`, "
