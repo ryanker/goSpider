@@ -70,7 +70,7 @@ func HttpGetRetry(url string) (bodyByte []byte, i int64, err error) {
 // 抓取网页
 func HttpGet(url string) (bodyByte []byte, err error) {
 	c := &http.Client{}
-	c.Timeout = 20 * time.Second // 请求网页，20秒足够
+	c.Timeout = 5 * time.Second // 请求网页，5 秒足够
 
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {

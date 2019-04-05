@@ -139,7 +139,6 @@ func createDatabase(Type int64, DateBase string, s string) error {
 		return err
 	}
 
-	// 文件不存在，则创建表
 	if Type == 1 {
 		if _, err = db.Exec(s); err != nil {
 			return err

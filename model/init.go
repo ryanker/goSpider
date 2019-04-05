@@ -45,10 +45,10 @@ func init() {
 // 任务
 func cron() {
 	for {
-		time.Sleep(5 * time.Second)
+		time.Sleep(10 * time.Second)
 
 		// 读取需要采集的规则
-		list, err := RuleList(dbs.H{"Status >": 0}, 0, 0)
+		list, err := RuleList(dbs.H{"Status >": 1}, 0, 0)
 		if err != nil {
 			cronErrorLog("读取采集规则失败: " + err.Error())
 			continue
@@ -78,21 +78,20 @@ func cron() {
 			getListAll(dbc, &ListData, &row) // 列表：抓取所有列表
 
 			// 判断任务状态，进行相应处理
-			if row.Status == 1 {
+			if row.Status == 2 {
 				cronLog("采集一次完成，关闭采集")
 				// 采集一次，完成后关闭采集
-				err := RuleUpdate(dbs.H{"Status": 0}, row.Rid)
+				err := RuleUpdate(dbs.H{"Status": 1}, row.Rid)
 				if err != nil {
 					cronErrorLog("更新采集任务状态失败: " + err.Error())
 					continue
 				}
-			} else if row.Status == 2 {
+			} else if row.Status == 3 {
 				// 间隔采集，完成后等待下次采集
 				cronLog("间隔采集完成，等待下次采集")
 				time.Sleep(time.Duration(row.IntervalHour) * time.Hour)
 			}
 		}
-
 	}
 }
 

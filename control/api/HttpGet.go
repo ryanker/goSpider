@@ -139,7 +139,7 @@ func HttpGetContentRule(c *gin.Context) {
 		return
 	}
 
-	bodyByte, err := misc.HttpGet(m.Url)
+	bodyByte, _, err := misc.HttpGetRetry(m.Url)
 	if err != nil {
 		c.Message("-1", "抓取页面失败: "+err.Error())
 		return

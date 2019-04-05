@@ -70,6 +70,22 @@
                     <el-table-column label="数据库名称" prop="DateBase" width="150"></el-table-column>
                     <el-table-column label="修改时间" prop="UpdateDate" width="180"></el-table-column>
                     <el-table-column label="添加时间" prop="CreateDate" width="180"></el-table-column>
+                    <el-table-column label="状态" width="100" align="center">
+                        <template slot-scope="scope">
+                            <span v-if="scope.row.Status === 1">
+                                <el-tag type="info">关闭采集</el-tag>
+                            </span>
+                            <span v-else-if="scope.row.Status === 2">
+                                <el-tag>采集一次</el-tag>
+                            </span>
+                            <span v-else-if="scope.row.Status === 3">
+                                <el-tag type="success">间隔采集</el-tag>
+                            </span>
+                            <span v-else>
+                                <el-tag type="danger">-</el-tag>
+                            </span>
+                        </template>
+                    </el-table-column>
                     <el-table-column label="操作" width="150">
                         <template slot-scope="scope">
                             <el-tooltip effect="dark" content="采集任务" placement="top">
@@ -449,7 +465,7 @@
 					const d = r.data;
 					this.cronDateBase = {
 						Rid: d.Rid,
-						Type: 1,
+						Type: 3,
 					};
 					this.cronData = {
 						Rid: d.Rid,
