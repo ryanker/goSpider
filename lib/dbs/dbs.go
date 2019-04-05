@@ -264,7 +264,7 @@ func LogWrite(s string, args ...interface{}) {
 	}
 	_, err := fmt.Fprintf(LogIoWriter, "%v | %s\n",
 		time.Now().Format("2006-01-02 15:04:05"),
-		fmt.Sprintf(strings.Replace(s, "?", "%v", -1), args...),
+		fmt.Sprintf(strings.Replace(s, "?", "'%v'", -1), ReplaceSlash(args...)...),
 	)
 	if err != nil {
 		fmt.Println(err)
@@ -284,7 +284,7 @@ func ErrorLogWrite(e error, s string, args ...interface{}) {
 	str := fmt.Sprintf("%v | ERROR: %v | SQL: %s\n",
 		time.Now().Format("2006-01-02 15:04:05"),
 		e.Error(),
-		fmt.Sprintf(strings.Replace(s, "?", "%v", -1), args...),
+		fmt.Sprintf(strings.Replace(s, "?", "'%v'", -1), ReplaceSlash(args...)...),
 	)
 	if _, err := f.Write([]byte(str)); err != nil {
 		fmt.Println(err)
@@ -293,4 +293,13 @@ func ErrorLogWrite(e error, s string, args ...interface{}) {
 	if err := f.Close(); err != nil {
 		fmt.Println(err)
 	}
+}
+
+func ReplaceSlash(args ...interface{}) []interface{} {
+	for k := range args {
+		if s, ok := args[k].(string); ok {
+			args[k] = strings.Replace(s, "'", "\\'", -1)
+		}
+	}
+	return args
 }
