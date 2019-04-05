@@ -100,16 +100,16 @@ func HttpGetListRule(c *gin.Context) {
 		return
 	}
 
-	doc2 := doc.Find(m.ListRule).Find(m.ParamRule).Eq(0)
+	dom := doc.Find(m.ListRule).Find(m.ParamRule).Eq(0)
 	value := ""
 	if m.ValueType == "Html" {
-		value, _ = doc2.Html()
+		value, _ = dom.Html()
 	} else if m.ValueType == "Text" {
-		value = doc2.Text()
+		value = dom.Text()
 	} else if m.ValueType == "Attr" {
-		value, _ = doc2.Attr(m.ValueAttr)
+		value, _ = dom.Attr(m.ValueAttr)
 	} else {
-		value, _ = doc2.Html()
+		value, _ = dom.Html()
 	}
 
 	if m.FilterType == "Trim" {
@@ -152,16 +152,16 @@ func HttpGetContentRule(c *gin.Context) {
 		return
 	}
 
-	doc2 := doc.Find(m.ParamRule).Eq(0)
+	dom := doc.Find(m.ParamRule).Eq(0)
 	value := ""
 	if m.ValueType == "Html" {
-		value, _ = doc2.Html()
+		value, _ = dom.Html()
 	} else if m.ValueType == "Text" {
-		value = doc2.Text()
+		value = dom.Text()
 	} else if m.ValueType == "Attr" {
-		value, _ = doc2.Attr(m.ValueAttr)
+		value, _ = dom.Attr(m.ValueAttr)
 	} else {
-		value, _ = doc2.Html()
+		value, _ = dom.Html()
 	}
 
 	if m.FilterType == "Trim" {

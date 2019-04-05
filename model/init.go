@@ -1,6 +1,7 @@
 package model
 
 import (
+	"net/url"
 	"os"
 	"regexp"
 	"strconv"
@@ -50,7 +51,7 @@ func cron() {
 		// 读取需要采集的规则
 		list, err := RuleList(dbs.H{"Status >": 1}, 0, 0)
 		if err != nil {
-			cronErrorLog("读取采集规则失败: " + err.Error())
+			cronErrorLog("读取采集规则失败: %v", err.Error())
 			continue
 		}
 
@@ -59,23 +60,24 @@ func cron() {
 			dbFile := "./db/" + row.DateBase + ".db"
 			dbc, err := dbs.Open(dbFile)
 			if err != nil {
-				cronErrorLog("打开采集入库数据库失败: " + err.Error())
+				cronErrorLog("打开采集入库数据库失败: %v", err.Error())
 				continue
 			}
 
 			// 读取规则参数
 			ListData, err := RuleParamList(dbs.H{"Rid": row.Rid, "Type": "List"}, 0, 0)
 			if err != nil {
-				cronErrorLog("读取列表采集参数失败: " + err.Error())
+				cronErrorLog("读取列表采集参数失败: %v", err.Error())
 				continue
 			}
-			// ContentData, err := RuleParamList(dbs.H{"Rid": row.Rid, "Type": "Content"}, 0, 0)
-			// if err != nil {
-			// 	cronErrorLog("读取内容采集参数失败: " + err.Error())
-			// 	return
-			// }
+			ContentData, err := RuleParamList(dbs.H{"Rid": row.Rid, "Type": "Content"}, 0, 0)
+			if err != nil {
+				cronErrorLog("读取内容采集参数失败: %v", err.Error())
+				return
+			}
 
-			getListAll(dbc, &ListData, &row) // 列表：抓取所有列表
+			getListAll(dbc, &ListData, &row)    // 列表页：抓取所有列表
+			getContent(dbc, &ContentData, &row) // 内容页：抓取内容页
 
 			// 判断任务状态，进行相应处理
 			if row.Status == 2 {
@@ -83,7 +85,7 @@ func cron() {
 				// 采集一次，完成后关闭采集
 				err := RuleUpdate(dbs.H{"Status": 1}, row.Rid)
 				if err != nil {
-					cronErrorLog("更新采集任务状态失败: " + err.Error())
+					cronErrorLog("更新采集任务状态失败: %v", err.Error())
 					continue
 				}
 			} else if row.Status == 3 {
@@ -114,36 +116,38 @@ func getListAll(dbc *dbs.DB, ParamList *[]RuleParam, row *Rule) {
 // 列表页：抓取列表页
 func getList(dbc *dbs.DB, ParamList *[]RuleParam, row *Rule, page int64) {
 	t := time.Now()
-	url := strings.Replace(row.ListUrl, "{page}", strconv.FormatInt(page, 10), -1)
-	bodyByte, i, err := misc.HttpGetRetry(url)
-	cronLog("请求链接: %v, 请求次数: %v, 耗时: %v", url, i, time.Since(t))
+	Url := strings.Replace(row.ListUrl, "{page}", strconv.FormatInt(page, 10), -1)
+	bodyByte, i, err := misc.HttpGetRetry(Url)
+	cronLog("请求链接: %v, 请求次数: %v, 耗时: %v", Url, i, time.Since(t))
 	if err != nil {
-		cronErrorLog("抓取页面失败: " + err.Error() + ", Url: " + url)
+		cronErrorLog("抓取页面失败: %v", err.Error())
 		return
 	}
 
-	dom, err := goquery.NewDocumentFromReader(strings.NewReader(string(bodyByte)))
+	t2 := time.Now()
+	doc, err := goquery.NewDocumentFromReader(strings.NewReader(string(bodyByte)))
 	if err != nil {
-		cronErrorLog("解析页面失败: " + err.Error() + ", Url: " + url)
+		cronErrorLog("解析页面失败: %v, Url:%v", err.Error(), Url)
 		return
 	}
 
-	se := dom.Find(row.ListRule)
-	se.Each(func(i int, sel *goquery.Selection) {
+	se := doc.Find(row.ListRule)
+	se.Each(func(i int, s *goquery.Selection) {
 		data := dbs.H{}
+		data["Status"] = 1 // 待采集
 		for _, v := range *ParamList {
-			sel2 := sel.Find(v.Rule)
+			dom := s.Find(v.Rule)
 
 			// 匹配数据
 			value := ""
 			if v.ValueType == "Html" {
-				value, _ = sel2.Html()
+				value, _ = dom.Html()
 			} else if v.ValueType == "Text" {
-				value = sel2.Text()
+				value = dom.Text()
 			} else if v.ValueType == "Attr" {
-				value, _ = sel2.Attr(v.ValueAttr)
+				value, _ = dom.Attr(v.ValueAttr)
 			} else {
-				value, _ = sel2.Html()
+				value, _ = dom.Html()
 			}
 
 			// 数据过滤
@@ -162,7 +166,7 @@ func getList(dbc *dbs.DB, ParamList *[]RuleParam, row *Rule, page int64) {
 		if ok {
 			n, err := dbc.Count("List", dbs.H{"Url": Url})
 			if err != nil {
-				cronErrorLog("列表查询重复入库失败: " + err.Error())
+				cronErrorLog("列表查询重复入库失败: %v", err.Error())
 				return
 			}
 			if n > 0 {
@@ -174,9 +178,97 @@ func getList(dbc *dbs.DB, ParamList *[]RuleParam, row *Rule, page int64) {
 		// 写入数据库
 		id, err := dbc.Insert("List", data)
 		if err != nil {
-			cronErrorLog("列表写入数据库失败: " + err.Error())
+			cronErrorLog("列表写入数据库失败: %v", err.Error())
 			return
 		}
-		cronLog("写入数据库成功: " + strconv.FormatInt(id, 10))
+		cronLog("写入数据库成功: %v", id)
 	})
+	cronLog("第 %v 页入库完成, 耗时： %v", page, time.Since(t2))
+}
+
+// 内容页：抓取内容页
+func getContent(dbc *dbs.DB, ContentData *[]RuleParam, row *Rule) {
+	rows, err := dbc.Find("List", "Url", dbs.H{}, "ListId DESC", 0, 2)
+	if err != nil {
+		cronErrorLog("列表读取失败: %v", err.Error())
+		return
+	}
+	for rows.Next() {
+		var Url string
+		err = rows.Scan(&Url)
+		if err != nil {
+			cronErrorLog("Url绑定失败: %v", err.Error())
+			return
+		}
+
+		// 效验链接
+		if Url == "" {
+			cronErrorLog("内容页 Url 为空")
+			continue
+		}
+		// 修正链接
+		if Url[0:1] == "/" {
+			u, _ := url.Parse(row.ListUrl)
+			Url = u.Scheme + "://" + u.Host + Url
+		}
+
+		t := time.Now()
+		bodyByte, i, err := misc.HttpGetRetry(Url)
+		cronLog("请求链接: %v, 请求次数: %v, 耗时: %v", Url, i, time.Since(t))
+		if err != nil {
+			cronErrorLog("抓取页面失败: %v", err.Error())
+			return
+		}
+
+		t2 := time.Now()
+		doc, err := goquery.NewDocumentFromReader(strings.NewReader(string(bodyByte)))
+		if err != nil {
+			cronErrorLog("解析页面失败: %v, Url:%v", err.Error(), Url)
+			return
+		}
+
+		data := dbs.H{}
+		data["Url"] = Url
+		for _, m := range *ContentData {
+			dom := doc.Find(m.Rule).Eq(0)
+			value := ""
+			if m.ValueType == "Html" {
+				value, _ = dom.Html()
+			} else if m.ValueType == "Text" {
+				value = dom.Text()
+			} else if m.ValueType == "Attr" {
+				value, _ = dom.Attr(m.ValueAttr)
+			} else {
+				value, _ = dom.Html()
+			}
+
+			if m.FilterType == "Trim" {
+				value = misc.Trim(value)
+			} else if m.FilterType == "Reg" {
+				re := regexp.MustCompile(m.FilterRegexp)
+				value = re.ReplaceAllString(value, m.FilterRepl)
+			}
+
+			data[m.Field] = value
+		}
+
+		// 根据Url，判断是否重复
+		n, err := dbc.Count("Content", dbs.H{"Url": Url})
+		if err != nil {
+			cronErrorLog("内容页查询重复入库失败: %v", err.Error())
+			return
+		}
+		if n > 0 {
+			cronLog("重复Url: %v", Url)
+			return
+		}
+
+		// 写入数据库
+		id, err := dbc.Insert("Content", data)
+		if err != nil {
+			cronErrorLog("列表写入数据库失败: %v", err.Error())
+			return
+		}
+		cronLog("写入数据库成功: %v, 耗时: %v", id, time.Since(t2))
+	}
 }
