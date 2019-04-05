@@ -65,18 +65,18 @@ func cron() {
 			}
 
 			// 读取规则参数
-			ListData, err := RuleParamList(dbs.H{"Rid": row.Rid, "Type": "List"}, 0, 0)
-			if err != nil {
-				cronErrorLog("读取列表采集参数失败: %v", err.Error())
-				continue
-			}
+			// ListData, err := RuleParamList(dbs.H{"Rid": row.Rid, "Type": "List"}, 0, 0)
+			// if err != nil {
+			// 	cronErrorLog("读取列表采集参数失败: %v", err.Error())
+			// 	continue
+			// }
 			ContentData, err := RuleParamList(dbs.H{"Rid": row.Rid, "Type": "Content"}, 0, 0)
 			if err != nil {
 				cronErrorLog("读取内容采集参数失败: %v", err.Error())
 				return
 			}
 
-			getListAll(dbc, &ListData, &row)    // 列表页：抓取所有列表
+			// getListAll(dbc, &ListData, &row)    // 列表页：抓取所有列表
 			getContent(dbc, &ContentData, &row) // 内容页：抓取内容页
 
 			// 判断任务状态，进行相应处理
@@ -193,6 +193,7 @@ func getContent(dbc *dbs.DB, ContentData *[]RuleParam, row *Rule) {
 		cronErrorLog("列表读取失败: %v", err.Error())
 		return
 	}
+	var list []string
 	for rows.Next() {
 		var Url string
 		err = rows.Scan(&Url)
@@ -200,7 +201,10 @@ func getContent(dbc *dbs.DB, ContentData *[]RuleParam, row *Rule) {
 			cronErrorLog("Url绑定失败: %v", err.Error())
 			continue
 		}
+		list = append(list, Url)
+	}
 
+	for _, Url := range list {
 		// 效验链接
 		if Url == "" {
 			cronErrorLog("内容页 Url 为空")
