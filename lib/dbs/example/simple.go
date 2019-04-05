@@ -134,7 +134,7 @@ CREATE TABLE user
 	if err != nil {
 		panic(err)
 	}
-	var listMap []interface{}
+	var listMap []map[string]interface{}
 	for rows.Next() {
 		m := map[string]interface{}{}
 		err = dbs.MapScan(rows, m)
