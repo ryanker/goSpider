@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"time"
@@ -125,6 +126,8 @@ CREATE TABLE user
 		list = append(list, *data)
 	}
 	fmt.Println("List:", list)
+	b, _ := json.Marshal(list)
+	fmt.Println("Json:", string(b))
 
 	// 读取多条(到 Map)
 	rows, err = db.Find("user", fields, dbs.H{}, "", 1, 20)
@@ -141,6 +144,8 @@ CREATE TABLE user
 		listMap = append(listMap, m)
 	}
 	fmt.Println("List Map:", listMap)
+	bMap, _ := json.Marshal(listMap)
+	fmt.Println("Json Map:", string(bMap))
 
 	// 删除
 	n, err = db.Delete("user", dbs.H{
