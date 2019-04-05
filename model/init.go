@@ -166,7 +166,7 @@ func getList(dbc *dbs.DB, ParamList *[]RuleParam, row *Rule, page int64) {
 		if ok {
 			n, err := dbc.Count("List", dbs.H{"Url": Url})
 			if err != nil {
-				cronErrorLog("列表查询重复入库失败: %v", err.Error())
+				cronErrorLog("列表页查询重复入库失败: %v", err.Error())
 				return
 			}
 			if n > 0 {
@@ -178,17 +178,17 @@ func getList(dbc *dbs.DB, ParamList *[]RuleParam, row *Rule, page int64) {
 		// 写入数据库
 		id, err := dbc.Insert("List", data)
 		if err != nil {
-			cronErrorLog("列表写入数据库失败: %v", err.Error())
+			cronErrorLog("列表页写入数据库失败: %v", err.Error())
 			return
 		}
-		cronLog("写入数据库成功: %v", id)
+		cronLog("列表页写入数据库成功: %v", id)
 	})
 	cronLog("第 %v 页入库完成, 耗时： %v", page, time.Since(t2))
 }
 
 // 内容页：抓取内容页
 func getContent(dbc *dbs.DB, ContentData *[]RuleParam, row *Rule) {
-	rows, err := dbc.Find("List", "Url", dbs.H{}, "ListId DESC", 0, 2)
+	rows, err := dbc.Find("List", "Url", dbs.H{}, "ListId DESC", 0, 1000)
 	if err != nil {
 		cronErrorLog("列表读取失败: %v", err.Error())
 		return
@@ -198,7 +198,7 @@ func getContent(dbc *dbs.DB, ContentData *[]RuleParam, row *Rule) {
 		err = rows.Scan(&Url)
 		if err != nil {
 			cronErrorLog("Url绑定失败: %v", err.Error())
-			return
+			continue
 		}
 
 		// 效验链接
@@ -217,14 +217,14 @@ func getContent(dbc *dbs.DB, ContentData *[]RuleParam, row *Rule) {
 		cronLog("请求链接: %v, 请求次数: %v, 耗时: %v", Url, i, time.Since(t))
 		if err != nil {
 			cronErrorLog("抓取页面失败: %v", err.Error())
-			return
+			continue
 		}
 
 		t2 := time.Now()
 		doc, err := goquery.NewDocumentFromReader(strings.NewReader(string(bodyByte)))
 		if err != nil {
 			cronErrorLog("解析页面失败: %v, Url:%v", err.Error(), Url)
-			return
+			continue
 		}
 
 		data := dbs.H{}
@@ -256,19 +256,19 @@ func getContent(dbc *dbs.DB, ContentData *[]RuleParam, row *Rule) {
 		n, err := dbc.Count("Content", dbs.H{"Url": Url})
 		if err != nil {
 			cronErrorLog("内容页查询重复入库失败: %v", err.Error())
-			return
+			continue
 		}
 		if n > 0 {
 			cronLog("重复Url: %v", Url)
-			return
+			continue
 		}
 
 		// 写入数据库
 		id, err := dbc.Insert("Content", data)
 		if err != nil {
-			cronErrorLog("列表写入数据库失败: %v", err.Error())
-			return
+			cronErrorLog("内容页写入数据库失败: %v", err.Error())
+			continue
 		}
-		cronLog("写入数据库成功: %v, 耗时: %v", id, time.Since(t2))
+		cronLog("内容页写入数据库成功: %v, 耗时: %v", id, time.Since(t2))
 	}
 }
