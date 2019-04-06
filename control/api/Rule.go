@@ -29,11 +29,11 @@ func RuleCreate(c *gin.Context) {
 		"ListPageSize":   m.ListPageSize,
 		"ListRule":       m.ListRule,
 		"ContentUrl":     m.ContentUrl,
-		"IsList":         m.IsList,
-		"IsContent":      m.IsContent,
-		"IsDownInit":     m.IsDownInit,
-		"IsDownList":     m.IsDownList,
-		"IsDownContent":  m.IsDownContent,
+		"IsList":         1,
+		"IsContent":      1,
+		"IsDownInit":     1,
+		"IsDownList":     1,
+		"IsDownContent":  1,
 	})
 	if err != nil {
 		c.Message("-1", err.Error())

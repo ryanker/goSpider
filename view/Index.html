@@ -134,6 +134,15 @@
                                 <el-button slot="append">小时</el-button>
                             </el-input>
                         </el-form-item>
+
+                        <el-form-item label="任务开关">
+                            <el-checkbox v-model="cronData.IsList">抓取列表页</el-checkbox>
+                            <el-checkbox v-model="cronData.IsContent">抓取内容页</el-checkbox>
+                            <el-checkbox v-model="cronData.IsDownInit">分析下载地址</el-checkbox>
+                            <el-checkbox v-model="cronData.IsDownList">列表页资源下载</el-checkbox>
+                            <el-checkbox v-model="cronData.IsDownContent">内容页资源下载</el-checkbox>
+                        </el-form-item>
+
                         <el-form-item>
                             <el-button :disabled="cronButtonDisabled" type="primary" @click="cronDataSubmit">
                                 确认
@@ -471,6 +480,11 @@
 						Rid: d.Rid,
 						Status: d.Status,
 						IntervalHour: d.IntervalHour,
+						IsList: !!d.IsList,
+						IsContent: !!d.IsContent,
+						IsDownInit: !!d.IsDownInit,
+						IsDownList: !!d.IsDownList,
+						IsDownContent: !!d.IsDownContent,
 					};
 				}).catch(error => {
 					this.$message.error(error)
