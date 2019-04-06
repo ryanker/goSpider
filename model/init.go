@@ -212,6 +212,7 @@ func getList(dbc *dbs.DB, ParamList *[]RuleParam, row *Rule, Url string) {
 func getContent(dbc *dbs.DB, ParamContent *[]RuleParam, row *Rule) {
 	t := time.Now() // 记时开始
 	repeatNum := 0  // 重复入库数
+	newNum := 0     // 新增入库数
 	errorNum := 0   // 错误入库数
 
 	where := dbs.H{"Status": 1}
@@ -308,10 +309,11 @@ func getContent(dbc *dbs.DB, ParamContent *[]RuleParam, row *Rule) {
 				cronErrorLog("内容页写入数据库失败: %v", err.Error())
 				continue
 			}
+			newNum++
 			cronLog("内容页写入数据库成功: %v, 耗时: %v", id, time.Since(t3))
 		}
 	}
-	cronLog("内容页下载资源完成, 总数: %v, 重复: %v, 错误: %v, 耗时: %v", n, repeatNum, errorNum, time.Since(t))
+	cronLog("内容页下载资源完成, 总数: %v, 重复: %v, 新增: %v, 错误: %v, 耗时: %v", n, repeatNum, newNum, errorNum, time.Since(t))
 }
 
 // 下载：分析列表页下载地址
