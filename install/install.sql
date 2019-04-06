@@ -1,23 +1,36 @@
 -- 规则表
 CREATE TABLE Rule
 (
-  Rid           INTEGER PRIMARY KEY AUTOINCREMENT, -- 规则ID
-  Status        INTEGER      NOT NULL DEFAULT '0', -- 任务状态 1:关闭执行 2:执行一次 3:间隔执行
-  IntervalHour  INTEGER      NOT NULL DEFAULT '0', -- 间隔执行时间(小时)
-  Name          VARCHAR(255) NOT NULL DEFAULT '',  -- 规则名称
-  Brief         VARCHAR(255) NOT NULL DEFAULT '',  -- 规则备注
+  Rid            INTEGER PRIMARY KEY AUTOINCREMENT,               -- 规则ID
+  Status         INTEGER      NOT NULL DEFAULT '0',               -- 任务状态 1:关闭执行 2:执行一次 3:间隔执行
+  IntervalHour   INTEGER      NOT NULL DEFAULT '0',               -- 间隔执行时间(小时)
+  Name           VARCHAR(255) NOT NULL DEFAULT '',                -- 规则名称
+  Brief          VARCHAR(255) NOT NULL DEFAULT '',                -- 规则备注
 
-  DateBase      VARCHAR(255) NOT NULL DEFAULT '',  -- 数据库名称
-  ListUrl       VARCHAR(255) NOT NULL DEFAULT '',  -- 抓取列表网址
-  ListPageStart INTEGER      NOT NULL DEFAULT '0', -- 列表开始页码
-  ListPageEnd   INTEGER      NOT NULL DEFAULT '0', -- 列表结束页码
-  ListPageSize  INTEGER      NOT NULL DEFAULT '0', -- 每页间隔，默认为1
-  ListRule      TEXT                  DEFAULT '',  -- 列表规则
+  DateBase       VARCHAR(255) NOT NULL DEFAULT '',                -- 数据库名称
+  Cookie         TEXT                  DEFAULT '',                -- 登录抓取 Cookie
 
-  ContentUrl    VARCHAR(255) NOT NULL DEFAULT '',  -- 内容测试网址
+  ListSpecialUrl TEXT                  DEFAULT '',                -- 抓取列表网址(特殊路径)
+  ListUrl        VARCHAR(255) NOT NULL DEFAULT '',                -- 抓取列表网址
+  ListPageStart  INTEGER      NOT NULL DEFAULT '0',               -- 列表开始页码
+  ListPageEnd    INTEGER      NOT NULL DEFAULT '0',               -- 列表结束页码
+  ListPageSize   INTEGER      NOT NULL DEFAULT '0',               -- 每页间隔，默认为1
+  ListRule       TEXT                  DEFAULT '',                -- 列表规则
 
-  UpdateDate    DATETIME              DEFAULT CURRENT_TIMESTAMP,
-  CreateDate    DATETIME              DEFAULT CURRENT_TIMESTAMP
+  ContentUrl     VARCHAR(255) NOT NULL DEFAULT '',                -- 内容测试网址
+
+  IsList         INTEGER      NOT NULL DEFAULT '0',               -- 是否抓取列表页
+  IsContent      INTEGER      NOT NULL DEFAULT '0',               -- 是否抓取内容页
+  IsDownInit     INTEGER      NOT NULL DEFAULT '0',               -- 是否分析下载地址
+  IsDownList     INTEGER      NOT NULL DEFAULT '0',               -- 是否对列表页资源下载
+  IsDownContent  INTEGER      NOT NULL DEFAULT '0',               -- 是否对内容页资源下载
+
+  LastStartDate  DATETIME              DEFAULT CURRENT_TIMESTAMP, -- 上次采集开始时间
+  LastEndData    DATETIME              DEFAULT CURRENT_TIMESTAMP, -- 上次采集结束时间
+  NextStartDate  DATETIME              DEFAULT CURRENT_TIMESTAMP, -- 下次采集开始时间
+
+  UpdateDate     DATETIME              DEFAULT CURRENT_TIMESTAMP,
+  CreateDate     DATETIME              DEFAULT CURRENT_TIMESTAMP
 );
 
 -- 规则参数表
