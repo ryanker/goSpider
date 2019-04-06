@@ -72,7 +72,7 @@ func main() {
 	// Database
 	app.POST("/DatabaseCreate", api.DatabaseCreate)
 
-	err = app.Run("0.0.0.0:8888")
+	err = app.Run("0.0.0.0:3333")
 	if err != nil {
 		panic(err)
 	}
