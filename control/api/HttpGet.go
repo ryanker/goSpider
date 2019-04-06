@@ -241,9 +241,7 @@ func HttpGetListRuleDown(c *gin.Context) {
 	var htmlList []interface{}
 	doc.Find(m.DownRule).Each(func(i int, s *goquery.Selection) {
 		html := ""
-		if m.DownValueType == "Html" {
-			html, _ = s.Html()
-		} else if m.DownValueType == "Text" {
+		if m.DownValueType == "Text" {
 			html = s.Text()
 		} else if m.DownValueType == "Attr" {
 			html, _ = s.Attr(m.DownValueAttr)
@@ -320,9 +318,7 @@ func HttpGetContentRuleDown(c *gin.Context) {
 	var htmlList []interface{}
 	doc.Find(m.DownRule).Each(func(i int, s *goquery.Selection) {
 		html := ""
-		if m.DownValueType == "Html" {
-			html, _ = s.Html()
-		} else if m.DownValueType == "Text" {
+		if m.DownValueType == "Text" {
 			html = s.Text()
 		} else if m.DownValueType == "Attr" {
 			html, _ = s.Attr(m.DownValueAttr)

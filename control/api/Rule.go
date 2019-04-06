@@ -16,24 +16,25 @@ func RuleCreate(c *gin.Context) {
 	}
 
 	Rid, err := model.RuleCreate(dbs.H{
-		"Status":         1,
-		"IntervalHour":   1,
-		"Name":           m.Name,
-		"Brief":          m.Brief,
-		"DateBase":       m.DateBase,
-		"Cookie":         m.Cookie,
-		"ListSpecialUrl": m.ListSpecialUrl,
-		"ListUrl":        m.ListUrl,
-		"ListPageStart":  m.ListPageStart,
-		"ListPageEnd":    m.ListPageEnd,
-		"ListPageSize":   m.ListPageSize,
-		"ListRule":       m.ListRule,
-		"ContentUrl":     m.ContentUrl,
-		"IsList":         1,
-		"IsContent":      1,
-		"IsDownInit":     1,
-		"IsDownList":     1,
-		"IsDownContent":  1,
+		"Status":           1,
+		"IntervalHour":     1,
+		"Name":             m.Name,
+		"Brief":            m.Brief,
+		"DateBase":         m.DateBase,
+		"Cookie":           m.Cookie,
+		"ListSpecialUrl":   m.ListSpecialUrl,
+		"ListUrl":          m.ListUrl,
+		"ListPageStart":    m.ListPageStart,
+		"ListPageEnd":      m.ListPageEnd,
+		"ListPageSize":     m.ListPageSize,
+		"ListRule":         m.ListRule,
+		"ContentUrl":       m.ContentUrl,
+		"IsList":           1,
+		"IsListDownAna":    1,
+		"IsListDownRun":    1,
+		"IsContent":        1,
+		"IsContentDownAna": 1,
+		"IsContentDownRun": 1,
 	})
 	if err != nil {
 		c.Message("-1", err.Error())
@@ -58,22 +59,23 @@ func RuleUpdate(c *gin.Context) {
 	}
 
 	err = model.RuleUpdate(dbs.H{
-		"Name":           m.Name,
-		"Brief":          m.Brief,
-		"DateBase":       m.DateBase,
-		"Cookie":         m.Cookie,
-		"ListSpecialUrl": m.ListSpecialUrl,
-		"ListUrl":        m.ListUrl,
-		"ListPageStart":  m.ListPageStart,
-		"ListPageEnd":    m.ListPageEnd,
-		"ListPageSize":   m.ListPageSize,
-		"ListRule":       m.ListRule,
-		"ContentUrl":     m.ContentUrl,
-		"IsList":         m.IsList,
-		"IsContent":      m.IsContent,
-		"IsDownInit":     m.IsDownInit,
-		"IsDownList":     m.IsDownList,
-		"IsDownContent":  m.IsDownContent,
+		"Name":             m.Name,
+		"Brief":            m.Brief,
+		"DateBase":         m.DateBase,
+		"Cookie":           m.Cookie,
+		"ListSpecialUrl":   m.ListSpecialUrl,
+		"ListUrl":          m.ListUrl,
+		"ListPageStart":    m.ListPageStart,
+		"ListPageEnd":      m.ListPageEnd,
+		"ListPageSize":     m.ListPageSize,
+		"ListRule":         m.ListRule,
+		"ContentUrl":       m.ContentUrl,
+		"IsList":           m.IsList,
+		"IsListDownAna":    m.IsListDownAna,
+		"IsListDownRun":    m.IsListDownRun,
+		"IsContent":        m.IsContent,
+		"IsContentDownAna": m.IsContentDownAna,
+		"IsContentDownRun": m.IsContentDownRun,
 	}, m.Rid)
 	if err != nil {
 		c.Message("-1", "更新数据库失败："+err.Error())
@@ -98,13 +100,13 @@ func RuleUpdateCron(c *gin.Context) {
 	}
 
 	err = model.RuleUpdate(dbs.H{
-		"Status":        m.Status,
-		"IntervalHour":  m.IntervalHour,
-		"IsList":        m.IsList,
-		"IsContent":     m.IsContent,
-		"IsDownInit":    m.IsDownInit,
-		"IsDownList":    m.IsDownList,
-		"IsDownContent": m.IsDownContent,
+		"Status":           m.Status,
+		"IntervalHour":     m.IntervalHour,
+		"IsListDownAna":    m.IsListDownAna,
+		"IsListDownRun":    m.IsListDownRun,
+		"IsContent":        m.IsContent,
+		"IsContentDownAna": m.IsContentDownAna,
+		"IsContentDownRun": m.IsContentDownRun,
 	}, m.Rid)
 	if err != nil {
 		c.Message("-1", "更新数据库失败："+err.Error())

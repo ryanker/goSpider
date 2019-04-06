@@ -26,11 +26,12 @@ type Rule struct {
 
 	ContentUrl string
 
-	IsList        string
-	IsContent     string
-	IsDownInit    string
-	IsDownList    string
-	IsDownContent string
+	IsList           int64
+	IsListDownAna    int64
+	IsListDownRun    int64
+	IsContent        int64
+	IsContentDownAna int64
+	IsContentDownRun int64
 
 	LastStartDate string
 	LastEndData   string
@@ -44,30 +45,31 @@ type Rule struct {
 func RuleMap() (ptr *Rule, fields string, args *[]interface{}) {
 	row := Rule{}
 	fields, scanArr := dbs.GetSqlRead(dbs.H{
-		"Rid":            &row.Rid,
-		"Status":         &row.Status,
-		"IntervalHour":   &row.IntervalHour,
-		"Name":           &row.Name,
-		"Brief":          &row.Brief,
-		"DateBase":       &row.DateBase,
-		"Cookie":         &row.Cookie,
-		"ListSpecialUrl": &row.ListSpecialUrl,
-		"ListUrl":        &row.ListUrl,
-		"ListPageStart":  &row.ListPageStart,
-		"ListPageEnd":    &row.ListPageEnd,
-		"ListPageSize":   &row.ListPageSize,
-		"ListRule":       &row.ListRule,
-		"ContentUrl":     &row.ContentUrl,
-		"IsList":         &row.IsList,
-		"IsContent":      &row.IsContent,
-		"IsDownInit":     &row.IsDownInit,
-		"IsDownList":     &row.IsDownList,
-		"IsDownContent":  &row.IsDownContent,
-		"LastStartDate":  &row.LastStartDate,
-		"LastEndData":    &row.LastEndData,
-		"NextStartDate":  &row.NextStartDate,
-		"UpdateDate":     &row.UpdateDate,
-		"CreateDate":     &row.CreateDate,
+		"Rid":              &row.Rid,
+		"Status":           &row.Status,
+		"IntervalHour":     &row.IntervalHour,
+		"Name":             &row.Name,
+		"Brief":            &row.Brief,
+		"DateBase":         &row.DateBase,
+		"Cookie":           &row.Cookie,
+		"ListSpecialUrl":   &row.ListSpecialUrl,
+		"ListUrl":          &row.ListUrl,
+		"ListPageStart":    &row.ListPageStart,
+		"ListPageEnd":      &row.ListPageEnd,
+		"ListPageSize":     &row.ListPageSize,
+		"ListRule":         &row.ListRule,
+		"ContentUrl":       &row.ContentUrl,
+		"IsList":           &row.IsList,
+		"IsListDownAna":    &row.IsListDownAna,
+		"IsListDownRun":    &row.IsListDownRun,
+		"IsContent":        &row.IsContent,
+		"IsContentDownAna": &row.IsContentDownAna,
+		"IsContentDownRun": &row.IsContentDownRun,
+		"LastStartDate":    &row.LastStartDate,
+		"LastEndData":      &row.LastEndData,
+		"NextStartDate":    &row.NextStartDate,
+		"UpdateDate":       &row.UpdateDate,
+		"CreateDate":       &row.CreateDate,
 	})
 	ptr = &row
 	args = &scanArr

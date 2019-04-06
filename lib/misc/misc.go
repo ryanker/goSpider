@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"os"
 	"strings"
 	"time"
@@ -90,4 +91,12 @@ func HttpGet(url string) (bodyByte []byte, err error) {
 
 func Trim(s string) string {
 	return strings.Trim(s, " \t\r\n")
+}
+
+func UrlFix(Url string, BaseUrl string) string {
+	if Url[0:1] == "/" {
+		u, _ := url.Parse(BaseUrl)
+		Url = u.Scheme + "://" + u.Host + Url
+	}
+	return Url
 }

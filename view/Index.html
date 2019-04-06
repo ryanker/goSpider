@@ -136,11 +136,25 @@
                         </el-form-item>
 
                         <el-form-item label="任务开关">
-                            <el-checkbox v-model="cronData.IsList">抓取列表页</el-checkbox>
-                            <el-checkbox v-model="cronData.IsContent">抓取内容页</el-checkbox>
-                            <el-checkbox v-model="cronData.IsDownInit">分析下载地址</el-checkbox>
-                            <el-checkbox v-model="cronData.IsDownList">列表页资源下载</el-checkbox>
-                            <el-checkbox v-model="cronData.IsDownContent">内容页资源下载</el-checkbox>
+                            <el-checkbox :true-label="1" :false-label="0" v-model="cronData.IsList">
+                                列表页: 抓取
+                            </el-checkbox>
+                            <el-checkbox :true-label="1" :false-label="0" v-model="cronData.IsListDownAna">
+                                列表页: 分析下载地址
+                            </el-checkbox>
+                            <el-checkbox :true-label="1" :false-label="0" v-model="cronData.IsListDownRun">
+                                列表页: 下载资源
+                            </el-checkbox>
+                            <br>
+                            <el-checkbox :true-label="1" :false-label="0" v-model="cronData.IsContent">
+                                内容页: 抓取
+                            </el-checkbox>
+                            <el-checkbox :true-label="1" :false-label="0" v-model="cronData.IsContentDownAna">
+                                内容页: 分析下载地址
+                            </el-checkbox>
+                            <el-checkbox :true-label="1" :false-label="0" v-model="cronData.IsContentDownRun">
+                                内容页: 下载资源
+                            </el-checkbox>
                         </el-form-item>
 
                         <el-form-item>
@@ -481,10 +495,11 @@
 						Status: d.Status,
 						IntervalHour: d.IntervalHour,
 						IsList: !!d.IsList,
+						IsListDownAna: !!d.IsListDownAna,
+						IsListDownRun: !!d.IsListDownRun,
 						IsContent: !!d.IsContent,
-						IsDownInit: !!d.IsDownInit,
-						IsDownList: !!d.IsDownList,
-						IsDownContent: !!d.IsDownContent,
+						IsContentDownAna: !!d.IsContentDownAna,
+						IsContentDownRun: !!d.IsContentDownRun,
 					};
 				}).catch(error => {
 					this.$message.error(error)
