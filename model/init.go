@@ -212,7 +212,7 @@ func getList(dbc *dbs.DB, ParamList *[]RuleParam, row *Rule, Url string) {
 		}
 		cronLog("列表页写入数据库成功: %v", id)
 	})
-	cronLog("第 %v 页入库完成, 耗时： %v", page, time.Since(t2))
+	cronLog("Url: %v 入库完成, 耗时： %v", Url, time.Since(t2))
 }
 
 // 内容页：抓取内容页
