@@ -1,6 +1,7 @@
 package model
 
 import (
+	"math"
 	"net/url"
 	"os"
 	"regexp"
@@ -65,19 +66,35 @@ func cron() {
 			}
 
 			// 读取规则参数
-			// ListData, err := RuleParamList(dbs.H{"Rid": row.Rid, "Type": "List"}, 0, 0)
-			// if err != nil {
-			// 	cronErrorLog("读取列表采集参数失败: %v", err.Error())
-			// 	continue
-			// }
-			ContentData, err := RuleParamList(dbs.H{"Rid": row.Rid, "Type": "Content"}, 0, 0)
+			ParamList, err := RuleParamList(dbs.H{"Rid": row.Rid, "Type": "List"}, 0, 0)
+			if err != nil {
+				cronErrorLog("读取列表采集参数失败: %v", err.Error())
+				continue
+			}
+			ParamContent, err := RuleParamList(dbs.H{"Rid": row.Rid, "Type": "Content"}, 0, 0)
 			if err != nil {
 				cronErrorLog("读取内容采集参数失败: %v", err.Error())
 				return
 			}
 
-			// getListAll(dbc, &ListData, &row)    // 列表页：抓取所有列表
-			getContent(dbc, &ContentData, &row) // 内容页：抓取内容页
+			if row.IsList == 1 {
+				getListAll(dbc, &ParamList, &row) // 列表页：抓取所有列表
+			}
+			if row.IsContent == 1 {
+				getContent(dbc, &ParamContent, &row) // 内容页：抓取内容页
+			}
+			if row.IsListDownAna == 1 {
+				downInitList(dbc, &ParamList, &row) // 下载：分析列表页下载地址
+			}
+			if row.IsContentDownAna == 1 {
+				downInitContent(dbc, &ParamContent, &row) // 下载：分析内容页下载地址
+			}
+			if row.IsListDownRun == 1 {
+				downList(dbc, &ParamList, &row) // 下载：列表页资源下载
+			}
+			if row.IsContentDownRun == 1 {
+				downContent(dbc, &ParamContent, &row) // 下载：内容页资源下载
+			}
 
 			// 判断任务状态，进行相应处理
 			if row.Status == 2 {
@@ -187,7 +204,7 @@ func getList(dbc *dbs.DB, ParamList *[]RuleParam, row *Rule, page int64) {
 }
 
 // 内容页：抓取内容页
-func getContent(dbc *dbs.DB, ContentData *[]RuleParam, row *Rule) {
+func getContent(dbc *dbs.DB, ParamContent *[]RuleParam, row *Rule) {
 	rows, err := dbc.Find("List", "Url", dbs.H{}, "ListId DESC", 0, 1000)
 	if err != nil {
 		cronErrorLog("列表读取失败: %v", err.Error())
@@ -233,7 +250,7 @@ func getContent(dbc *dbs.DB, ContentData *[]RuleParam, row *Rule) {
 
 		data := dbs.H{}
 		data["Url"] = Url
-		for _, m := range *ContentData {
+		for _, m := range *ParamContent {
 			dom := doc.Find(m.Rule).Eq(0)
 			value := ""
 			if m.ValueType == "Html" {
@@ -275,4 +292,364 @@ func getContent(dbc *dbs.DB, ContentData *[]RuleParam, row *Rule) {
 		}
 		cronLog("内容页写入数据库成功: %v, 耗时: %v", id, time.Since(t2))
 	}
+}
+
+// 下载：分析列表页下载地址
+func downInitList(dbc *dbs.DB, ParamList *[]RuleParam, row *Rule) {
+	for _, v := range *ParamList {
+		if v.DownType == 1 {
+			t := time.Now() // 记时开始
+			repeatNum := 0  // 重复入库数
+			errorNum := 0   // 错误入库数
+
+			where := dbs.H{}
+			n, err := dbc.Count("List", where)
+			if err != nil {
+				cronErrorLog("列表统计数量失败: %v", err.Error())
+				return
+			}
+
+			pageSize := int64(1000)
+			pageMax := int64(math.Ceil(float64(n / pageSize)))
+
+			for page := int64(1); page <= pageMax; page++ {
+				rows, err := dbc.Find("List", "`ListId`,`"+v.Field+"`", where, "ListId ASC", page, pageSize)
+				if err != nil {
+					cronErrorLog("列表读取失败: %v", err.Error())
+					return
+				}
+
+				type st struct {
+					ListId int64
+					Url    string
+				}
+				var list []st
+				for rows.Next() {
+					st := st{}
+					err = rows.Scan(&st.ListId, &st.Url)
+					if err != nil {
+						cronErrorLog("绑定失败: %v", err.Error())
+						continue
+					}
+					list = append(list, st)
+				}
+
+				for _, lv := range list {
+					// 效验链接
+					if lv.Url == "" {
+						errorNum++
+						cronErrorLog("下载 Url 为空")
+						continue
+					}
+					lv.Url = misc.UrlFix(lv.Url, row.ListUrl) // 修正链接
+
+					// 根据Url，判断是否重复
+					n, err := dbc.Count("ListDownload", dbs.H{"ListId": lv.ListId, "Field": v.Field, "OldUrl": lv.Url})
+					if err != nil {
+						errorNum++
+						cronErrorLog("分析下载地址排重查询失败: %v", err.Error())
+						continue
+					}
+					if n > 0 {
+						repeatNum++
+						// cronLog("分析下载地址重复ListId: %v, Url: %v", lv.ListId, lv.Url)
+						continue
+					}
+
+					// 写入数据库
+					_, err = dbc.Insert("ListDownload", dbs.H{
+						"ListId": lv.ListId,
+						"Status": 1,
+						"Field":  v.Field,
+						"OldUrl": lv.Url,
+					})
+					if err != nil {
+						errorNum++
+						cronErrorLog("列表页下载地址写入数据库失败: %v", err.Error())
+						continue
+					}
+				}
+			}
+
+			cronLog("列表页下载地址入库完成, 总数: %v, 重复: %v, 错误: %v, 耗时: %v", n, repeatNum, errorNum, time.Since(t))
+		} else if v.DownType == 2 {
+			t := time.Now() // 记时开始
+			repeatNum := 0  // 重复入库数
+			errorNum := 0   // 错误入库数
+
+			where := dbs.H{}
+			n, err := dbc.Count("List", where)
+			if err != nil {
+				cronErrorLog("列表统计数量失败: %v", err.Error())
+				return
+			}
+
+			pageSize := int64(1000)
+			pageMax := int64(math.Ceil(float64(n / pageSize)))
+
+			for page := int64(1); page <= pageMax; page++ {
+				rows, err := dbc.Find("List", "`ListId`,`"+v.Field+"`", where, "ListId ASC", page, pageSize)
+				if err != nil {
+					cronErrorLog("列表读取失败: %v", err.Error())
+					return
+				}
+
+				type st struct {
+					ListId int64
+					Html   string
+				}
+				var list []st
+				for rows.Next() {
+					st := st{}
+					err = rows.Scan(&st.ListId, &st.Html)
+					if err != nil {
+						cronErrorLog("绑定失败: %v", err.Error())
+						continue
+					}
+					list = append(list, st)
+				}
+
+				for _, lv := range list {
+					// 分析图片
+					dom, err := goquery.NewDocumentFromReader(strings.NewReader(lv.Html))
+					if err != nil {
+						errorNum++
+						cronErrorLog("解析代码失败: %v, Html:%v", err.Error(), lv.Html)
+						continue
+					}
+
+					// 下载列表
+					dom.Find(v.DownRule).Each(func(i int, s *goquery.Selection) {
+						Url := ""
+						if v.DownValueType == "Text" {
+							Url = s.Text()
+						} else if v.DownValueType == "Attr" {
+							Url, _ = s.Attr(v.DownValueAttr)
+						}
+						if Url == "" {
+							errorNum++
+							cronErrorLog("下载 Url 为空")
+							return
+						}
+						Url = misc.UrlFix(Url, row.ListUrl) // 修正链接
+
+						// 根据Url，判断是否重复
+						n, err := dbc.Count("ListDownload", dbs.H{"ListId": lv.ListId, "Field": v.Field, "OldUrl": Url})
+						if err != nil {
+							errorNum++
+							cronErrorLog("分析下载地址排重查询失败: %v", err.Error())
+							return
+						}
+						if n > 0 {
+							repeatNum++
+							// cronLog("分析下载地址重复ListId: %v, Url: %v", lv.ListId, lv.Url)
+							return
+						}
+
+						// 写入数据库
+						_, err = dbc.Insert("ListDownload", dbs.H{
+							"ListId": lv.ListId,
+							"Status": 1,
+							"Field":  v.Field,
+							"OldUrl": Url,
+							"Sort":   i,
+						})
+						if err != nil {
+							errorNum++
+							cronErrorLog("列表页下载地址写入数据库失败: %v", err.Error())
+							return
+						}
+					})
+
+				}
+			}
+
+			cronLog("列表页下载地址入库完成, 总数: %v, 重复: %v, 错误: %v, 耗时: %v", n, repeatNum, errorNum, time.Since(t))
+		}
+	}
+}
+
+// 下载：分析内容页下载地址
+func downInitContent(dbc *dbs.DB, ParamContent *[]RuleParam, row *Rule) {
+	for _, v := range *ParamContent {
+		if v.DownType == 1 {
+			t := time.Now() // 记时开始
+			repeatNum := 0  // 重复入库数
+			errorNum := 0   // 错误入库数
+
+			where := dbs.H{}
+			n, err := dbc.Count("Content", where)
+			if err != nil {
+				cronErrorLog("内容统计数量失败: %v", err.Error())
+				return
+			}
+
+			pageSize := int64(1000)
+			pageMax := int64(math.Ceil(float64(n / pageSize)))
+
+			for page := int64(1); page <= pageMax; page++ {
+				rows, err := dbc.Find("Content", "`ContentId`,`"+v.Field+"`", where, "ContentId ASC", page, pageSize)
+				if err != nil {
+					cronErrorLog("内容读取失败: %v", err.Error())
+					return
+				}
+
+				type st struct {
+					ContentId int64
+					Url       string
+				}
+				var list []st
+				for rows.Next() {
+					st := st{}
+					err = rows.Scan(&st.ContentId, &st.Url)
+					if err != nil {
+						cronErrorLog("绑定失败: %v", err.Error())
+						continue
+					}
+					list = append(list, st)
+				}
+
+				for _, lv := range list {
+					// 效验链接
+					if lv.Url == "" {
+						errorNum++
+						cronErrorLog("下载 Url 为空")
+						continue
+					}
+					lv.Url = misc.UrlFix(lv.Url, row.ContentUrl) // 修正链接
+
+					// 根据Url，判断是否重复
+					n, err := dbc.Count("ContentDownload", dbs.H{"ContentId": lv.ContentId, "Field": v.Field, "OldUrl": lv.Url})
+					if err != nil {
+						errorNum++
+						cronErrorLog("分析下载地址排重查询失败: %v", err.Error())
+						continue
+					}
+					if n > 0 {
+						repeatNum++
+						// cronLog("分析下载地址重复ContentId: %v, Url: %v", lv.ContentId, lv.Url)
+						continue
+					}
+
+					// 写入数据库
+					_, err = dbc.Insert("ContentDownload", dbs.H{
+						"ContentId": lv.ContentId,
+						"Status":    1,
+						"Field":     v.Field,
+						"OldUrl":    lv.Url,
+					})
+					if err != nil {
+						errorNum++
+						cronErrorLog("内容页下载地址写入数据库失败: %v", err.Error())
+						continue
+					}
+				}
+			}
+
+			cronLog("内容页下载地址入库完成, 总数: %v, 重复: %v, 错误: %v, 耗时: %v", n, repeatNum, errorNum, time.Since(t))
+		} else if v.DownType == 2 {
+			t := time.Now() // 记时开始
+			repeatNum := 0  // 重复入库数
+			errorNum := 0   // 错误入库数
+
+			where := dbs.H{}
+			n, err := dbc.Count("Content", where)
+			if err != nil {
+				cronErrorLog("内容统计数量失败: %v", err.Error())
+				return
+			}
+
+			pageSize := int64(1000)
+			pageMax := int64(math.Ceil(float64(n / pageSize)))
+
+			for page := int64(1); page <= pageMax; page++ {
+				rows, err := dbc.Find("Content", "`ContentId`,`"+v.Field+"`", where, "ContentId ASC", page, pageSize)
+				if err != nil {
+					cronErrorLog("内容读取失败: %v", err.Error())
+					return
+				}
+
+				type st struct {
+					ContentId int64
+					Html      string
+				}
+				var list []st
+				for rows.Next() {
+					st := st{}
+					err = rows.Scan(&st.ContentId, &st.Html)
+					if err != nil {
+						cronErrorLog("绑定失败: %v", err.Error())
+						continue
+					}
+					list = append(list, st)
+				}
+
+				for _, lv := range list {
+					// 分析图片
+					dom, err := goquery.NewDocumentFromReader(strings.NewReader(lv.Html))
+					if err != nil {
+						errorNum++
+						cronErrorLog("解析代码失败: %v, Html:%v", err.Error(), lv.Html)
+						continue
+					}
+
+					// 下载内容
+					dom.Find(v.DownRule).Each(func(i int, s *goquery.Selection) {
+						Url := ""
+						if v.DownValueType == "Text" {
+							Url = s.Text()
+						} else if v.DownValueType == "Attr" {
+							Url, _ = s.Attr(v.DownValueAttr)
+						}
+						if Url == "" {
+							errorNum++
+							cronErrorLog("下载 Url 为空")
+							return
+						}
+						Url = misc.UrlFix(Url, row.ContentUrl) // 修正链接
+
+						// 根据Url，判断是否重复
+						n, err := dbc.Count("ContentDownload", dbs.H{"ContentId": lv.ContentId, "Field": v.Field, "OldUrl": Url})
+						if err != nil {
+							errorNum++
+							cronErrorLog("分析下载地址排重查询失败: %v", err.Error())
+							return
+						}
+						if n > 0 {
+							repeatNum++
+							// cronLog("分析下载地址重复ContentId: %v, Url: %v", lv.ContentId, lv.Url)
+							return
+						}
+
+						// 写入数据库
+						_, err = dbc.Insert("ContentDownload", dbs.H{
+							"ContentId": lv.ContentId,
+							"Status":    1,
+							"Field":     v.Field,
+							"OldUrl":    Url,
+							"Sort":      i,
+						})
+						if err != nil {
+							errorNum++
+							cronErrorLog("内容页下载地址写入数据库失败: %v", err.Error())
+							return
+						}
+					})
+
+				}
+			}
+
+			cronLog("内容页下载地址入库完成, 总数: %v, 重复: %v, 错误: %v, 耗时: %v", n, repeatNum, errorNum, time.Since(t))
+		}
+	}
+}
+
+// 下载：列表页资源下载
+func downList(dbc *dbs.DB, ParamList *[]RuleParam, row *Rule) {
+
+}
+
+// 下载：内容页资源下载
+func downContent(dbc *dbs.DB, ParamContent *[]RuleParam, row *Rule) {
+
 }
