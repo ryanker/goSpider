@@ -8,6 +8,8 @@ import (
 	"os"
 	"strings"
 	"time"
+
+	"github.com/cavaliercoder/grab"
 )
 
 // 写入文件日志
@@ -87,6 +89,20 @@ func HttpGet(url string) (bodyByte []byte, err error) {
 
 	bodyByte, err = ioutil.ReadAll(resp.Body)
 	return
+}
+
+// 下载文件
+func DownloadFile(Url string, DstFile string) (size int64, err error) {
+	client := grab.NewClient()
+	req, err := grab.NewRequest(DstFile, Url)
+	if err != nil {
+		return 0, err
+	}
+	resp := client.Do(req)
+	if err := resp.Err(); err != nil {
+		return 0, err
+	}
+	return resp.Size, err
 }
 
 func Trim(s string) string {

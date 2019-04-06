@@ -1,9 +1,11 @@
 package model
 
 import (
+	"fmt"
 	"math"
 	"net/url"
 	"os"
+	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
@@ -90,10 +92,10 @@ func cron() {
 				downInitContent(dbc, &ParamContent, &row) // 下载：分析内容页下载地址
 			}
 			if row.IsListDownRun == 1 {
-				downList(dbc, &ParamList, &row) // 下载：列表页资源下载
+				downList(dbc, &row) // 下载：列表页资源下载
 			}
 			if row.IsContentDownRun == 1 {
-				downContent(dbc, &ParamContent, &row) // 下载：内容页资源下载
+				downContent(dbc) // 下载：内容页资源下载
 			}
 
 			// 判断任务状态，进行相应处理
@@ -302,6 +304,11 @@ func downInitList(dbc *dbs.DB, ParamList *[]RuleParam, row *Rule) {
 			repeatNum := 0  // 重复入库数
 			errorNum := 0   // 错误入库数
 
+			type st struct {
+				ListId int64
+				Url    string
+			}
+
 			where := dbs.H{}
 			n, err := dbc.Count("List", where)
 			if err != nil {
@@ -317,11 +324,6 @@ func downInitList(dbc *dbs.DB, ParamList *[]RuleParam, row *Rule) {
 				if err != nil {
 					cronErrorLog("列表读取失败: %v", err.Error())
 					return
-				}
-
-				type st struct {
-					ListId int64
-					Url    string
 				}
 				var list []st
 				for rows.Next() {
@@ -377,6 +379,11 @@ func downInitList(dbc *dbs.DB, ParamList *[]RuleParam, row *Rule) {
 			repeatNum := 0  // 重复入库数
 			errorNum := 0   // 错误入库数
 
+			type st struct {
+				ListId int64
+				Html   string
+			}
+
 			where := dbs.H{}
 			n, err := dbc.Count("List", where)
 			if err != nil {
@@ -392,11 +399,6 @@ func downInitList(dbc *dbs.DB, ParamList *[]RuleParam, row *Rule) {
 				if err != nil {
 					cronErrorLog("列表读取失败: %v", err.Error())
 					return
-				}
-
-				type st struct {
-					ListId int64
-					Html   string
 				}
 				var list []st
 				for rows.Next() {
@@ -477,6 +479,11 @@ func downInitContent(dbc *dbs.DB, ParamContent *[]RuleParam, row *Rule) {
 			repeatNum := 0  // 重复入库数
 			errorNum := 0   // 错误入库数
 
+			type st struct {
+				ContentId int64
+				Url       string
+			}
+
 			where := dbs.H{}
 			n, err := dbc.Count("Content", where)
 			if err != nil {
@@ -492,11 +499,6 @@ func downInitContent(dbc *dbs.DB, ParamContent *[]RuleParam, row *Rule) {
 				if err != nil {
 					cronErrorLog("内容读取失败: %v", err.Error())
 					return
-				}
-
-				type st struct {
-					ContentId int64
-					Url       string
 				}
 				var list []st
 				for rows.Next() {
@@ -552,6 +554,11 @@ func downInitContent(dbc *dbs.DB, ParamContent *[]RuleParam, row *Rule) {
 			repeatNum := 0  // 重复入库数
 			errorNum := 0   // 错误入库数
 
+			type st struct {
+				ContentId int64
+				Html      string
+			}
+
 			where := dbs.H{}
 			n, err := dbc.Count("Content", where)
 			if err != nil {
@@ -567,11 +574,6 @@ func downInitContent(dbc *dbs.DB, ParamContent *[]RuleParam, row *Rule) {
 				if err != nil {
 					cronErrorLog("内容读取失败: %v", err.Error())
 					return
-				}
-
-				type st struct {
-					ContentId int64
-					Html      string
 				}
 				var list []st
 				for rows.Next() {
@@ -645,11 +647,98 @@ func downInitContent(dbc *dbs.DB, ParamContent *[]RuleParam, row *Rule) {
 }
 
 // 下载：列表页资源下载
-func downList(dbc *dbs.DB, ParamList *[]RuleParam, row *Rule) {
+func downList(dbc *dbs.DB, row *Rule) {
+	t := time.Now() // 记时开始
+	repeatNum := 0  // 重复入库数
+	errorNum := 0   // 错误入库数
 
+	fields := "`Id`,`ListId`,`Field`,`OldUrl`,`NewUrl`,`Sort`"
+	type st struct {
+		Id     int64
+		ListId int64
+		Field  string
+		OldUrl string
+		NewUrl string
+		Sort   int64
+	}
+
+	where := dbs.H{"Status": 1}
+	n, err := dbc.Count("ListDownload", where)
+	if err != nil {
+		cronErrorLog("下载列表统计数量失败: %v", err.Error())
+		return
+	}
+
+	pageSize := int64(1000)
+	pageMax := int64(math.Ceil(float64(n / pageSize)))
+
+	for page := int64(1); page <= pageMax; page++ {
+		rows, err := dbc.Find("ListDownload", fields, where, "Id ASC", 0, pageSize)
+		if err != nil {
+			cronErrorLog("下载列表读取失败: %v", err.Error())
+			return
+		}
+
+		var list []st
+		for rows.Next() {
+			st := st{}
+			err = rows.Scan(&st.Id, &st.ListId, &st.Field, &st.OldUrl, &st.NewUrl, &st.Sort)
+			if err != nil {
+				cronErrorLog("绑定失败: %v", err.Error())
+				return
+			}
+			list = append(list, st)
+		}
+
+		for _, lv := range list {
+			// 存放目录
+			path := fmt.Sprintf("/upload/%s/list/%s/%03d/%d/", row.DateBase, lv.Field,
+				int64(math.Floor(float64(lv.ListId/1000))), lv.ListId)
+			dir := "." + path
+			err = os.MkdirAll(dir, os.ModePerm)
+			if err != nil {
+				cronErrorLog("创建目录失败: %v", err.Error())
+				return
+			}
+
+			// 存放文件名
+			filename := fmt.Sprintf("%02d%v", lv.Sort+1, filepath.Ext(lv.OldUrl))
+
+			// 统计已下载过的数量
+			if lv.NewUrl != "" {
+				repeatNum++
+			}
+
+			// 下载文件
+			t2 := time.Now() // 记时开始
+			FileSize, err := misc.DownloadFile(lv.OldUrl, dir+filename)
+			if err != nil {
+				errorNum++
+				cronErrorLog("下载文件失败: %v, 大小: %v, 耗时: %v, File: %v, Url: %v", err.Error(), FileSize, time.Since(t2), dir+filename, lv.OldUrl)
+				continue
+			}
+			cronLog("下载文件完成, 大小: %v, 耗时: %v, File: %v, Url: %v", FileSize, time.Since(t2), dir+filename, lv.OldUrl)
+
+			// 更新
+			_, err = dbc.Update("ListDownload", dbs.H{
+				"Status":       2, // 下载完成
+				"NewUrl":       path + filename,
+				"FileSize":     FileSize,
+				"DownloadDate": time.Now().Format("2006-01-02 15:04:05"),
+			}, dbs.H{
+				"Id": lv.Id,
+			})
+			if err != nil {
+				errorNum++
+				cronErrorLog("下载完成更新数据库失败: %v", err.Error())
+			}
+		}
+	}
+
+	cronLog("列表页下载资源完成, 总数: %v, 重复: %v, 错误: %v, 耗时: %v", n, repeatNum, errorNum, time.Since(t))
 }
 
 // 下载：内容页资源下载
-func downContent(dbc *dbs.DB, ParamContent *[]RuleParam, row *Rule) {
+func downContent(dbc *dbs.DB) {
 
 }
