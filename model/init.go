@@ -739,6 +739,93 @@ func downList(dbc *dbs.DB, row *Rule) {
 }
 
 // 下载：内容页资源下载
-func downContent(dbc *dbs.DB) {
+func downContent(dbc *dbs.DB, row *Rule) {
+	t := time.Now() // 记时开始
+	repeatNum := 0  // 重复入库数
+	errorNum := 0   // 错误入库数
 
+	fields := "`Id`,`ContentId`,`Field`,`OldUrl`,`NewUrl`,`Sort`"
+	type st struct {
+		Id        int64
+		ContentId int64
+		Field     string
+		OldUrl    string
+		NewUrl    string
+		Sort      int64
+	}
+
+	where := dbs.H{"Status": 1}
+	n, err := dbc.Count("ContentDownload", where)
+	if err != nil {
+		cronErrorLog("下载列表统计数量失败: %v", err.Error())
+		return
+	}
+
+	pageSize := int64(1000)
+	pageMax := int64(math.Ceil(float64(n / pageSize)))
+
+	for page := int64(1); page <= pageMax; page++ {
+		rows, err := dbc.Find("ContentDownload", fields, where, "Id ASC", 0, pageSize)
+		if err != nil {
+			cronErrorLog("下载列表读取失败: %v", err.Error())
+			return
+		}
+
+		var list []st
+		for rows.Next() {
+			st := st{}
+			err = rows.Scan(&st.Id, &st.ContentId, &st.Field, &st.OldUrl, &st.NewUrl, &st.Sort)
+			if err != nil {
+				cronErrorLog("绑定失败: %v", err.Error())
+				return
+			}
+			list = append(list, st)
+		}
+
+		for _, lv := range list {
+			// 存放目录
+			path := fmt.Sprintf("/upload/%s/content/%s/%03d/%d/", row.DateBase, lv.Field,
+				int64(math.Floor(float64(lv.ContentId/1000))), lv.ContentId)
+			dir := "." + path
+			err = os.MkdirAll(dir, os.ModePerm)
+			if err != nil {
+				cronErrorLog("创建目录失败: %v", err.Error())
+				return
+			}
+
+			// 存放文件名
+			filename := fmt.Sprintf("%02d%v", lv.Sort+1, filepath.Ext(lv.OldUrl))
+
+			// 统计已下载过的数量
+			if lv.NewUrl != "" {
+				repeatNum++
+			}
+
+			// 下载文件
+			t2 := time.Now() // 记时开始
+			FileSize, err := misc.DownloadFile(lv.OldUrl, dir+filename)
+			if err != nil {
+				errorNum++
+				cronErrorLog("下载文件失败: %v, 大小: %v, 耗时: %v, File: %v, Url: %v", err.Error(), FileSize, time.Since(t2), dir+filename, lv.OldUrl)
+				continue
+			}
+			cronLog("下载文件完成, 大小: %v, 耗时: %v, File: %v, Url: %v", FileSize, time.Since(t2), dir+filename, lv.OldUrl)
+
+			// 更新
+			_, err = dbc.Update("ContentDownload", dbs.H{
+				"Status":       2, // 下载完成
+				"NewUrl":       path + filename,
+				"FileSize":     FileSize,
+				"DownloadDate": time.Now().Format("2006-01-02 15:04:05"),
+			}, dbs.H{
+				"Id": lv.Id,
+			})
+			if err != nil {
+				errorNum++
+				cronErrorLog("下载完成更新数据库失败: %v", err.Error())
+			}
+		}
+	}
+
+	cronLog("内容页下载资源完成, 总数: %v, 重复: %v, 错误: %v, 耗时: %v", n, repeatNum, errorNum, time.Since(t))
 }
