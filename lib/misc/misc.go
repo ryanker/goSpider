@@ -94,14 +94,22 @@ func HttpGet(url string) (bodyByte []byte, err error) {
 
 // 下载文件
 func DownloadFile(Url string, DstFile string) (size int64, err error) {
-	client := grab.NewClient()
-	req, err := grab.NewRequest(DstFile, Url)
-	if err != nil {
-		return 0, err
-	}
-	resp := client.Do(req)
-	if err := resp.Err(); err != nil {
-		return 0, err
+	var req *grab.Request
+	var resp *grab.Response
+	for i := 1; i <= 5; i++ {
+		client := grab.NewClient()
+		client.UserAgent = "Mozilla/5.0 AppleWebKit/537.36 Chrome/73.0.3683.86 Safari/537.36"
+		client.HTTPClient.Timeout = 20 * time.Duration(i) * time.Second
+		req, err = grab.NewRequest(DstFile, Url)
+		if err != nil {
+			continue
+		}
+		resp = client.Do(req)
+		err = resp.Err()
+		if err != nil {
+			continue
+		}
+		return resp.Size, err
 	}
 	return resp.Size, err
 }
