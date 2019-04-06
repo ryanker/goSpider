@@ -125,16 +125,27 @@ func cronLog(format string, args ...interface{}) {
 
 // 列表页：抓取所有列表页
 func getListAll(dbc *dbs.DB, ParamList *[]RuleParam, row *Rule) {
-	// 抓取列表页，入库
+	// 特殊列表 Url 抓取
+	if row.ListSpecialUrl != "" {
+		Urls := strings.Split(row.ListSpecialUrl, "\n")
+		for _, Url := range Urls {
+			Url = misc.Trim(Url)
+			if Url != "" {
+				getList(dbc, ParamList, row, Url)
+			}
+		}
+	}
+
+	// 规律列表 Url 抓取
 	for page := row.ListPageStart; page <= row.ListPageEnd; page += row.ListPageSize {
-		getList(dbc, ParamList, row, page)
+		Url := strings.Replace(row.ListUrl, "{page}", strconv.FormatInt(page, 10), -1)
+		getList(dbc, ParamList, row, Url)
 	}
 }
 
 // 列表页：抓取列表页
-func getList(dbc *dbs.DB, ParamList *[]RuleParam, row *Rule, page int64) {
+func getList(dbc *dbs.DB, ParamList *[]RuleParam, row *Rule, Url string) {
 	t := time.Now()
-	Url := strings.Replace(row.ListUrl, "{page}", strconv.FormatInt(page, 10), -1)
 	bodyByte, i, err := misc.HttpGetRetry(Url)
 	cronLog("请求链接: %v, 请求次数: %v, 耗时: %v", Url, i, time.Since(t))
 	if err != nil {
