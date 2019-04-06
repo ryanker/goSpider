@@ -10,17 +10,31 @@ type Rule struct {
 	Rid          int64
 	Status       int64
 	IntervalHour int64
-	Name         string
-	Brief        string
 
-	DateBase      string
-	ListUrl       string
-	ListPageStart int64
-	ListPageEnd   int64
-	ListPageSize  int64
-	ListRule      string
+	Name  string
+	Brief string
+
+	DateBase string
+	Cookie   string
+
+	ListSpecialUrl string
+	ListUrl        string
+	ListPageStart  int64
+	ListPageEnd    int64
+	ListPageSize   int64
+	ListRule       string
 
 	ContentUrl string
+
+	IsList        string
+	IsContent     string
+	IsDownInit    string
+	IsDownList    string
+	IsDownContent string
+
+	LastStartDate string
+	LastEndData   string
+	NextStartDate string
 
 	UpdateDate string
 	CreateDate string
@@ -30,20 +44,30 @@ type Rule struct {
 func RuleMap() (ptr *Rule, fields string, args *[]interface{}) {
 	row := Rule{}
 	fields, scanArr := dbs.GetSqlRead(dbs.H{
-		"Rid":           &row.Rid,
-		"Status":        &row.Status,
-		"IntervalHour":  &row.IntervalHour,
-		"Name":          &row.Name,
-		"Brief":         &row.Brief,
-		"DateBase":      &row.DateBase,
-		"ListUrl":       &row.ListUrl,
-		"ListPageStart": &row.ListPageStart,
-		"ListPageEnd":   &row.ListPageEnd,
-		"ListPageSize":  &row.ListPageSize,
-		"ListRule":      &row.ListRule,
-		"ContentUrl":    &row.ContentUrl,
-		"UpdateDate":    &row.UpdateDate,
-		"CreateDate":    &row.CreateDate,
+		"Rid":            &row.Rid,
+		"Status":         &row.Status,
+		"IntervalHour":   &row.IntervalHour,
+		"Name":           &row.Name,
+		"Brief":          &row.Brief,
+		"DateBase":       &row.DateBase,
+		"Cookie":         &row.Cookie,
+		"ListSpecialUrl": &row.ListSpecialUrl,
+		"ListUrl":        &row.ListUrl,
+		"ListPageStart":  &row.ListPageStart,
+		"ListPageEnd":    &row.ListPageEnd,
+		"ListPageSize":   &row.ListPageSize,
+		"ListRule":       &row.ListRule,
+		"ContentUrl":     &row.ContentUrl,
+		"IsList":         &row.IsList,
+		"IsContent":      &row.IsContent,
+		"IsDownInit":     &row.IsDownInit,
+		"IsDownList":     &row.IsDownList,
+		"IsDownContent":  &row.IsDownContent,
+		"LastStartDate":  &row.LastStartDate,
+		"LastEndData":    &row.LastEndData,
+		"NextStartDate":  &row.NextStartDate,
+		"UpdateDate":     &row.UpdateDate,
+		"CreateDate":     &row.CreateDate,
 	})
 	ptr = &row
 	args = &scanArr
