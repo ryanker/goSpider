@@ -494,12 +494,12 @@
 						Rid: d.Rid,
 						Status: d.Status,
 						IntervalHour: d.IntervalHour,
-						IsList: !!d.IsList,
-						IsListDownAna: !!d.IsListDownAna,
-						IsListDownRun: !!d.IsListDownRun,
-						IsContent: !!d.IsContent,
-						IsContentDownAna: !!d.IsContentDownAna,
-						IsContentDownRun: !!d.IsContentDownRun,
+						IsList: d.IsList,
+						IsListDownAna: d.IsListDownAna,
+						IsListDownRun: d.IsListDownRun,
+						IsContent: d.IsContent,
+						IsContentDownAna: d.IsContentDownAna,
+						IsContentDownRun: d.IsContentDownRun,
 					};
 				}).catch(error => {
 					this.$message.error(error)
