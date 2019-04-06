@@ -57,12 +57,12 @@ func FileSave(name string, bodyByte []byte) {
 
 // 抓取网页（支持重试）
 func HttpGetRetry(url string) (bodyByte []byte, i int64, err error) {
-	var interval time.Duration = 1 // 间隔
+	var interval time.Duration = 2 // 间隔
 	for i = 1; i <= 6; i++ {
 		bodyByte, err = HttpGet(url)
 		if err != nil {
 			time.Sleep(interval * time.Second)
-			interval *= 2 // 每次重试，延迟双倍时间，增加重试成功率
+			interval *= 1 // 每次重试，延迟双倍时间，增加重试成功率
 			continue
 		}
 		return
@@ -73,7 +73,7 @@ func HttpGetRetry(url string) (bodyByte []byte, i int64, err error) {
 // 抓取网页
 func HttpGet(url string) (bodyByte []byte, err error) {
 	c := &http.Client{}
-	c.Timeout = 5 * time.Second // 请求网页，5 秒足够
+	c.Timeout = 20 * time.Second // 请求网页，20 秒足够
 
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
