@@ -145,29 +145,31 @@ func getListAll(dbc *dbs.DB, ParamList *[]RuleParam, row *Rule) {
 
 // 列表页：抓取列表页
 func getList(dbc *dbs.DB, ParamList *[]RuleParam, row *Rule, Url string) {
-	t := time.Now()
+	// 抓取页面
+	t2 := time.Now()
 	bodyByte, i, err := misc.HttpGetRetry(Url)
-	cronLog("请求链接: %v, 请求次数: %v, 耗时: %v", Url, i, time.Since(t))
 	if err != nil {
-		cronErrorLog("抓取页面失败: %v", err.Error())
+		cronErrorLog("抓取列表页失败: %v, 耗时: %v, Url: %v", err.Error(), time.Since(t2), Url)
 		return
 	}
+	cronLog("抓取列表页成功, 请求次数: %v, 耗时: %v, Url: %v", i, time.Since(t2), Url)
 
-	t2 := time.Now()
+	// 解析代码
+	t3 := time.Now()
 	doc, err := goquery.NewDocumentFromReader(strings.NewReader(string(bodyByte)))
 	if err != nil {
 		cronErrorLog("解析页面失败: %v, Url:%v", err.Error(), Url)
 		return
 	}
 
-	se := doc.Find(row.ListRule)
-	se.Each(func(i int, s *goquery.Selection) {
+	// 代码匹配
+	doc.Find(row.ListRule).Each(func(i int, s *goquery.Selection) {
 		data := dbs.H{}
 		data["Status"] = 1 // 待采集
 		for _, v := range *ParamList {
 			dom := s.Find(v.Rule)
 
-			// 匹配数据
+			// 匹配字段
 			value := ""
 			if v.ValueType == "Html" {
 				value, _ = dom.Html()
@@ -212,7 +214,7 @@ func getList(dbc *dbs.DB, ParamList *[]RuleParam, row *Rule, Url string) {
 		}
 		cronLog("列表页写入数据库成功: %v", id)
 	})
-	cronLog("Url: %v 入库完成, 耗时： %v", Url, time.Since(t2))
+	cronLog("Url: %v 抓取完成, 耗时： %v", Url, time.Since(t3))
 }
 
 // 内容页：抓取内容页
@@ -275,10 +277,10 @@ func getContent(dbc *dbs.DB, ParamContent *[]RuleParam, row *Rule) {
 			bodyByte, i, err := misc.HttpGetRetry(Url)
 			if err != nil {
 				errorNum++
-				cronErrorLog("抓取页面失败, 耗时: %v, Error: %v", time.Since(t2), err.Error())
+				cronErrorLog("抓取内容页失败, 耗时: %v, Error: %v, Url: %v", time.Since(t2), err.Error(), Url)
 				continue
 			}
-			cronLog("抓取页面完成, 请求次数: %v, 耗时: %v, Url: %v", i, time.Since(t2), Url)
+			cronLog("抓取内容页完成, 请求次数: %v, 耗时: %v, Url: %v", i, time.Since(t2), Url)
 
 			// 解析代码
 			t3 := time.Now()
@@ -289,7 +291,7 @@ func getContent(dbc *dbs.DB, ParamContent *[]RuleParam, row *Rule) {
 				continue
 			}
 
-			// 匹配内容
+			// 匹配字段
 			data := dbs.H{}
 			data["Url"] = Url
 			for _, m := range *ParamContent {
