@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"regexp"
 	"strings"
 	"time"
 
@@ -115,4 +116,16 @@ func UrlFix(Url string, BaseUrl string) string {
 		Url = u.Scheme + "://" + u.Host + Url
 	}
 	return Url
+}
+
+func StrClear(value, FilterType, FilterRegexp, FilterRepl string) string {
+	if FilterType == "Reg" {
+		re := regexp.MustCompile(FilterRegexp)
+		if FilterRepl == "" {
+			value = re.FindString(value)
+		} else {
+			value = re.ReplaceAllString(value, FilterRepl)
+		}
+	}
+	return Trim(value)
 }

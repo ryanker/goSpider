@@ -1,7 +1,6 @@
 package api
 
 import (
-	"regexp"
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
@@ -111,13 +110,7 @@ func HttpGetListRule(c *gin.Context) {
 	} else {
 		value, _ = dom.Html()
 	}
-
-	if m.FilterType == "Trim" {
-		value = misc.Trim(value)
-	} else if m.FilterType == "Reg" {
-		re := regexp.MustCompile(m.FilterRegexp)
-		value = re.ReplaceAllString(value, m.FilterRepl)
-	}
+	value = misc.StrClear(value, m.FilterType, m.FilterRegexp, m.FilterRepl)
 
 	c.Message("0", "success", gin.H{"html": value})
 }
@@ -163,13 +156,7 @@ func HttpGetContentRule(c *gin.Context) {
 	} else {
 		value, _ = dom.Html()
 	}
-
-	if m.FilterType == "Trim" {
-		value = misc.Trim(value)
-	} else if m.FilterType == "Reg" {
-		re := regexp.MustCompile(m.FilterRegexp)
-		value = re.ReplaceAllString(value, m.FilterRepl)
-	}
+	value = misc.StrClear(value, m.FilterType, m.FilterRegexp, m.FilterRepl)
 
 	c.Message("0", "success", gin.H{"html": value})
 }
@@ -219,13 +206,7 @@ func HttpGetListRuleDown(c *gin.Context) {
 	} else {
 		value, _ = doc2.Html()
 	}
-
-	if m.FilterType == "Trim" {
-		value = misc.Trim(value)
-	} else if m.FilterType == "Reg" {
-		re := regexp.MustCompile(m.FilterRegexp)
-		value = re.ReplaceAllString(value, m.FilterRepl)
-	}
+	value = misc.StrClear(value, m.FilterType, m.FilterRegexp, m.FilterRepl)
 
 	// 解析HTML代码
 	doc, err = goquery.NewDocumentFromReader(strings.NewReader(value))
@@ -296,13 +277,7 @@ func HttpGetContentRuleDown(c *gin.Context) {
 	} else {
 		value, _ = doc2.Html()
 	}
-
-	if m.FilterType == "Trim" {
-		value = misc.Trim(value)
-	} else if m.FilterType == "Reg" {
-		re := regexp.MustCompile(m.FilterRegexp)
-		value = re.ReplaceAllString(value, m.FilterRepl)
-	}
+	value = misc.StrClear(value, m.FilterType, m.FilterRegexp, m.FilterRepl)
 
 	// 解析HTML代码
 	doc, err = goquery.NewDocumentFromReader(strings.NewReader(value))

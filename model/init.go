@@ -5,7 +5,6 @@ import (
 	"math"
 	"os"
 	"path/filepath"
-	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -180,15 +179,7 @@ func getList(dbc *dbs.DB, ParamList *[]RuleParam, row *Rule, Url string) {
 			} else {
 				value, _ = dom.Html()
 			}
-
-			// 数据过滤
-			if v.FilterType == "Trim" {
-				value = misc.Trim(value)
-			} else if v.FilterType == "Reg" {
-				re := regexp.MustCompile(v.FilterRegexp)
-				value = re.ReplaceAllString(value, v.FilterRepl)
-			}
-
+			value = misc.StrClear(value, v.FilterType, v.FilterRegexp, v.FilterRepl)
 			data[v.Field] = value
 		}
 
@@ -294,27 +285,20 @@ func getContent(dbc *dbs.DB, ParamContent *[]RuleParam, row *Rule) {
 			// 匹配字段
 			data := dbs.H{}
 			data["Url"] = Url
-			for _, m := range *ParamContent {
-				dom := doc.Find(m.Rule).Eq(0)
+			for _, v := range *ParamContent {
+				dom := doc.Find(v.Rule).Eq(0)
 				value := ""
-				if m.ValueType == "Html" {
+				if v.ValueType == "Html" {
 					value, _ = dom.Html()
-				} else if m.ValueType == "Text" {
+				} else if v.ValueType == "Text" {
 					value = dom.Text()
-				} else if m.ValueType == "Attr" {
-					value, _ = dom.Attr(m.ValueAttr)
+				} else if v.ValueType == "Attr" {
+					value, _ = dom.Attr(v.ValueAttr)
 				} else {
 					value, _ = dom.Html()
 				}
-
-				if m.FilterType == "Trim" {
-					value = misc.Trim(value)
-				} else if m.FilterType == "Reg" {
-					re := regexp.MustCompile(m.FilterRegexp)
-					value = re.ReplaceAllString(value, m.FilterRepl)
-				}
-
-				data[m.Field] = value
+				value = misc.StrClear(value, v.FilterType, v.FilterRegexp, v.FilterRepl)
+				data[v.Field] = value
 			}
 
 			// 写入数据库
