@@ -165,10 +165,10 @@ func (db *DB) Find(table, fields string, where H, order string, page, pageSize i
 }
 
 // 绑定到 Map
-func MapScan(r *sql.Rows, dest map[string]interface{}) error {
-	columns, err := r.Columns()
+func MapScan(r *sql.Rows, dest map[string]interface{}) (columns []string, err error) {
+	columns, err = r.Columns()
 	if err != nil {
-		return err
+		return
 	}
 
 	values := make([]interface{}, len(columns))
@@ -178,14 +178,15 @@ func MapScan(r *sql.Rows, dest map[string]interface{}) error {
 
 	err = r.Scan(values...)
 	if err != nil {
-		return err
+		return
 	}
 
 	for i, column := range columns {
 		dest[column] = *(values[i].(*interface{}))
 	}
 
-	return r.Err()
+	err = r.Err()
+	return
 }
 
 func GetSqlRead(dest H) (fStr string, scanArr []interface{}) {
