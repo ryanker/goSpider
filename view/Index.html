@@ -122,15 +122,13 @@
                             </el-radio-group>
                         </el-form-item>
                         <el-form-item label="间隔时间" v-if="cronData.Status===3">
-                            <el-input v-model="cronData.IntervalHour" style="width:200px">
-                                <el-button slot="append">小时</el-button>
-                            </el-input>
+                            <el-input-number v-model="cronData.IntervalHour" :min="0"></el-input-number>
+                            <el-button type="danger">时</el-button>
                         </el-form-item>
 
                         <el-form-item label="抓取超时">
-                            <el-input v-model="cronData.Timeout" style="width:200px">
-                                <el-button slot="append">秒</el-button>
-                            </el-input>
+                            <el-input-number v-model="cronData.Timeout" :min="0"></el-input-number>
+                            <el-button type="danger">秒</el-button>
                         </el-form-item>
 
                         <el-form-item label="任务开关">
@@ -350,6 +348,17 @@
                             </el-form-item>
                             <el-form-item label="下载地址获取属性" v-if="ruleParamData.DownValueType==='Attr'">
                                 <el-input v-model="ruleParamData.DownValueAttr" placeholder=""/>
+                            </el-form-item>
+                            <el-form-item label="下载文件类型">
+                                <el-radio-group v-model="ruleParamData.DownFileType">
+                                    <el-radio label="Image">Image</el-radio>
+                                    <el-radio label="Movie">Movie</el-radio>
+                                    <el-radio label="File">File</el-radio>
+                                </el-radio-group>
+                            </el-form-item>
+                            <el-form-item label="下载文件超时">
+                                <el-input-number v-model="ruleParamData.DownTimeout" :min="0"></el-input-number>
+                                <el-button type="danger">秒</el-button>
                             </el-form-item>
                         </div>
                         <el-form-item>
@@ -829,6 +838,8 @@
 					DownRule: 'a',
 					DownValueType: 'Attr',
 					DownValueAttr: 'href',
+					DownFileType: 'Image',
+					DownTimeout: 20,
 				};
 				this.ruleParamDialogVisible = true;
 			},
