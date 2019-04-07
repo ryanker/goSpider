@@ -72,18 +72,10 @@
                     <el-table-column label="添加时间" prop="CreateDate" width="180"></el-table-column>
                     <el-table-column label="状态" width="100" align="center">
                         <template slot-scope="scope">
-                            <span v-if="scope.row.Status === 1">
-                                <el-tag type="info">关闭采集</el-tag>
-                            </span>
-                            <span v-else-if="scope.row.Status === 2">
-                                <el-tag>采集一次</el-tag>
-                            </span>
-                            <span v-else-if="scope.row.Status === 3">
-                                <el-tag type="success">间隔采集</el-tag>
-                            </span>
-                            <span v-else>
-                                <el-tag type="danger">-</el-tag>
-                            </span>
+                            <el-tag v-if="scope.row.Status === 1" type="info">关闭采集</el-tag>
+                            <el-tag v-else-if="scope.row.Status === 2">采集一次</el-tag>
+                            <el-tag v-else-if="scope.row.Status === 3" type="success">间隔采集</el-tag>
+                            <el-tag v-else type="danger">-</el-tag>
                         </template>
                     </el-table-column>
                     <el-table-column label="操作" width="150">
@@ -132,6 +124,12 @@
                         <el-form-item label="间隔时间" v-if="cronData.Status===3">
                             <el-input v-model="cronData.IntervalHour" style="width:200px">
                                 <el-button slot="append">小时</el-button>
+                            </el-input>
+                        </el-form-item>
+
+                        <el-form-item label="抓取超时">
+                            <el-input v-model="cronData.Timeout" style="width:200px">
+                                <el-button slot="append">秒</el-button>
                             </el-input>
                         </el-form-item>
 
@@ -494,6 +492,7 @@
 						Rid: d.Rid,
 						Status: d.Status,
 						IntervalHour: d.IntervalHour,
+						Timeout: d.Timeout,
 						IsList: d.IsList,
 						IsListDownAna: d.IsListDownAna,
 						IsListDownRun: d.IsListDownRun,

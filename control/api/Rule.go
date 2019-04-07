@@ -22,6 +22,7 @@ func RuleCreate(c *gin.Context) {
 		"Brief":            m.Brief,
 		"DateBase":         m.DateBase,
 		"Cookie":           m.Cookie,
+		"Timeout":          20,
 		"ListSpecialUrl":   m.ListSpecialUrl,
 		"ListUrl":          m.ListUrl,
 		"ListPageStart":    m.ListPageStart,
@@ -102,6 +103,7 @@ func RuleUpdateCron(c *gin.Context) {
 	err = model.RuleUpdate(dbs.H{
 		"Status":           m.Status,
 		"IntervalHour":     m.IntervalHour,
+		"Timeout":          m.Timeout,
 		"IsListDownAna":    m.IsListDownAna,
 		"IsListDownRun":    m.IsListDownRun,
 		"IsContent":        m.IsContent,

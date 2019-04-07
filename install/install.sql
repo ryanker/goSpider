@@ -9,6 +9,7 @@ CREATE TABLE Rule
 
   DateBase         VARCHAR(255) NOT NULL DEFAULT '',                -- 数据库名称
   Cookie           TEXT                  DEFAULT '',                -- 登录抓取 Cookie
+  Timeout          INTEGER      NOT NULL DEFAULT '0',               -- 抓取超时时间(秒)
 
   ListSpecialUrl   TEXT                  DEFAULT '',                -- 抓取列表网址(特殊路径)
   ListUrl          VARCHAR(255) NOT NULL DEFAULT '',                -- 抓取列表网址
