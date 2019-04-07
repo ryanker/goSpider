@@ -32,6 +32,8 @@ func RuleParamCreate(c *gin.Context) {
 		"DownRule":      m.DownRule,
 		"DownValueType": m.DownValueType,
 		"DownValueAttr": m.DownValueAttr,
+		"DownFileType":  m.DownFileType,
+		"DownTimeout":   m.DownTimeout,
 	})
 	if err != nil {
 		c.Message("-1", err.Error())
@@ -70,6 +72,8 @@ func RuleParamUpdate(c *gin.Context) {
 		"DownRule":      m.DownRule,
 		"DownValueType": m.DownValueType,
 		"DownValueAttr": m.DownValueAttr,
+		"DownFileType":  m.DownFileType,
+		"DownTimeout":   m.DownTimeout,
 	}, m.Pid)
 	if err != nil {
 		c.Message("-1", "更新数据库失败："+err.Error())

@@ -24,6 +24,8 @@ type RuleParam struct {
 	DownRule      string
 	DownValueType string
 	DownValueAttr string
+	DownFileType  string
+	DownTimeout   int64
 	CreateDate    string
 }
 
@@ -47,6 +49,8 @@ func RuleParamMap() (ptr *RuleParam, fields string, args *[]interface{}) {
 		"DownRule":      &row.DownRule,
 		"DownValueType": &row.DownValueType,
 		"DownValueAttr": &row.DownValueAttr,
+		"DownFileType":  &row.DownFileType,
+		"DownTimeout":   &row.DownTimeout,
 		"CreateDate":    &row.CreateDate,
 	})
 	ptr = &row

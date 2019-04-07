@@ -55,5 +55,7 @@ CREATE TABLE RuleParam
   DownRule      TEXT                  DEFAULT '',  -- 下载地址匹配规则
   DownValueType VARCHAR(255) NOT NULL DEFAULT '',  -- 下载地址获取类型 值:Text Attr
   DownValueAttr VARCHAR(255) NOT NULL DEFAULT '',  -- 下载地址获取属性 (当为 Attr 时有效)
+  DownFileType  VARCHAR(255) NOT NULL DEFAULT '',  -- 下载文件类型 值:Image Movie File
+  DownTimeout   INTEGER      NOT NULL DEFAULT '0', -- 下载超时时间(秒)
   CreateDate    DATETIME              DEFAULT CURRENT_TIMESTAMP
 );
