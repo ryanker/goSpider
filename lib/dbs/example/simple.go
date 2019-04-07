@@ -130,7 +130,7 @@ CREATE TABLE user
 	fmt.Println("Json:", string(b))
 
 	// 读取多条(到 Map)
-	rows, err = db.Find("user", fields, dbs.H{}, "", 1, 20)
+	rows, err = db.Find("user", "*", dbs.H{}, "", 1, 20)
 	if err != nil {
 		panic(err)
 	}
