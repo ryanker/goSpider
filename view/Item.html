@@ -42,15 +42,20 @@
             <el-main>
                 <!--筛选-->
                 <el-radio-group v-model="q.Table" class="mb-1" @change="tableChange">
-                    <el-radio-button label="List">List</el-radio-button>
-                    <el-radio-button label="Content">Content</el-radio-button>
-                    <el-radio-button label="ListDownload">ListDownload</el-radio-button>
-                    <el-radio-button label="ContentDownload">ContentDownload</el-radio-button>
+                    <el-radio-button label="List">列表</el-radio-button>
+                    <el-radio-button label="Content">内容</el-radio-button>
+                    <el-radio-button label="ListDownload">列表下载</el-radio-button>
+                    <el-radio-button label="ContentDownload">内容下载</el-radio-button>
                 </el-radio-group>
 
                 <!--表格-->
-                <el-table v-loading="tableLoading" :data="tableData" border>
-                    <el-table-column fixed v-for="col in tableColumns" :label="col" :prop="col"></el-table-column>
+                <el-table v-loading="tableLoading" :data="tableData" border height="666">
+                    <el-table-column v-for="item in tableColumns" :fixed="item==='Name' ? true : false" :label="item"
+                                     min-width="200">
+                        <template slot-scope="scope">
+                            <el-input v-model="scope.row[item]"></el-input>
+                        </template>
+                    </el-table-column>
                 </el-table>
 
                 <!--分页-->
@@ -126,6 +131,8 @@
 			// 列表
 			getList() {
 				this.tableLoading = true;
+				this.tableData = [];
+				this.tableColumns = [];
 				aPost('/ItemList', this.q).then(r => {
 					this.tableData = r.list || [];
 					this.tableColumns = r.columns || [];
