@@ -72,6 +72,9 @@ func main() {
 	// Database
 	app.POST("/DatabaseCreate", api.DatabaseCreate)
 
+	// Item
+	app.Any("/ItemList", api.ItemList)
+
 	err = app.Run("0.0.0.0:3333")
 	if err != nil {
 		panic(err)
