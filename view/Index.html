@@ -55,7 +55,7 @@
                 </el-row>
 
                 <!--状态筛选-->
-                <el-radio-group v-model="q.Status" class="mb-1" @change="StatusChange">
+                <el-radio-group v-model="q.Status" class="mb-1" @change="statusChange">
                     <el-radio-button :label="0">全部</el-radio-button>
                     <el-radio-button :label="1">关闭采集</el-radio-button>
                     <el-radio-button :label="2">采集一次</el-radio-button>
@@ -78,7 +78,7 @@
                             <el-tag v-else type="danger">-</el-tag>
                         </template>
                     </el-table-column>
-                    <el-table-column label="操作" width="150">
+                    <el-table-column label="操作" width="200">
                         <template slot-scope="scope">
                             <el-tooltip effect="dark" content="采集任务" placement="top">
                                 <el-button type="success" size="small" circle icon="el-icon-caret-right"
@@ -92,6 +92,9 @@
                                 <el-button type="danger" size="small" circle icon="el-icon-delete"
                                            @click="deleteDialog(scope.row)"/>
                             </el-tooltip>
+                            <a :href="'/Item?Rid='+scope.row.Rid" target="_blank">
+                                <el-button size="small" circle icon="el-icon-search"/>
+                            </a>
                         </template>
                     </el-table-column>
                 </el-table>
@@ -483,7 +486,7 @@
 			},
 
 			// 状态筛选
-			StatusChange(val) {
+			statusChange(val) {
 				this.q.Status = val;
 				this.q.Page = 1;
 				this.getList();

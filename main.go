@@ -33,7 +33,7 @@ func main() {
 	gin.DefaultErrorWriter = io.MultiWriter(webErrorLog, os.Stdout)
 
 	app := gin.Default()
-	app.Delims("{[{", "}]}")
+	app.Delims("${", "}")
 	app.Static("/upload", "./upload")
 	app.SetFuncMap(template.FuncMap{
 		"htmlTags": func(s string) template.HTML {
@@ -44,6 +44,7 @@ func main() {
 
 	// ========== Front ==========
 	app.GET("/", front.Index)
+	app.GET("/Item", front.Item)
 
 	// ========== Api ==========
 	// Rule

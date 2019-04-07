@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>狗狗采集</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.5.4/theme-chalk/index.css">
+    <style>
+        body {
+            margin: 0;
+        }
+
+        .el-header {
+            min-height: 60px;
+            padding: 0;
+        }
+
+        .el-main {
+            min-height: 160px;
+        }
+
+        .el-footer {
+            line-height: 60px;
+            text-align: center;
+        }
+
+        .mb-1 {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <template>
+        <el-container>
+            <el-header>
+                <el-menu :default-active="1" mode="horizontal">
+                    <el-menu-item index="1"><a href="/">狗狗采集</a></el-menu-item>
+                </el-menu>
+            </el-header>
+            <el-main>
+                <!--筛选-->
+                <el-radio-group v-model="q.Table" class="mb-1" @change="tableChange">
+                    <el-radio-button label="List">List</el-radio-button>
+                    <el-radio-button label="Content">Content</el-radio-button>
+                    <el-radio-button label="ListDownload">ListDownload</el-radio-button>
+                    <el-radio-button label="ContentDownload">ContentDownload</el-radio-button>
+                </el-radio-group>
+
+                <!--表格-->
+                <el-table v-loading="tableLoading" :data="tableData" border>
+                    <el-table-column fixed v-for="col in tableColumns" :label="col" :prop="col"></el-table-column>
+                </el-table>
+
+                <!--分页-->
+                <el-row type="flex" justify="end" style="margin-top:15px">
+                    <el-pagination v-if="tableTotal > 0" :current-page="q.Page" :page-size="20" :total="tableTotal"
+                                   background layout="total, prev, pager, next, jumper"
+                                   @current-change="tableCurrentChange"/>
+                </el-row>
+            </el-main>
+            <el-footer>@2019</el-footer>
+        </el-container>
+    </template>
+</div>
+</body>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.7/vue.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.5.4/index.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js"></script>
+<script>
+	function aPost(url, params) {
+		return new Promise((resolve, reject) => {
+			axios.post(url, params).then(res => {
+				const r = res.data;
+				if (!r) {
+					// console.log('data: ' + r);
+					reject('服务器错误，请稍后再试');
+				} else if (r.code !== '0') {
+					// console.log('message: ' + r.message);
+					reject(r.message || '服务器错误，请稍后再试');
+				} else {
+					resolve(r)
+				}
+			}).catch(error => {
+				console.log(error);
+				reject('服务器错误，请稍后再试');
+			})
+		})
+	}
+
+	new Vue({
+		el: '#app',
+		data() {
+			return {
+				tableLoading: false,
+				tableTotal: 0,
+				tableData: [],
+				tableColumns: [],
+
+				q: {
+					Rid: Number('${.Rid}'),
+					Table: '${.Table}' || 'List',
+					Page: 1
+				},
+			}
+		},
+		mounted() {
+			this.getList();
+		},
+		methods: {
+			// 表筛选
+			tableChange(val) {
+				this.q.Table = val;
+				this.q.Page = 1;
+				this.getList();
+			},
+
+			// 分页
+			tableCurrentChange(page) {
+				this.q.Page = page;
+				this.getList();
+			},
+
+			// 列表
+			getList() {
+				this.tableLoading = true;
+				aPost('/ItemList', this.q).then(r => {
+					this.tableData = r.list || [];
+					this.tableColumns = r.columns || [];
+					this.tableTotal = r.total || 0;
+					this.tableLoading = false;
+				}).catch(error => {
+					this.$message.error(error);
+				});
+			},
+		}
+	})
+</script>
+</body>
+</html>

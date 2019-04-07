@@ -85,6 +85,7 @@ func generateSql(Rid int64) (s string, err error) {
 	// Content
 	s += "CREATE TABLE Content(\n"
 	s += "  `ContentId` INTEGER PRIMARY KEY AUTOINCREMENT,\n"
+	s += "  `ListId` INTEGER NOT NULL DEFAULT '0',\n"
 	s += "  `Url` VARCHAR(255) NOT NULL DEFAULT '',\n"
 	for _, v := range ContentData {
 		Suffix := ""

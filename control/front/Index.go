@@ -9,3 +9,10 @@ import (
 func Index(c *gin.Context) {
 	c.HTML(http.StatusOK, "Index.html", gin.H{})
 }
+
+func Item(c *gin.Context) {
+	c.HTML(http.StatusOK, "Item.html", gin.H{
+		"Rid":   c.Query("Rid"),
+		"Table": c.Query("Table"),
+	})
+}

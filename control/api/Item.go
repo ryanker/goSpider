@@ -42,7 +42,7 @@ func ItemList(c *gin.Context) {
 	}
 
 	// 列表
-	rows, err := dbc.Find(m.Table, "*", dbs.H{}, "", m.Page, 200)
+	rows, err := dbc.Find(m.Table, "*", dbs.H{}, "", m.Page, 20)
 	if err != nil {
 		c.Message("-1", "读取表失败: "+err.Error())
 		return
