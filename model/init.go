@@ -17,11 +17,20 @@ import (
 
 var err error
 var db *dbs.DB
+var dbLog *dbs.DB
 
 func init() {
 	dbs.LogFile = "./log/db.log"
 	dbs.ErrorLogFile = "./log/db.error.log"
 
+	InitDB()    // 打开主库
+	InitDbLog() // 打开日志库
+
+	go cron()
+}
+
+// 打开主库
+func InitDB() {
 	dbFile := "./db/data.db"
 	db, err = dbs.Open(dbFile)
 	if err != nil {
@@ -40,8 +49,34 @@ func init() {
 	if err = db.Ping(); err != nil {
 		panic(err)
 	}
+}
 
-	go cron()
+// 打开日志库
+func InitDbLog() {
+	dbFile := "./db/log.db"
+	dbLog, err = dbs.Open(dbFile)
+	if err != nil {
+		panic(err)
+	}
+
+	// 文件不存在，则创建表
+	if _, err := os.Stat(dbFile); os.IsNotExist(err) {
+		query := `CREATE TABLE Log
+(
+  LogId      INTEGER PRIMARY KEY AUTOINCREMENT,   -- 日志ID
+  Runtime    DECIMAL(10, 6) NOT NULL DEFAULT '0', -- 执行耗时
+  Message    TEXT                    DEFAULT '',  -- 日志内容
+  CreateDate DATETIME                DEFAULT CURRENT_TIMESTAMP
+);`
+		_, err = dbLog.Exec(query)
+		if err != nil {
+			panic(err)
+		}
+	}
+
+	if err = dbLog.Ping(); err != nil {
+		panic(err)
+	}
 }
 
 // 任务
