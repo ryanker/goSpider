@@ -50,6 +50,7 @@ func StartGin() {
 	// ========== Front ==========
 	app.GET("/", front.Index)
 	app.GET("/Item", front.Item)
+	app.GET("/Log", front.Log)
 
 	// ========== Api ==========
 	// Rule

@@ -27,13 +27,13 @@ func LogMap() (ptr *Log, fields string, args *[]interface{}) {
 }
 
 func LogCount(h dbs.H) (n int64, err error) {
-	n, err = db.Count("Log", h)
+	n, err = dbLog.Count("Log", h)
 	return n, err
 }
 
 func LogList(h dbs.H, order string, page, pageSize int64) (list []Log, err error) {
 	data, fields, scanArr := LogMap()
-	rows, err := db.Find("Log", fields, h, order, page, pageSize)
+	rows, err := dbLog.Find("Log", fields, h, order, page, pageSize)
 	if err != nil {
 		return
 	}

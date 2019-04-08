@@ -16,3 +16,7 @@ func Item(c *gin.Context) {
 		"Table": c.Query("Table"),
 	})
 }
+
+func Log(c *gin.Context) {
+	c.HTML(http.StatusOK, "Log.html", gin.H{})
+}
