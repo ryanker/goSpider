@@ -50,6 +50,7 @@
                         <el-button slot="append" icon="el-icon-search" @click="searchClick"/>
                     </el-input>
                     <el-button type="primary" class="mb-1" @click="createDialog">添加规则</el-button>
+                    <el-button type="success" class="mb-1" @click="importDialog">导入规则</el-button>
                     <el-button v-if="tableSelectData.length!==0" type="danger" class="mb-1" @click="batchDelete">删除规则
                     </el-button>
                 </el-row>
@@ -398,7 +399,7 @@
                         <template slot="prepend">抓取页面</template>
                     </el-input>
                     <el-input v-if="ruleTestHtmlList.length === 0" type="textarea"
-                              autosize="{minRows: 5, maxRows:10000}" placeholder="玩命抓取中..."
+                              :autosize="{minRows: 5, maxRows:10000}" placeholder="玩命抓取中..."
                               v-model="ruleTestHtml" style="margin-top: 20px">
                     </el-input>
 
@@ -407,7 +408,7 @@
                               style="margin-top: 20px">
                         <template slot="prepend">匹配数量</template>
                     </el-input>
-                    <el-input v-for="item in ruleTestHtmlList" type="textarea" autosize="{minRows: 5, maxRows:10000}"
+                    <el-input v-for="item in ruleTestHtmlList" type="textarea" :autosize="{minRows: 2, maxRows:10000}"
                               placeholder="玩命抓取中..."
                               v-model="item" style="margin-top: 20px">
                     </el-input>
@@ -417,8 +418,15 @@
                 <el-dialog :title="ruleExportTitle" :visible.sync="ruleExportDialog" fullscreen>
                     <el-alert title="可将下面代码复制分享给你朋友或保存到别处。" type="success" :closable="false">
                     </el-alert>
-                    <el-input type="textarea" autosize="{minRows: 5, maxRows:10000}" placeholder="导出中..."
+                    <el-input type="textarea" :autosize="{minRows: 5, maxRows:10000}" placeholder="导出中..."
                               v-model="ruleExportData" style="margin-top: 20px"></el-input>
+                </el-dialog>
+
+                <!--对话框: 导入规则-->
+                <el-dialog :visible.sync="ruleImportDialog" title="导入规则" fullscreen>
+                    <el-input type="textarea" :autosize="{minRows: 5, maxRows:10000}" placeholder="请粘贴规则代码进行导入"
+                              v-model="ruleImportData" style="margin-bottom: 20px"></el-input>
+                    <el-button :disabled="ruleImportDisabled" type="primary" @click="importSubmit">确认</el-button>
                 </el-dialog>
             </el-main>
             <el-footer>@2019</el-footer>
@@ -503,7 +511,12 @@
 				// 导出规则
 				ruleExportTitle: '',
 				ruleExportDialog: false,
-				ruleExportData: false,
+				ruleExportData: '',
+
+				// 导入规则
+				ruleImportDialog: false,
+				ruleImportDisabled: false,
+				ruleImportData: '',
 			}
 		},
 		mounted() {
@@ -688,6 +701,26 @@
 				}).catch(error => {
 					this.$message.error(error)
 				})
+			},
+
+			// 导入规则
+			importDialog() {
+				this.ruleImportDialog = true;
+			},
+
+			// 导入规则: 提交
+			importSubmit() {
+				this.ruleImportDisabled = true;
+				aPost('/RuleImport', {Data: this.ruleImportData}).then(r => {
+					this.$message.success(r.message);
+					this.ruleImportDisabled = false;
+					this.ruleImportDialog = false;
+					this.ruleImportData = '';
+					this.getList();
+				}).catch(error => {
+					this.$message.error(error);
+					this.ruleImportDisabled = false;
+				});
 			},
 
 			// 分页

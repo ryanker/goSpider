@@ -234,7 +234,7 @@ func RuleExport(c *gin.Context) {
 
 func RuleImport(c *gin.Context) {
 	m := struct {
-		encoded string
+		Data string
 	}{}
 	err := c.ShouldBind(&m)
 	if err != nil {
@@ -242,10 +242,10 @@ func RuleImport(c *gin.Context) {
 		return
 	}
 
-	m.encoded = strings.TrimPrefix(m.encoded, "[GO:BEGIN]\n")
-	m.encoded = strings.TrimSuffix(m.encoded, "\n[GO:END]")
-	m.encoded = strings.Trim(m.encoded, " \t\r\n")
-	b, err := base64.StdEncoding.DecodeString(m.encoded)
+	m.Data = strings.TrimPrefix(m.Data, "[GO:BEGIN]\n")
+	m.Data = strings.TrimSuffix(m.Data, "\n[GO:END]")
+	m.Data = strings.Trim(m.Data, " \t\r\n")
+	b, err := base64.StdEncoding.DecodeString(m.Data)
 	if err != nil {
 		c.Message("-1", "解析 encoded 失败："+err.Error())
 		return
