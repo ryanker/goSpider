@@ -57,6 +57,8 @@
                         <el-button slot="append" icon="el-icon-search" @click="searchClick"/>
                     </el-input>
                     <el-button type="danger" class="mb-1" @click="deleteDialog">清空日志</el-button>
+                    <el-checkbox v-model="autoRefresh" label="刷新日志" border style="margin-left:10px"
+                                 @change="autoChange"></el-checkbox>
                 </el-row>
 
                 <!--筛选-->
@@ -127,6 +129,10 @@
 				tableTotal: 0,
 				tableData: [],
 
+				// 自动刷新日志
+				autoRefresh: false,
+				autoT: null,
+
 				q: {
 					Status: 0,
 					Message: '',
@@ -156,6 +162,17 @@
 			sortChange(obj) {
 				this.q.Order = obj.order === 'descending' ? 'Runtime' : '';
 				this.getList()
+			},
+
+			// 自动刷新
+			autoChange() {
+				if (this.autoRefresh) {
+					this.autoT = window.setInterval(() => {
+						this.getList();
+					}, 5000);
+				} else {
+					window.clearInterval(this.autoT);
+				}
 			},
 
 			// 删除
