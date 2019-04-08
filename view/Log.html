@@ -61,7 +61,8 @@
                 </el-radio-group>
 
                 <!--表格-->
-                <el-table v-loading="tableLoading" :data="tableData" border height="666">
+                <el-table v-loading="tableLoading" :data="tableData" border height="666" @sort-change="sortChange"
+                          :default-sort="{prop: 'Runtime', order: 'ascending'}">
                     <el-table-column label="日志ID" prop="LogId" width="100"></el-table-column>
                     <el-table-column label="状态" width="100" align="center">
                         <template slot-scope="scope">
@@ -70,7 +71,8 @@
                             <el-tag v-else type="danger">-</el-tag>
                         </template>
                     </el-table-column>
-                    <el-table-column label="执行耗时" prop="Runtime" width="120"></el-table-column>
+                    <el-table-column label="执行耗时" prop="Runtime" width="120"
+                                     :sort-orders="['ascending', 'descending']" sortable="custom"></el-table-column>
                     <el-table-column f label="日志内容" prop="Message" min-width="200"></el-table-column>
                     <el-table-column label="日志时间" prop="CreateDate" width="180"></el-table-column>
                 </el-table>
@@ -129,7 +131,7 @@
 			}
 		},
 		mounted() {
-			this.getList();
+			// this.getList();
 		},
 		methods: {
 			// 搜索
@@ -143,6 +145,12 @@
 				this.q.Status = val;
 				this.q.Page = 1;
 				this.getList();
+			},
+
+			// 排序
+			sortChange(obj) {
+				this.q.Order = obj.order === 'descending' ? 'Runtime' : '';
+				this.getList()
 			},
 
 			// 分页
