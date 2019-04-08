@@ -13,15 +13,18 @@ import (
 	"./control/front"
 )
 
+func main() {
+	ConfigRuntime()
+	StartGin()
+}
+
 func ConfigRuntime() {
 	nuCPU := runtime.NumCPU()
 	runtime.GOMAXPROCS(nuCPU)
 	fmt.Printf("Running with %d CPUs\n", nuCPU)
 }
 
-func main() {
-	ConfigRuntime()
-
+func StartGin() {
 	WebLogFile := "./log/web.log"
 	WebErrorLogFile := "./log/webError.log"
 
