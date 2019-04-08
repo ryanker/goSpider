@@ -50,3 +50,12 @@ func LogList(c *gin.Context) {
 
 	c.Message("0", "success", gin.H{"total": total, "list": list})
 }
+
+func LogDeleteDB(c *gin.Context) {
+	err := model.LogDeleteDB()
+	if err != nil {
+		c.Message("-1", err.Error())
+		return
+	}
+	c.Message("0", "删除完成")
+}

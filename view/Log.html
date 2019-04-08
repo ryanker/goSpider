@@ -56,6 +56,7 @@
                     <el-input v-model="q.Message" placeholder="搜索日志" class="mb-1 mr-1" clearable>
                         <el-button slot="append" icon="el-icon-search" @click="searchClick"/>
                     </el-input>
+                    <el-button type="danger" class="mb-1" @click="deleteDialog">清空日志</el-button>
                 </el-row>
 
                 <!--筛选-->
@@ -155,6 +156,19 @@
 			sortChange(obj) {
 				this.q.Order = obj.order === 'descending' ? 'Runtime' : '';
 				this.getList()
+			},
+
+			// 删除
+			deleteDialog() {
+				this.$confirm('删除不可逆, 是否继续? ', '提示', {type: 'warning'}).then(() => {
+					aPost('/LogDeleteDB').then(r => {
+						this.$message.success(r.message);
+						this.getList();
+					}).catch(error => {
+						this.$message.error(error);
+					})
+				}).catch(_ => {
+				});
 			},
 
 			// 分页

@@ -579,11 +579,13 @@
 				aPost('/DatabaseCreate', this.cronDateBase).then(r => {
 					this.cronData.IntervalHour = Number(this.cronData.IntervalHour);
 					aPost('/RuleUpdateCron', this.cronData).then(r => {
-						this.cronButtonDisabled = false;
 						this.$message.success(r.message);
-					}).catch(error => {
 						this.cronButtonDisabled = false;
+						this.cronDialogVisible = false;
+						this.getList();
+					}).catch(error => {
 						this.$message.error(error);
+						this.cronButtonDisabled = false;
 					})
 				}).catch(error => {
 					this.cronButtonDisabled = false;

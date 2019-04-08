@@ -19,6 +19,15 @@ var err error
 var db *dbs.DB
 var dbLog *dbs.DB
 
+var logSql = `CREATE TABLE Log
+(
+  LogId      INTEGER PRIMARY KEY AUTOINCREMENT,   -- 日志ID
+  Status     INTEGER        NOT NULL DEFAULT '0', -- 日志状态 1:普通日志 2:错误日志
+  Runtime    DECIMAL(10, 6) NOT NULL DEFAULT '0', -- 执行耗时
+  Message    TEXT                    DEFAULT '',  -- 日志内容
+  CreateDate DATETIME                DEFAULT CURRENT_TIMESTAMP
+);`
+
 func init() {
 	dbs.LogFile = "./log/db.log"
 	dbs.ErrorLogFile = "./log/db.error.log"
@@ -61,17 +70,7 @@ func InitDbLog() {
 
 	// 文件不存在，则创建表
 	if _, err := os.Stat(dbFile); os.IsNotExist(err) {
-		s := func() string {
-			return `CREATE TABLE Log
-(
-  LogId      INTEGER PRIMARY KEY AUTOINCREMENT,   -- 日志ID
-  Status     INTEGER        NOT NULL DEFAULT '0', -- 日志状态 1:普通日志 2:错误日志
-  Runtime    DECIMAL(10, 6) NOT NULL DEFAULT '0', -- 执行耗时
-  Message    TEXT                    DEFAULT '',  -- 日志内容
-  CreateDate DATETIME                DEFAULT CURRENT_TIMESTAMP
-);`
-		}
-		_, err = dbLog.Exec(s())
+		_, err = dbLog.Exec(logSql)
 		if err != nil {
 			panic(err)
 		}

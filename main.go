@@ -86,6 +86,7 @@ func StartGin() {
 
 	// Log
 	app.POST("/LogList", api.LogList)
+	app.POST("/LogDeleteDB", api.LogDeleteDB)
 
 	err = app.Run("0.0.0.0:3333")
 	if err != nil {

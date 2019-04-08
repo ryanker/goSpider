@@ -1,6 +1,8 @@
 package model
 
 import (
+	"os"
+
 	"../lib/dbs"
 )
 
@@ -45,4 +47,43 @@ func LogList(h dbs.H, order string, page, pageSize int64) (list []Log, err error
 		list = append(list, *data)
 	}
 	return
+}
+
+// 删除数据库
+func LogDeleteDB() error {
+	dbFile := "./db/log.db"
+
+	// 关闭数据库
+	if err := dbLog.Ping(); err == nil {
+		err := dbLog.Close()
+		if err != nil {
+			return err
+		}
+	}
+
+	// 删除数据库文件
+	if _, err := os.Stat(dbFile); !os.IsNotExist(err) {
+		if err = os.Remove(dbFile); err != nil {
+			return err
+		}
+	}
+
+	// 重新打开数据库
+	dbLog, err = dbs.Open(dbFile)
+	if err != nil {
+		return err
+	}
+
+	// 重新创建表
+	if _, err := os.Stat(dbFile); os.IsNotExist(err) {
+		_, err = dbLog.Exec(logSql)
+		if err != nil {
+			return err
+		}
+	}
+
+	if err = dbLog.Ping(); err != nil {
+		return err
+	}
+	return nil
 }
