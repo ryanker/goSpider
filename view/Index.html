@@ -32,6 +32,11 @@
         .mb-1 {
             margin-bottom: 20px;
         }
+
+        .mr-1 {
+            width: 300px;
+            margin-right: 10px
+        }
     </style>
 </head>
 <body>
@@ -46,7 +51,7 @@
             <el-main>
                 <!--搜索栏-->
                 <el-row>
-                    <el-input v-model="q.Name" placeholder="请输入规则" style="width:300px;margin-right:10px" class="mb-1">
+                    <el-input v-model="q.Name" placeholder="请输入规则" class="mb-1 mr-1" clearable>
                         <el-button slot="append" icon="el-icon-search" @click="searchClick"/>
                     </el-input>
                     <el-button type="primary" class="mb-1" @click="createDialog">添加规则</el-button>
