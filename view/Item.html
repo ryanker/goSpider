@@ -25,6 +25,11 @@
             text-align: center;
         }
 
+        .el-menu-item > a {
+            display: block;
+            height: 100%;
+        }
+
         .mb-1 {
             margin-bottom: 20px;
         }
@@ -36,7 +41,8 @@
         <el-container>
             <el-header>
                 <el-menu :default-active="1" mode="horizontal">
-                    <el-menu-item index="1"><a href="/">狗狗采集</a></el-menu-item>
+                    <el-menu-item :index="1"><a href="/">采集规则</a></el-menu-item>
+                    <el-menu-item :index="2"><a href="/Log">采集日志</a></el-menu-item>
                 </el-menu>
             </el-header>
             <el-main>
