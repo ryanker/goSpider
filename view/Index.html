@@ -415,8 +415,10 @@
 
                 <!--对话框: 导出规则-->
                 <el-dialog :title="ruleExportTitle" :visible.sync="ruleExportDialog" fullscreen>
+                    <el-alert title="可将下面代码复制分享给你朋友或保存到别处。" type="success" :closable="false">
+                    </el-alert>
                     <el-input type="textarea" autosize="{minRows: 5, maxRows:10000}" placeholder="导出中..."
-                              v-model="ruleExportData"></el-input>
+                              v-model="ruleExportData" style="margin-top: 20px"></el-input>
                 </el-dialog>
             </el-main>
             <el-footer>@2019</el-footer>
