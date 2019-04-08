@@ -83,7 +83,7 @@ func InitDbLog() {
 }
 
 func cronErrorLog(t time.Duration, format string, args ...interface{}) {
-	misc.FileLogWrite("./log/cronError.log", format, args...)
+	// misc.FileLogWrite("./log/cronError.log", format, args...)
 	_, err := dbLog.Insert("Log", dbs.H{
 		"Status":     2,
 		"Runtime":    t / time.Second,
@@ -96,7 +96,7 @@ func cronErrorLog(t time.Duration, format string, args ...interface{}) {
 }
 
 func cronLog(t time.Duration, format string, args ...interface{}) {
-	misc.FileLogWrite("./log/cron.log", format, args...)
+	// misc.FileLogWrite("./log/cron.log", format, args...)
 	_, err := dbLog.Insert("Log", dbs.H{
 		"Status":     1,
 		"Runtime":    t / time.Second,
