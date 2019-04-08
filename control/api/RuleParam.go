@@ -20,6 +20,7 @@ func RuleParamCreate(c *gin.Context) {
 		"Type":          m.Type,
 		"Field":         m.Field,
 		"FieldType":     m.FieldType,
+		"Brief":         m.Brief,
 		"Rule":          m.Rule,
 		"ValueType":     m.ValueType,
 		"ValueAttr":     m.ValueAttr,
@@ -60,6 +61,7 @@ func RuleParamUpdate(c *gin.Context) {
 	err = model.RuleParamUpdate(dbs.H{
 		"Field":         m.Field,
 		"FieldType":     m.FieldType,
+		"Brief":         m.Brief,
 		"Rule":          m.Rule,
 		"ValueType":     m.ValueType,
 		"ValueAttr":     m.ValueAttr,

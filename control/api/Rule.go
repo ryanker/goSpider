@@ -1,6 +1,10 @@
 package api
 
 import (
+	"encoding/base64"
+	"encoding/json"
+	"strings"
+
 	"github.com/xiuno/gin"
 
 	"../../lib/dbs"
@@ -184,4 +188,158 @@ func RuleList(c *gin.Context) {
 	}
 
 	c.Message("0", "success", gin.H{"total": total, "list": list})
+}
+
+func RuleExport(c *gin.Context) {
+	m := model.Rule{}
+	err := c.ShouldBind(&m)
+	if err != nil {
+		c.Message("-1", "参数不正确："+err.Error())
+		return
+	}
+
+	// 读取规则
+	row, err := model.RuleRead(m.Rid)
+	if err != nil {
+		c.Message("-1", err.Error())
+		return
+	}
+
+	// 读取规则参数
+	ParamList, err := model.RuleParamList(dbs.H{"Rid": row.Rid, "Type": "List"}, 0, 0)
+	if err != nil {
+		c.Message("-1", err.Error())
+		return
+	}
+	ParamContent, err := model.RuleParamList(dbs.H{"Rid": row.Rid, "Type": "Content"}, 0, 0)
+	if err != nil {
+		c.Message("-1", err.Error())
+		return
+	}
+
+	RuleSt := struct {
+		Rule         model.Rule
+		ParamList    []model.RuleParam
+		ParamContent []model.RuleParam
+	}{row, ParamList, ParamContent}
+	b, err := json.Marshal(RuleSt)
+	if err != nil {
+		c.Message("-1", err.Error())
+		return
+	}
+
+	encoded := "[GO:BEGIN]\n" + base64.StdEncoding.EncodeToString(b) + "\n[GO:END]"
+
+	c.Message("0", "success", gin.H{"encoded": encoded})
+}
+
+func RuleImport(c *gin.Context) {
+	m := struct {
+		encoded string
+	}{}
+	err := c.ShouldBind(&m)
+	if err != nil {
+		c.Message("-1", "参数不正确："+err.Error())
+		return
+	}
+
+	m.encoded = strings.TrimPrefix(m.encoded, "[GO:BEGIN]\n")
+	m.encoded = strings.TrimSuffix(m.encoded, "\n[GO:END]")
+
+	F := struct {
+		Rule         model.Rule
+		ParamList    []model.RuleParam
+		ParamContent []model.RuleParam
+	}{}
+	err = json.Unmarshal([]byte(m.encoded), &F)
+	if err != nil {
+		c.Message("-1", "解析 Json 失败："+err.Error())
+		return
+	}
+
+	Rid, err := model.RuleCreate(dbs.H{
+		"Status":           1,
+		"IntervalHour":     F.Rule.IntervalHour,
+		"Name":             F.Rule.Name,
+		"Brief":            F.Rule.Brief,
+		"DateBase":         F.Rule.DateBase,
+		"Cookie":           F.Rule.Cookie,
+		"Charset":          F.Rule.Charset,
+		"Timeout":          F.Rule.Timeout,
+		"ListSpecialUrl":   F.Rule.ListSpecialUrl,
+		"ListUrl":          F.Rule.ListUrl,
+		"ListPageStart":    F.Rule.ListPageStart,
+		"ListPageEnd":      F.Rule.ListPageEnd,
+		"ListPageSize":     F.Rule.ListPageSize,
+		"ListRule":         F.Rule.ListRule,
+		"ContentUrl":       F.Rule.ContentUrl,
+		"IsList":           1,
+		"IsListDownAna":    1,
+		"IsListDownRun":    1,
+		"IsContent":        1,
+		"IsContentDownAna": 1,
+		"IsContentDownRun": 1,
+	})
+	if err != nil {
+		c.Message("-1", err.Error())
+		return
+	}
+
+	for _, m := range F.ParamList {
+		_, err = model.RuleParamCreate(dbs.H{
+			"Rid":           Rid,
+			"Type":          m.Type,
+			"Field":         m.Field,
+			"FieldType":     m.FieldType,
+			"Brief":         m.Brief,
+			"Rule":          m.Rule,
+			"ValueType":     m.ValueType,
+			"ValueAttr":     m.ValueAttr,
+			"FilterType":    m.FilterType,
+			"FilterRegexp":  m.FilterRegexp,
+			"FilterRepl":    m.FilterRepl,
+			"Sort":          m.Sort,
+			"IsSearch":      m.IsSearch,
+			"DownType":      m.DownType,
+			"DownRule":      m.DownRule,
+			"DownValueType": m.DownValueType,
+			"DownValueAttr": m.DownValueAttr,
+			"DownFileType":  m.DownFileType,
+			"DownTimeout":   m.DownTimeout,
+		})
+		if err != nil {
+			c.Message("-1", err.Error())
+			return
+		}
+	}
+
+	for _, m := range F.ParamContent {
+		_, err = model.RuleParamCreate(dbs.H{
+			"Rid":           Rid,
+			"Type":          m.Type,
+			"Field":         m.Field,
+			"FieldType":     m.FieldType,
+			"Brief":         m.Brief,
+			"Rule":          m.Rule,
+			"ValueType":     m.ValueType,
+			"ValueAttr":     m.ValueAttr,
+			"FilterType":    m.FilterType,
+			"FilterRegexp":  m.FilterRegexp,
+			"FilterRepl":    m.FilterRepl,
+			"Sort":          m.Sort,
+			"IsSearch":      m.IsSearch,
+			"DownType":      m.DownType,
+			"DownRule":      m.DownRule,
+			"DownValueType": m.DownValueType,
+			"DownValueAttr": m.DownValueAttr,
+			"DownFileType":  m.DownFileType,
+			"DownTimeout":   m.DownTimeout,
+		})
+		if err != nil {
+			c.Message("-1", err.Error())
+			return
+		}
+	}
+
+	c.Message("0", "导入成功")
 }

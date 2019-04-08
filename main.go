@@ -54,6 +54,8 @@ func main() {
 	app.POST("/RuleRead", api.RuleRead)
 	app.POST("/RuleDelete", api.RuleDelete)
 	app.POST("/RuleList", api.RuleList)
+	app.POST("/RuleExport", api.RuleExport)
+	app.POST("/RuleImport", api.RuleImport)
 
 	// RuleParam
 	app.POST("/RuleParamCreate", api.RuleParamCreate)
