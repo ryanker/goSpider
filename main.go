@@ -13,11 +13,6 @@ import (
 	"./control/front"
 )
 
-func main() {
-	ConfigRuntime()
-	StartGin()
-}
-
 func ConfigRuntime() {
 	nuCPU := runtime.NumCPU()
 	runtime.GOMAXPROCS(nuCPU)
@@ -86,10 +81,18 @@ func StartGin() {
 	app.POST("/DatabaseCreate", api.DatabaseCreate)
 
 	// Item
-	app.Any("/ItemList", api.ItemList)
+	app.POST("/ItemList", api.ItemList)
+
+	// Log
+	app.POST("/LogList", api.LogList)
 
 	err = app.Run("0.0.0.0:3333")
 	if err != nil {
 		panic(err)
 	}
+}
+
+func main() {
+	ConfigRuntime()
+	StartGin()
 }
