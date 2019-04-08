@@ -245,13 +245,19 @@ func RuleImport(c *gin.Context) {
 
 	m.encoded = strings.TrimPrefix(m.encoded, "[GO:BEGIN]\n")
 	m.encoded = strings.TrimSuffix(m.encoded, "\n[GO:END]")
+	m.encoded = strings.Trim(m.encoded, " \t\r\n")
+	b, err := base64.StdEncoding.DecodeString(m.encoded)
+	if err != nil {
+		c.Message("-1", "解析 encoded 失败："+err.Error())
+		return
+	}
 
 	F := struct {
 		Rule         model.Rule
 		ParamList    []model.RuleParam
 		ParamContent []model.RuleParam
 	}{}
-	err = json.Unmarshal([]byte(m.encoded), &F)
+	err = json.Unmarshal(b, &F)
 	if err != nil {
 		c.Message("-1", "解析 Json 失败："+err.Error())
 		return
