@@ -78,7 +78,7 @@
                             <el-tag v-else type="danger">-</el-tag>
                         </template>
                     </el-table-column>
-                    <el-table-column label="操作" width="200">
+                    <el-table-column label="操作" width="250">
                         <template slot-scope="scope">
                             <el-tooltip effect="dark" content="采集任务" placement="top">
                                 <el-button type="success" size="small" circle icon="el-icon-caret-right"
@@ -91,6 +91,10 @@
                             <el-tooltip effect="dark" content="删除规则" placement="top">
                                 <el-button type="danger" size="small" circle icon="el-icon-delete"
                                            @click="deleteDialog(scope.row)"/>
+                            </el-tooltip>
+                            <el-tooltip effect="dark" content="导出规则" placement="top">
+                                <el-button type="warning" size="small" circle icon="el-icon-download"
+                                           @click="exportDialog(scope.row)"/>
                             </el-tooltip>
                             <a :href="'/Item?Rid='+scope.row.Rid" target="_blank" style="margin-left:10px">
                                 <el-button size="small" circle icon="el-icon-search"/>
@@ -408,6 +412,12 @@
                               v-model="item" style="margin-top: 20px">
                     </el-input>
                 </el-dialog>
+
+                <!--对话框: 导出规则-->
+                <el-dialog :title="ruleExportTitle" :visible.sync="ruleExportDialog" fullscreen>
+                    <el-input type="textarea" autosize="{minRows: 5, maxRows:10000}" placeholder="导出中..."
+                              v-model="ruleExportData"></el-input>
+                </el-dialog>
             </el-main>
             <el-footer>@2019</el-footer>
         </el-container>
@@ -487,6 +497,11 @@
 				ruleTestUrl: '',
 				ruleTestHtml: '',
 				ruleTestHtmlList: [],
+
+				// 导出规则
+				ruleExportTitle: '',
+				ruleExportDialog: false,
+				ruleExportData: false,
 			}
 		},
 		mounted() {
@@ -660,6 +675,17 @@
 					})
 				}).catch(_ => {
 				});
+			},
+
+			// 导出规则
+			exportDialog(row) {
+				this.ruleExportTitle = '导出规则 - ' + row.Name;
+				this.ruleExportDialog = true;
+				aPost('/RuleExport', {Rid: row.Rid}).then(r => {
+					this.ruleExportData = r.data;
+				}).catch(error => {
+					this.$message.error(error)
+				})
 			},
 
 			// 分页

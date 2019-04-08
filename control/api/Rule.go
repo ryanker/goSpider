@@ -228,9 +228,8 @@ func RuleExport(c *gin.Context) {
 		return
 	}
 
-	encoded := "[GO:BEGIN]\n" + base64.StdEncoding.EncodeToString(b) + "\n[GO:END]"
-
-	c.Message("0", "success", gin.H{"encoded": encoded})
+	data := "[GO:BEGIN]\n" + base64.StdEncoding.EncodeToString(b) + "\n[GO:END]"
+	c.Message("0", "success", data)
 }
 
 func RuleImport(c *gin.Context) {
