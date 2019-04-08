@@ -61,8 +61,7 @@
                 </el-radio-group>
 
                 <!--表格-->
-                <el-table v-loading="tableLoading" :data="tableData" border height="666" @sort-change="sortChange"
-                          :default-sort="{prop: 'Runtime', order: 'ascending'}">
+                <el-table v-loading="tableLoading" :data="tableData" border height="666" @sort-change="sortChange">
                     <el-table-column label="日志ID" prop="LogId" width="100"></el-table-column>
                     <el-table-column label="状态" width="100" align="center">
                         <template slot-scope="scope">
@@ -131,7 +130,7 @@
 			}
 		},
 		mounted() {
-			// this.getList();
+			this.getList();
 		},
 		methods: {
 			// 搜索
