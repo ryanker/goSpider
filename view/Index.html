@@ -186,6 +186,12 @@
                                 <el-input v-model="ruleData.Cookie" type="textarea" :autosize="{minRows: 2, maxRows: 5}"
                                           placeholder="如需要登录抓取，请设置此处"/>
                             </el-form-item>
+                            <el-form-item label="网站编码">
+                                <el-radio-group v-model="ruleData.Charset">
+                                    <el-radio label="UTF8">UTF-8</el-radio>
+                                    <el-radio label="GBK">GBK</el-radio>
+                                </el-radio-group>
+                            </el-form-item>
                             <el-form-item>
                                 <el-button :disabled="ruleButtonDisabled" type="primary" @click="formSubmit(2)">
                                     下一步
@@ -552,6 +558,7 @@
 				this.ruleTitle = '添加规则';
 				this.ruleUrl = '/RuleCreate';
 				this.ruleData = {
+					Charset: 'UTF8',
 					ListPageStart: 1,
 					ListPageEnd: 10,
 					ListPageSize: 1,
