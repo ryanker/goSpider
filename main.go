@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"html/template"
 	"io"
 	"os"
@@ -12,8 +13,14 @@ import (
 	"./control/front"
 )
 
+func ConfigRuntime() {
+	nuCPU := runtime.NumCPU()
+	runtime.GOMAXPROCS(nuCPU)
+	fmt.Printf("Running with %d CPUs\n", nuCPU)
+}
+
 func main() {
-	runtime.GOMAXPROCS(3)
+	ConfigRuntime()
 
 	WebLogFile := "./log/web.log"
 	WebErrorLogFile := "./log/webError.log"
