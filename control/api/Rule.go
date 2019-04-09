@@ -159,7 +159,10 @@ func RuleDelete(c *gin.Context) {
 }
 
 func RuleList(c *gin.Context) {
-	m := model.Rule{}
+	m := struct {
+		model.Rule
+		Page int64
+	}{}
 	err := c.ShouldBind(&m)
 	if err != nil {
 		c.Message("-1", "参数不正确："+err.Error())

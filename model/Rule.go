@@ -41,7 +41,6 @@ type Rule struct {
 
 	UpdateDate string
 	CreateDate string
-	Page       int64
 }
 
 func RuleMap() (ptr *Rule, fields string, args *[]interface{}) {
