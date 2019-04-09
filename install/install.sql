@@ -61,3 +61,23 @@ CREATE TABLE RuleParam
   DownTimeout   INTEGER      NOT NULL DEFAULT '0', -- 下载超时时间(秒)
   CreateDate    DATETIME              DEFAULT CURRENT_TIMESTAMP
 );
+
+-- 用户表
+CREATE TABLE `User`
+(
+  `Uid`        INTEGER PRIMARY KEY AUTOINCREMENT,               -- 用户ID
+  `Gid`        INTEGER      NOT NULL DEFAULT '0',               -- 用户组ID 1:管理员 2:普通用户
+  `Name`       VARCHAR(255) NOT NULL DEFAULT '',                -- 用户名
+  `Email`      VARCHAR(255) NOT NULL DEFAULT '',                -- 邮箱
+  `Mobile`     VARCHAR(255) NOT NULL DEFAULT '',                -- 手机号
+  `Password`   VARCHAR(32)  NOT NULL DEFAULT '',                -- 密码MD5
+  `Salt`       VARCHAR(32)  NOT NULL DEFAULT '',                -- 密码盐
+  `LoginNum`   INTEGER      NOT NULL DEFAULT '0',               -- 登录次数
+  `LastIP`     VARCHAR(255) NOT NULL DEFAULT '',                -- 最后登陆IP
+  `LastDate`   DATETIME              DEFAULT CURRENT_TIMESTAMP, -- 最后登陆时间
+  `CreateIP`   VARCHAR(255) NOT NULL DEFAULT '',                -- 创建IP
+  `CreateDate` DATETIME              DEFAULT CURRENT_TIMESTAMP, -- 创建时间
+  `UpdateDate` DATETIME              DEFAULT CURRENT_TIMESTAMP  -- 更新时间
+);
+INSERT INTO `User` (`uid`, `gid`, `name`, `email`, `mobile`, `password`, `salt`)
+VALUES (1, 1, 'dog', 'dog@dog.com', '18812345678', 'ea7ac79f95e032b0c73eec73ba6d1263', '12345678'); -- 密码: 88888888
