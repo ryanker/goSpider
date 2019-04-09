@@ -84,7 +84,7 @@ func InitDbLog() {
 func cronErrorLog(t time.Duration, format string, args ...interface{}) {
 	_, err := dbLog.Insert("Log", dbs.H{
 		"Status":     2,
-		"Runtime":    t / time.Second,
+		"Runtime":    float64(t / time.Second),
 		"Message":    fmt.Sprintf(format, args...),
 		"CreateDate": time.Now().Format("2006-01-02 15:04:05"),
 	})
@@ -96,7 +96,7 @@ func cronErrorLog(t time.Duration, format string, args ...interface{}) {
 func cronLog(t time.Duration, format string, args ...interface{}) {
 	_, err := dbLog.Insert("Log", dbs.H{
 		"Status":     1,
-		"Runtime":    t / time.Second,
+		"Runtime":    float64(t / time.Second),
 		"Message":    fmt.Sprintf(format, args...),
 		"CreateDate": time.Now().Format("2006-01-02 15:04:05"),
 	})
