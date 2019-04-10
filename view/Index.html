@@ -125,11 +125,12 @@
                 <!--对话框: 任务-->
                 <el-dialog :visible.sync="cronDialogVisible" title="采集任务" fullscreen>
                     <el-form ref="cronData" :model="cronData" label-width="130px" style="width:95%">
-                        <el-form-item label="数据库" v-if="cronDateBase.Type>0">
+                        <el-form-item label="数据库">
                             <el-radio-group v-model="cronDateBase.Type">
-                                <el-radio :label="1">全新创建表</el-radio>
-                                <el-radio :label="2">备份旧数据</el-radio>
-                                <el-radio :label="3">删除旧数据</el-radio>
+                                <el-radio :label="0">不操作</el-radio>
+                                <el-radio :label="1">创建表</el-radio>
+                                <el-radio :label="2">备份表</el-radio>
+                                <el-radio :label="3">删除表</el-radio>
                             </el-radio-group>
                         </el-form-item>
 
@@ -554,7 +555,7 @@
 					const d = r.data;
 					this.cronDateBase = {
 						Rid: d.Rid,
-						Type: 3,
+						Type: 0,
 					};
 					this.cronData = {
 						Rid: d.Rid,
