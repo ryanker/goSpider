@@ -78,10 +78,10 @@
                             <el-tag v-else type="danger">-</el-tag>
                         </template>
                     </el-table-column>
+                    <el-table-column label="执行时间" prop="CreateDate" width="175"></el-table-column>
                     <el-table-column label="执行耗时" prop="Runtime" width="120"
                                      :sort-orders="['ascending', 'descending']" sortable="custom"></el-table-column>
                     <el-table-column f label="日志内容" prop="Message" min-width="200"></el-table-column>
-                    <el-table-column label="日志时间" prop="CreateDate" width="180"></el-table-column>
                 </el-table>
 
                 <!--分页-->
