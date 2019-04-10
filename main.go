@@ -47,6 +47,9 @@ func StartGin() {
 	})
 	app.LoadHTMLGlob("./view/*")
 
+	// 内存统计信息
+	app.GET("/MemStatsInfo", api.MemStatsInfo)
+
 	// ========== Front ==========
 	app.GET("/", front.Index)
 	app.GET("/Item", front.Item)

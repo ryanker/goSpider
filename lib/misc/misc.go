@@ -114,6 +114,20 @@ func DownloadFile(Url string, DstFile string) (size int64, err error) {
 	return resp.Size, err
 }
 
+func HumanSize(n uint64) string {
+	if n < 1024 {
+		return fmt.Sprintf("%d B", n)
+	} else if n < 1024*1024 {
+		return fmt.Sprintf("%.2f K", float64(n)/1024)
+	} else if n < 1024*1024*1024 {
+		return fmt.Sprintf("%.2f M", float64(n)/(1024*1024))
+	} else if n < 1024*1024*1024*1024 {
+		return fmt.Sprintf("%.2f G", float64(n)/(1024*1024*1024))
+	} else {
+		return fmt.Sprintf("%.2f T", float64(n)/(1024*1024*1024*1024))
+	}
+}
+
 func Trim(s string) string {
 	return strings.Trim(s, " \t\r\n")
 }
