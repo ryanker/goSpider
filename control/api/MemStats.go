@@ -96,7 +96,7 @@ func MemStatsInfo(c *gin.Context) {
 	m.NextGC = misc.HumanSize(mem.NextGC)
 	m.LastGC = fmt.Sprintf("%.4f S", float64(time.Now().UnixNano()-int64(mem.LastGC))/ts)
 	m.PauseTotalNs = fmt.Sprintf("%.4f S", float64(mem.PauseTotalNs)/ts)
-	m.PauseNs = fmt.Sprintf("%.4f S", float64(mem.PauseNs[(m.NumGC+255)%256])/ts)
+	m.PauseNs = fmt.Sprintf("%.4f S", float64(mem.PauseNs[(mem.NumGC+255)%256])/ts)
 	m.NumGC = mem.NumGC
 
 	c.AbortWithStatusJSON(http.StatusOK, gin.H{"m": m})
