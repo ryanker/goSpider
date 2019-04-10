@@ -5,6 +5,7 @@ import (
 	"math"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strconv"
 	"strings"
 	"time"
@@ -280,7 +281,7 @@ func getContent(dbc *dbs.DB, ParamContent *[]RuleParam, row *Rule) {
 		return
 	}
 
-	pageSize := int64(1000)
+	pageSize := int64(100)
 	pageMax := int64(math.Ceil(float64(n / pageSize)))
 
 	for page := int64(1); page <= pageMax; page++ {
@@ -395,7 +396,7 @@ func downInitList(dbc *dbs.DB, ParamList *[]RuleParam, row *Rule) {
 				return
 			}
 
-			pageSize := int64(1000)
+			pageSize := int64(100)
 			pageMax := int64(math.Ceil(float64(n / pageSize)))
 
 			for page := int64(1); page <= pageMax; page++ {
@@ -470,7 +471,7 @@ func downInitList(dbc *dbs.DB, ParamList *[]RuleParam, row *Rule) {
 				return
 			}
 
-			pageSize := int64(1000)
+			pageSize := int64(100)
 			pageMax := int64(math.Ceil(float64(n / pageSize)))
 
 			for page := int64(1); page <= pageMax; page++ {
@@ -570,7 +571,7 @@ func downInitContent(dbc *dbs.DB, ParamContent *[]RuleParam, row *Rule) {
 				return
 			}
 
-			pageSize := int64(1000)
+			pageSize := int64(100)
 			pageMax := int64(math.Ceil(float64(n / pageSize)))
 
 			for page := int64(1); page <= pageMax; page++ {
@@ -645,7 +646,7 @@ func downInitContent(dbc *dbs.DB, ParamContent *[]RuleParam, row *Rule) {
 				return
 			}
 
-			pageSize := int64(1000)
+			pageSize := int64(100)
 			pageMax := int64(math.Ceil(float64(n / pageSize)))
 
 			for page := int64(1); page <= pageMax; page++ {
@@ -748,7 +749,7 @@ func downList(dbc *dbs.DB, row *Rule) {
 		return
 	}
 
-	pageSize := int64(1000)
+	pageSize := int64(100)
 	pageMax := int64(math.Ceil(float64(n / pageSize)))
 
 	for page := int64(1); page <= pageMax; page++ {
@@ -840,7 +841,7 @@ func downContent(dbc *dbs.DB, row *Rule) {
 		return
 	}
 
-	pageSize := int64(1000)
+	pageSize := int64(100)
 	pageMax := int64(math.Ceil(float64(n / pageSize)))
 
 	for page := int64(1); page <= pageMax; page++ {
