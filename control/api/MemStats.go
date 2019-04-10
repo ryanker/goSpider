@@ -14,7 +14,7 @@ import (
 type MemStats struct {
 	Uptime       string // 程序运行时间
 	NumCPU       int    // 当前可用的 CPU 数
-	NumGoroutine int    // 当前纯在的 GO 程数
+	NumGoroutine int    // 当前存在的 GO 程数
 
 	// 基本信息
 	Alloc      string // 当前内存使用量

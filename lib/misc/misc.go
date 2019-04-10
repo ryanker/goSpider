@@ -123,8 +123,10 @@ func HumanSize(n uint64) string {
 		return fmt.Sprintf("%.2f M", float64(n)/(1024*1024))
 	} else if n < 1024*1024*1024*1024 {
 		return fmt.Sprintf("%.2f G", float64(n)/(1024*1024*1024))
-	} else {
+	} else if n < 1024*1024*1024*1024*1024 {
 		return fmt.Sprintf("%.2f T", float64(n)/(1024*1024*1024*1024))
+	} else {
+		return fmt.Sprintf("%.2f P", float64(n)/(1024*1024*1024*1024*1024))
 	}
 }
 

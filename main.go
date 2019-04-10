@@ -47,13 +47,15 @@ func StartGin() {
 	})
 	app.LoadHTMLGlob("./view/*")
 
-	// 内存统计信息
+	// 内存信息 && 磁盘信息
 	app.GET("/MemStatsInfo", api.MemStatsInfo)
+	app.GET("/DiskInfo", api.DiskInfo)
 
 	// ========== Front ==========
 	app.GET("/", front.Index)
 	app.GET("/Item", front.Item)
 	app.GET("/Log", front.Log)
+	app.GET("/Sys", front.Sys)
 
 	// ========== Api ==========
 	// Rule

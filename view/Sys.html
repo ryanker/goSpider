@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>狗狗采集器</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.5.4/theme-chalk/index.css">
+    <style>
+        body {
+            margin: 0;
+        }
+
+        .el-header {
+            min-height: 60px;
+            padding: 0;
+        }
+
+        .el-main {
+            min-height: 160px;
+        }
+
+        .el-footer {
+            line-height: 60px;
+            text-align: center;
+        }
+
+        .el-menu-item > a {
+            display: block;
+            height: 100%;
+        }
+
+        .mt-1 {
+            margin-top: 50px;
+        }
+
+        .mr-1 {
+            width: 300px;
+            margin-right: 10px
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <template>
+        <el-container>
+            <el-header>
+                <el-menu :default-active="3" mode="horizontal">
+                    <el-menu-item :index="1"><a href="/">采集规则</a></el-menu-item>
+                    <el-menu-item :index="2"><a href="/Log">采集日志</a></el-menu-item>
+                    <el-menu-item :index="3"><a href="/Sys">系统信息</a></el-menu-item>
+                </el-menu>
+            </el-header>
+            <el-main>
+                <el-card class="box-card">
+                    <div slot="header" class="clearfix">
+                        <span>系统信息</span>
+                    </div>
+                    <el-form :model="m" label-position="right" label-width="250px" style="width:95%">
+                        <el-form-item label="程序运行时间">
+                            <el-input v-model="m.Uptime" disabled></el-input>
+                        </el-form-item>
+                        <el-form-item label="当前可用的 CPU 数">
+                            <el-input v-model="m.NumCPU" disabled></el-input>
+                        </el-form-item>
+                        <el-form-item label="当前存在的 GO 程数">
+                            <el-input v-model="m.NumGoroutine" disabled></el-input>
+                        </el-form-item>
+
+                        <el-form-item label="当前内存使用量" class="mt-1">
+                            <el-input v-model="m.Alloc" disabled></el-input>
+                        </el-form-item>
+                        <el-form-item label="所有被分配的内存">
+                            <el-input v-model="m.TotalAlloc" disabled></el-input>
+                        </el-form-item>
+                        <el-form-item label="内存占用量">
+                            <el-input v-model="m.Sys" disabled></el-input>
+                        </el-form-item>
+
+                        <el-form-item label="指针查找次数" class="mt-1">
+                            <el-input v-model="m.Lookups" disabled></el-input>
+                        </el-form-item>
+                        <el-form-item label="内存分配次数">
+                            <el-input v-model="m.Mallocs" disabled></el-input>
+                        </el-form-item>
+                        <el-form-item label="内存释放次数">
+                            <el-input v-model="m.Frees" disabled></el-input>
+                        </el-form-item>
+
+                        <el-form-item label="当前 Heap 内存使用量" class="mt-1">
+                            <el-input v-model="m.HeapAlloc" disabled></el-input>
+                        </el-form-item>
+                        <el-form-item label="Heap 内存占用量">
+                            <el-input v-model="m.HeapSys" disabled></el-input>
+                        </el-form-item>
+                        <el-form-item label="Heap 内存空闲量">
+                            <el-input v-model="m.HeapIdle" disabled></el-input>
+                        </el-form-item>
+                        <el-form-item label="正在使用的 Heap 内存">
+                            <el-input v-model="m.HeapInuse" disabled></el-input>
+                        </el-form-item>
+                        <el-form-item label="被释放的 Heap 内存">
+                            <el-input v-model="m.HeapReleased" disabled></el-input>
+                        </el-form-item>
+                        <el-form-item label="Heap 对象数量">
+                            <el-input v-model="m.HeapObjects" disabled></el-input>
+                        </el-form-item>
+
+                        <el-form-item label="启动 Stack 使用量" class="mt-1">
+                            <el-input v-model="m.StackInuse" disabled></el-input>
+                        </el-form-item>
+                        <el-form-item label="系统分配的 Stack 内存">
+                            <el-input v-model="m.StackSys" disabled></el-input>
+                        </el-form-item>
+                        <el-form-item label="MSpan 结构内存使用量">
+                            <el-input v-model="m.MSpanInuse" disabled></el-input>
+                        </el-form-item>
+                        <el-form-item label="系统分配的 MSpan 结构内存">
+                            <el-input v-model="m.MSpanSys" disabled></el-input>
+                        </el-form-item>
+                        <el-form-item label="MCache 结构内存使用量">
+                            <el-input v-model="m.MCacheInuse" disabled></el-input>
+                        </el-form-item>
+                        <el-form-item label="系统分配的 MCache 结构内存">
+                            <el-input v-model="m.MCacheSys" disabled></el-input>
+                        </el-form-item>
+                        <el-form-item label="系统分配的剖析哈希表内存">
+                            <el-input v-model="m.BuckHashSys" disabled></el-input>
+                        </el-form-item>
+                        <el-form-item label="系统分配的 GC 元数据内存">
+                            <el-input v-model="m.GCSys" disabled></el-input>
+                        </el-form-item>
+                        <el-form-item label="其它被分配的系统内存">
+                            <el-input v-model="m.OtherSys" disabled></el-input>
+                        </el-form-item>
+
+                        <el-form-item label="下次 GC 内存回收量" class="mt-1">
+                            <el-input v-model="m.NextGC" disabled></el-input>
+                        </el-form-item>
+                        <el-form-item label="距离上次 GC 时间">
+                            <el-input v-model="m.LastGC" disabled></el-input>
+                        </el-form-item>
+                        <el-form-item label="GC 暂停时间总量">
+                            <el-input v-model="m.PauseTotalNs" disabled></el-input>
+                        </el-form-item>
+                        <el-form-item label="上次 GC 暂停时间">
+                            <el-input v-model="m.PauseNs" disabled></el-input>
+                        </el-form-item>
+                        <el-form-item label="GC 执行次数">
+                            <el-input v-model="m.NumGC" disabled></el-input>
+                        </el-form-item>
+
+                        <el-form-item label="磁盘总大小" class="mt-1">
+                            <el-input v-model="disk.All" disabled></el-input>
+                        </el-form-item>
+                        <el-form-item label="磁盘使用大小">
+                            <el-input v-model="disk.Used" disabled></el-input>
+                        </el-form-item>
+                        <el-form-item label="磁盘剩余大小">
+                            <el-input v-model="disk.Free" disabled></el-input>
+                        </el-form-item>
+                    </el-form>
+                </el-card>
+            </el-main>
+            <el-footer>@2019</el-footer>
+        </el-container>
+    </template>
+</div>
+</body>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.7/vue.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.5.4/index.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js"></script>
+<script>
+	new Vue({
+		el: '#app',
+		data() {
+			return {
+				m: {},
+				disk: {},
+			}
+		},
+		mounted() {
+			this.MemStatsInfo();
+			this.DiskInfo();
+
+			// 自动刷新
+			window.setInterval(() => {
+				this.MemStatsInfo();
+				this.DiskInfo();
+			}, 2000);
+		},
+		methods: {
+			// 内存信息
+			MemStatsInfo() {
+				axios.get('/MemStatsInfo').then(res => {
+					this.m = res.data.m;
+				})
+			},
+			// 磁盘信息
+			DiskInfo() {
+				axios.get('/DiskInfo').then(res => {
+					this.disk = res.data.disk;
+				})
+			},
+		}
+	})
+</script>
+</body>
+</html>

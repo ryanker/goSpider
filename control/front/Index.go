@@ -20,3 +20,7 @@ func Item(c *gin.Context) {
 func Log(c *gin.Context) {
 	c.HTML(http.StatusOK, "Log.html", gin.H{})
 }
+
+func Sys(c *gin.Context) {
+	c.HTML(http.StatusOK, "Sys.html", gin.H{})
+}
