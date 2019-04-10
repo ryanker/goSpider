@@ -17,9 +17,9 @@ type MemStats struct {
 	NumGoroutine int    // 当前存在的 GO 程数
 
 	// 基本信息
-	Alloc      string // 当前内存使用量
-	TotalAlloc string // 所有被分配的内存
-	Sys        string // 内存占用量
+	Alloc      string // 当前使用内存
+	TotalAlloc string // 累积使用内存
+	Sys        string // 系统使用内存
 	Lookups    uint64 // 指针查找次数
 	Mallocs    uint64 // 内存分配次数
 	Frees      uint64 // 内存释放次数
