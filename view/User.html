@@ -204,7 +204,14 @@
 				formData: {},
 				formRules: {
 					Name: [{required: true, trigger: 'blur', message: '请输入用户名'}],
-					Mobile: [{required: true, trigger: 'blur', message: '请输入手机号'}],
+					Mobile: [
+						{required: true, trigger: 'blur', message: '请输入手机号'},
+						{min: 11, max: 11, message: '请输入正确的手机号', trigger: ['blur', 'change']},
+					],
+					Email: [
+						{required: true, message: '请输入邮箱地址', trigger: 'blur'},
+						{type: 'email', message: '请输入正确的邮箱地址', trigger: ['blur', 'change']},
+					],
 				},
 			}
 		},
@@ -304,14 +311,17 @@
 
 			// 分页
 			userCurrentChange(val) {
-				this.q.page = val;
+				this.q.Page = val;
 				this.getList();
 			},
 
 			// 获取列表
 			getList() {
 				this.userLoading = true;
-				aPost('/UserList', {Gid: Number(this.q.Gid)}).then(r => {
+				aPost('/UserList', {
+					Gid: Number(this.q.Gid),
+					Page: Number(this.q.Page),
+				}).then(r => {
 					this.userData = r.list || [];
 					this.userTotal = r.total || 0;
 					this.userLoading = false;
