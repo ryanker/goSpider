@@ -1,7 +1,10 @@
 package model
 
 import (
+	"errors"
 	"fmt"
+	"strconv"
+	"strings"
 	"time"
 
 	"../lib/dbs"
@@ -22,6 +25,13 @@ type User struct {
 	CreateIP   string
 	CreateDate string
 	UpdateDate string
+}
+
+type UserToken struct {
+	Uid      int64  // 用户ID
+	Password string // 用户密码MD5
+	LastIP   string // 最后登录IP
+	LastDate string // 最后登录时间
 }
 
 func UserMap() (ptr *User, fields string, args *[]interface{}) {
@@ -49,6 +59,29 @@ func UserMap() (ptr *User, fields string, args *[]interface{}) {
 func UserTokenEncode(Uid int64, Password string, LastIP string) string {
 	s := fmt.Sprintf("%v,%v,%v,%v", Uid, Password, LastIP, time.Now().Format("2006-01-02 15:04:05"))
 	return misc.Base16Encode(s)
+}
+
+func UserTokenDecode(s string) (token UserToken, err error) {
+	if s == "" {
+		return token, errors.New("token is empty")
+	}
+	s, err = misc.Base16Decode(s)
+	if err != nil {
+		return
+	}
+	arr := strings.Split(s, ",")
+	if len(arr) != 4 {
+		return token, errors.New("token is error")
+	}
+	uid, err := strconv.ParseInt(arr[0], 10, 64)
+	if err != nil {
+		return token, err
+	}
+	token.Uid = uid
+	token.Password = arr[1]
+	token.LastIP = arr[2]
+	token.LastDate = arr[3]
+	return
 }
 
 func UserCreate(h dbs.H) (Uid int64, err error) {
