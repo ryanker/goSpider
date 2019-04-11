@@ -1,9 +1,11 @@
 package model
 
 import (
+	"fmt"
 	"time"
 
 	"../lib/dbs"
+	"../lib/misc"
 )
 
 type User struct {
@@ -42,6 +44,11 @@ func UserMap() (ptr *User, fields string, args *[]interface{}) {
 	ptr = &row
 	args = &scanArr
 	return
+}
+
+func UserTokenEncode(Uid int64, Password string, LastIP string) string {
+	s := fmt.Sprintf("%v,%v,%v,%v", Uid, Password, LastIP, time.Now().Format("2006-01-02 15:04:05"))
+	return misc.Base16Encode(s)
 }
 
 func UserCreate(h dbs.H) (Uid int64, err error) {

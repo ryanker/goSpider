@@ -2,6 +2,7 @@ package misc
 
 import (
 	"crypto/md5"
+	"encoding/hex"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -157,4 +158,21 @@ func StrClear(value, FilterType, FilterRegexp, FilterRepl string) string {
 
 func Md5(s string) string {
 	return fmt.Sprintf("%x", md5.Sum([]byte(s)))
+}
+
+func Base16Encode(s string) string {
+	src := []byte(s)
+	dst := make([]byte, hex.EncodedLen(len(src)))
+	hex.Encode(dst, src)
+	return fmt.Sprintf("%s", dst)
+}
+
+func Base16Decode(s string) (string, error) {
+	src := []byte(s)
+	dst := make([]byte, hex.DecodedLen(len(src)))
+	n, err := hex.Decode(dst, src)
+	if err != nil {
+		return "", err
+	}
+	return fmt.Sprintf("%s", dst[:n]), nil
 }

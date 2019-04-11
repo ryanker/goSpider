@@ -1,8 +1,10 @@
 package api
 
 import (
+	"database/sql"
 	"math/rand"
 	"strconv"
+	"time"
 
 	"github.com/xiuno/gin"
 
@@ -10,6 +12,47 @@ import (
 	"../../lib/misc"
 	"../../model"
 )
+
+func UserLogin(c *gin.Context) {
+	m := struct {
+		Mobile   string
+		Password string
+	}{}
+	err := c.ShouldBind(&m)
+	if err != nil {
+		c.Message("-1", "参数不正确："+err.Error())
+		return
+	}
+
+	u, err := model.UserReadByMobile(m.Mobile)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			c.Message("-1", "用户不存在或者密码不正确")
+			return
+		}
+		c.Message("-1", err.Error())
+		return
+	}
+	if misc.Md5(m.Password+u.Salt) != u.Password {
+		c.Message("-1", "用户不存在或者密码不正确")
+		return
+	}
+
+	// 更新最后一次登录信息
+	err = model.UserUpdate(dbs.H{
+		"LoginNum": u.LoginNum + 1,
+		"LastDate": time.Now().Format("2006-01-02 15:04:05"),
+		"LastIP":   c.ClientIP(),
+	}, u.Uid)
+	if err != nil {
+		c.Message("-1", "更新数据库失败："+err.Error())
+		return
+	}
+
+	c.Message("0", "登录成功", gin.H{
+		"token": model.UserTokenEncode(u.Uid, u.Password, c.ClientIP()),
+	})
+}
 
 func UserCreate(c *gin.Context) {
 	m := model.User{}

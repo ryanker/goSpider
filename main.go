@@ -60,6 +60,7 @@ func StartGin() {
 
 	// ========== Api ==========
 	// User
+	app.POST("/UserLogin", api.UserLogin)
 	app.POST("/UserCreate", api.UserCreate)
 	app.POST("/UserUpdate", api.UserUpdate)
 	app.POST("/UserRead", api.UserRead)
