@@ -56,7 +56,7 @@
                     <div slot="header" class="clearfix">
                         <span>系统信息</span>
                     </div>
-                    <el-form :model="m" :label-position="isMobile ? 'right' : 'top'" label-width="250px" style="width:95%">
+                    <el-form :model="m" :label-position="p" label-width="250px" style="width:95%">
                         <el-form-item label="程序运行时间">
                             <el-input v-model="m.Uptime" disabled></el-input>
                         </el-form-item>
@@ -177,11 +177,13 @@
 		data() {
 			return {
 				isMobile: document.body.getBoundingClientRect().width < 1024,
+				p: 'right',
 				m: {},
 				disk: {},
 			}
 		},
 		mounted() {
+			this.p = isMobile ? 'top' : 'right';
 			this.MemStatsInfo();
 			this.DiskInfo();
 
