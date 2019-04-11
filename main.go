@@ -54,10 +54,18 @@ func StartGin() {
 	// ========== Front ==========
 	app.GET("/", front.Index)
 	app.GET("/Item", front.Item)
+	app.GET("/User", front.User)
 	app.GET("/Log", front.Log)
 	app.GET("/Sys", front.Sys)
 
 	// ========== Api ==========
+	// User
+	app.POST("/UserCreate", api.UserCreate)
+	app.POST("/UserUpdate", api.UserUpdate)
+	app.POST("/UserRead", api.UserRead)
+	app.POST("/UserDelete", api.UserDelete)
+	app.POST("/UserList", api.UserList)
+
 	// Rule
 	app.POST("/RuleCreate", api.RuleCreate)
 	app.POST("/RuleUpdate", api.RuleUpdate)

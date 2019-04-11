@@ -16,6 +16,9 @@ func Item(c *gin.Context) {
 		"Table": c.Query("Table"),
 	})
 }
+func User(c *gin.Context) {
+	c.HTML(http.StatusOK, "User.html", gin.H{})
+}
 
 func Log(c *gin.Context) {
 	c.HTML(http.StatusOK, "Log.html", gin.H{})

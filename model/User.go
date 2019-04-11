@@ -67,6 +67,33 @@ func UserRead(Uid int64) (row User, err error) {
 	return
 }
 
+func UserReadByName(Name string) (row User, err error) {
+	data, fields, scanArr := UserMap()
+	err = db.Read("User", fields, *scanArr, dbs.H{
+		"Name": Name,
+	})
+	row = *data
+	return
+}
+
+func UserReadByEmail(Email string) (row User, err error) {
+	data, fields, scanArr := UserMap()
+	err = db.Read("User", fields, *scanArr, dbs.H{
+		"Email": Email,
+	})
+	row = *data
+	return
+}
+
+func UserReadByMobile(Mobile string) (row User, err error) {
+	data, fields, scanArr := UserMap()
+	err = db.Read("User", fields, *scanArr, dbs.H{
+		"Mobile": Mobile,
+	})
+	row = *data
+	return
+}
+
 func UserDelete(Uid int64) (err error) {
 	row, err := UserRead(Uid)
 	if err != nil {

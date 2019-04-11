@@ -1,6 +1,7 @@
 package misc
 
 import (
+	"crypto/md5"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -152,4 +153,8 @@ func StrClear(value, FilterType, FilterRegexp, FilterRepl string) string {
 		}
 	}
 	return Trim(value)
+}
+
+func Md5(s string) string {
+	return fmt.Sprintf("%x", md5.Sum([]byte(s)))
 }
