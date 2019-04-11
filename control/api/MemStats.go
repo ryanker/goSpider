@@ -2,7 +2,6 @@ package api
 
 import (
 	"fmt"
-	"net/http"
 	"runtime"
 	"time"
 
@@ -56,48 +55,48 @@ var Uptime = time.Now()
 
 // 内存信息
 func MemStatsInfo(c *gin.Context) {
-	mem := new(runtime.MemStats)
-	runtime.ReadMemStats(mem)
+	ms := new(runtime.MemStats)
+	runtime.ReadMemStats(ms)
 
-	m := MemStats{}
-	m.Uptime = Uptime.Format("2006-01-02 15:04:05")
-	m.NumCPU = runtime.NumCPU()
-	m.NumGoroutine = runtime.NumGoroutine()
+	mem := MemStats{}
+	mem.Uptime = Uptime.Format("2006-01-02 15:04:05")
+	mem.NumCPU = runtime.NumCPU()
+	mem.NumGoroutine = runtime.NumGoroutine()
 
 	// 基本信息
-	m.Alloc = misc.HumanSize(mem.Alloc)
-	m.TotalAlloc = misc.HumanSize(mem.TotalAlloc)
-	m.Sys = misc.HumanSize(mem.Sys)
-	m.Lookups = mem.Lookups
-	m.Mallocs = mem.Mallocs
-	m.Frees = mem.Frees
+	mem.Alloc = misc.HumanSize(ms.Alloc)
+	mem.TotalAlloc = misc.HumanSize(ms.TotalAlloc)
+	mem.Sys = misc.HumanSize(ms.Sys)
+	mem.Lookups = ms.Lookups
+	mem.Mallocs = ms.Mallocs
+	mem.Frees = ms.Frees
 
 	// Heap 基本信息
-	m.HeapAlloc = misc.HumanSize(mem.HeapAlloc)
-	m.HeapSys = misc.HumanSize(mem.HeapSys)
-	m.HeapIdle = misc.HumanSize(mem.HeapIdle)
-	m.HeapInuse = misc.HumanSize(mem.HeapInuse)
-	m.HeapReleased = misc.HumanSize(mem.HeapReleased)
-	m.HeapObjects = mem.HeapObjects
+	mem.HeapAlloc = misc.HumanSize(ms.HeapAlloc)
+	mem.HeapSys = misc.HumanSize(ms.HeapSys)
+	mem.HeapIdle = misc.HumanSize(ms.HeapIdle)
+	mem.HeapInuse = misc.HumanSize(ms.HeapInuse)
+	mem.HeapReleased = misc.HumanSize(ms.HeapReleased)
+	mem.HeapObjects = ms.HeapObjects
 
 	// 其他信息
-	m.StackInuse = misc.HumanSize(mem.StackInuse)
-	m.StackSys = misc.HumanSize(mem.StackSys)
-	m.MSpanInuse = misc.HumanSize(mem.MSpanInuse)
-	m.MSpanSys = misc.HumanSize(mem.MSpanSys)
-	m.MCacheInuse = misc.HumanSize(mem.MCacheInuse)
-	m.MCacheSys = misc.HumanSize(mem.MCacheSys)
-	m.BuckHashSys = misc.HumanSize(mem.BuckHashSys)
-	m.GCSys = misc.HumanSize(mem.GCSys)
-	m.OtherSys = misc.HumanSize(mem.OtherSys)
+	mem.StackInuse = misc.HumanSize(ms.StackInuse)
+	mem.StackSys = misc.HumanSize(ms.StackSys)
+	mem.MSpanInuse = misc.HumanSize(ms.MSpanInuse)
+	mem.MSpanSys = misc.HumanSize(ms.MSpanSys)
+	mem.MCacheInuse = misc.HumanSize(ms.MCacheInuse)
+	mem.MCacheSys = misc.HumanSize(ms.MCacheSys)
+	mem.BuckHashSys = misc.HumanSize(ms.BuckHashSys)
+	mem.GCSys = misc.HumanSize(ms.GCSys)
+	mem.OtherSys = misc.HumanSize(ms.OtherSys)
 
 	// 垃圾回收信息
 	ts := float64(time.Second)
-	m.NextGC = misc.HumanSize(mem.NextGC)
-	m.LastGC = fmt.Sprintf("%.4f S", float64(time.Now().UnixNano()-int64(mem.LastGC))/ts)
-	m.PauseTotalNs = fmt.Sprintf("%.4f S", float64(mem.PauseTotalNs)/ts)
-	m.PauseNs = fmt.Sprintf("%.4f S", float64(mem.PauseNs[(mem.NumGC+255)%256])/ts)
-	m.NumGC = mem.NumGC
+	mem.NextGC = misc.HumanSize(ms.NextGC)
+	mem.LastGC = fmt.Sprintf("%.4f S", float64(time.Now().UnixNano()-int64(ms.LastGC))/ts)
+	mem.PauseTotalNs = fmt.Sprintf("%.4f S", float64(ms.PauseTotalNs)/ts)
+	mem.PauseNs = fmt.Sprintf("%.4f S", float64(ms.PauseNs[(ms.NumGC+255)%256])/ts)
+	mem.NumGC = ms.NumGC
 
-	c.AbortWithStatusJSON(http.StatusOK, gin.H{"m": m})
+	c.Message("0", "success", mem)
 }

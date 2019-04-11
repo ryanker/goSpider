@@ -197,13 +197,13 @@
 			// 内存信息
 			MemStatsInfo() {
 				axios.get('/MemStatsInfo').then(res => {
-					this.m = res.data.m || {};
+					this.m = res.data.data || {};
 				})
 			},
 			// 磁盘信息
 			DiskInfo() {
 				axios.get('/DiskInfo').then(res => {
-					this.disk = res.data.disk || {};
+					this.disk = res.data.data || {};
 				})
 			},
 		}

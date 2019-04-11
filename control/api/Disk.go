@@ -1,7 +1,6 @@
 package api
 
 import (
-	"net/http"
 	"syscall"
 
 	"../../lib/misc"
@@ -25,5 +24,5 @@ func DiskInfo(c *gin.Context) {
 		disk.Free = misc.HumanSize(fs.Bfree * uint64(fs.Bsize))
 		disk.Used = misc.HumanSize((fs.Blocks - fs.Bfree) * uint64(fs.Bsize))
 	}
-	c.AbortWithStatusJSON(http.StatusOK, gin.H{"disk": disk})
+	c.Message("0", "success", disk)
 }
