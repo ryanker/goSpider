@@ -110,6 +110,7 @@ func RuleUpdateCron(c *gin.Context) {
 		"Status":           m.Status,
 		"IntervalHour":     m.IntervalHour,
 		"Timeout":          m.Timeout,
+		"IsList":           m.IsList,
 		"IsListDownAna":    m.IsListDownAna,
 		"IsListDownRun":    m.IsListDownRun,
 		"IsContent":        m.IsContent,
