@@ -75,7 +75,7 @@
                 <!--表格列表-->
                 <el-table v-loading="userLoading" :data="userData" border @selection-change="userSelect" class="mb-1">
                     <el-table-column type="selection" width="50" align="center"></el-table-column>
-                    <el-table-column label="UID" prop="Uid" width="60"></el-table-column>
+                    <el-table-column label="UID" prop="Uid" width="60" align="center"></el-table-column>
                     <el-table-column label="用户信息" min-width="300">
                         <template slot-scope="scope">
                             用户：{{ scope.row.Name }}<br>
