@@ -93,10 +93,6 @@ func UserUpdate(c *gin.Context) {
 		c.Message("-1", "手机不能为空")
 		return
 	}
-	if m.Password == "" {
-		c.Message("-1", "密码不能为空")
-		return
-	}
 	if m.Gid == 0 {
 		m.Gid = 2
 	}
@@ -113,20 +109,22 @@ func UserUpdate(c *gin.Context) {
 		return
 	}
 
-	// password 为 md5 以后的数据
-	if len(m.Password) == 32 && m.Password != misc.Md5("") {
-		u.Salt = strconv.Itoa(rand.Intn(999999))
-		u.Password = misc.Md5(m.Password + u.Salt)
-	}
-
-	err = model.UserUpdate(dbs.H{
+	h := dbs.H{
 		"Gid":      m.Gid,
 		"Name":     m.Name,
 		"Email":    m.Email,
 		"Mobile":   m.Mobile,
 		"Password": u.Password,
 		"Salt":     u.Salt,
-	}, m.Uid)
+	}
+	if m.Password != "" {
+		if len(m.Password) == 32 && m.Password != misc.Md5("") {
+			h["Salt"] = strconv.Itoa(rand.Intn(999999))
+			h["Password"] = misc.Md5(m.Password + u.Salt)
+		}
+	}
+
+	err = model.UserUpdate(h, m.Uid)
 	if err != nil {
 		c.Message("-1", "更新数据库失败："+err.Error())
 		return

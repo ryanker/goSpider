@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>狗狗采集器</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.5.4/theme-chalk/index.css">
+    <style>
+        body {
+            margin: 0;
+        }
+
+        .el-header {
+            min-height: 60px;
+            padding: 0;
+        }
+
+        .el-main {
+            min-height: 160px;
+        }
+
+        .el-footer {
+            line-height: 60px;
+            text-align: center;
+        }
+
+        .el-menu-item > a {
+            display: block;
+            height: 100%;
+        }
+
+        .mb-1 {
+            margin-bottom: 20px;
+        }
+
+        .mr-1 {
+            width: 300px;
+            margin-right: 10px
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <template>
+        <el-container>
+            <el-header>
+                <el-menu :default-active="4" mode="horizontal">
+                    <el-menu-item :index="1"><a href="/">采集规则</a></el-menu-item>
+                    <el-menu-item :index="2"><a href="/Log">采集日志</a></el-menu-item>
+                    <el-menu-item :index="3"><a href="/Sys">系统信息</a></el-menu-item>
+                    <el-menu-item :index="4"><a href="/User">用户管理</a></el-menu-item>
+                </el-menu>
+            </el-header>
+            <el-main>
+                <el-row>
+                    <el-button type="primary" @click="dialogCreate" class="mb-1">添加用户</el-button>
+                    <el-button v-if="userSelectData.length!==0" type="danger" @click="batchDelete" class="mb-1">
+                        删除用户
+                    </el-button>
+                </el-row>
+
+                <!--选项卡-->
+                <el-tabs v-model="q.Gid" type="card" class="mt-1" @tab-click="tabsClick">
+                    <el-tab-pane label="全部" :name="0"></el-tab-pane>
+                    <el-tab-pane label="管理员" :name="1"></el-tab-pane>
+                    <el-tab-pane label="普通用户" :name="2"></el-tab-pane>
+                </el-tabs>
+
+                <!--表格列表-->
+                <el-table v-loading="userLoading" :data="userData" border @selection-change="userSelect" class="mb-1">
+                    <el-table-column type="selection" width="50" align="center"></el-table-column>
+                    <el-table-column label="UID" prop="Uid" width="60"></el-table-column>
+                    <el-table-column label="用户信息" min-width="300">
+                        <template slot-scope="scope">
+                            用户：{{ scope.row.Name }}<br>
+                            手机：{{ scope.row.Mobile }}<br>
+                            邮箱：{{ scope.row.Email }}<br>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="用户组" width="100" align="center">
+                        <template slot-scope="scope">
+                            <el-tag v-if="scope.row.Gid === 1" type="warning">管理员</el-tag>
+                            <el-tag v-else-if="scope.row.Gid === 2">普通用户</el-tag>
+                            <el-tag v-else type="danger">-</el-tag>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="登录信息" width="250">
+                        <template slot-scope="scope">
+                            登录次数：{{ scope.row.LoginNum }}<br>
+                            最后登录：{{ scope.row.LastDate }}<br>
+                            最后登录IP：{{ scope.row.LastIP }}<br>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="创建信息" width="250">
+                        <template slot-scope="scope">
+                            修改时间：{{ scope.row.UpdateDate }}<br>
+                            创建时间：{{ scope.row.CreateDate }}<br>
+                            创建时的IP：{{ scope.row.CreateIP }}<br>
+                        </template>
+                    </el-table-column>
+                    <el-table-column label="操作" width="100">
+                        <template slot-scope="scope">
+                            <el-tooltip effect="dark" content="编辑用户" placement="top">
+                                <el-button type="primary" size="small" circle icon="el-icon-edit"
+                                           @click="dialogUpdate(scope.row)"/>
+                            </el-tooltip>
+                            <el-tooltip effect="dark" content="删除用户" placement="top">
+                                <el-button type="danger" size="small" circle icon="el-icon-delete"
+                                           @click="userDelete(scope.row)"/>
+                            </el-tooltip>
+                        </template>
+                    </el-table-column>
+                </el-table>
+
+                <!--分页-->
+                <el-row type="flex" class="mt-1" justify="end">
+                    <el-pagination v-if="userTotal > 0" :current-page="q.page" :page-size="20" :total="userTotal"
+                                   background layout="total, prev, pager, next, jumper"
+                                   @current-change="userCurrentChange"/>
+                </el-row>
+
+                <!--编辑用户-->
+                <el-dialog :visible.sync="formDialog" :title="formTitle" :fullscreen="isMobile" width="60%" top="5vh">
+                    <el-form ref="formData" :model="formData" :rules="formRules" label-width="130px" style="width:95%">
+                        <el-form-item label="用户名" prop="Name">
+                            <el-input v-model="formData.Name" width="80%" placeholder="如：张三"/>
+                        </el-form-item>
+                        <el-form-item label="手机" prop="Mobile">
+                            <el-input v-model="formData.Mobile" width="80%" placeholder="如：18812345678"/>
+                        </el-form-item>
+                        <el-form-item label="邮箱" prop="Email">
+                            <el-input v-model="formData.Email" width="80%" placeholder="如：zhangsan@qq.com"/>
+                        </el-form-item>
+                        <el-form-item label="密码" prop="Password">
+                            <el-input v-model="formData.Password" width="80%" placeholder=""/>
+                        </el-form-item>
+                        <el-form-item label="用户组">
+                            <el-select v-model="formData.Gid" placeholder="请选择用户组">
+                                <el-option v-for="v in userGroup" :label="v.label" :value="v.value"/>
+                            </el-select>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-button :disabled="formDisabled" type="primary" @click="dialogSubmit">确认</el-button>
+                        </el-form-item>
+                    </el-form>
+                </el-dialog>
+            </el-main>
+            <el-footer>@2019</el-footer>
+        </el-container>
+    </template>
+</div>
+</body>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.7/vue.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.5.4/index.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/js-cookie/2.2.0/js.cookie.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/blueimp-md5/2.10.0/js/md5.min.js"></script>
+<script>
+	function aPost(url, params) {
+		return new Promise((resolve, reject) => {
+			axios.post(url, params).then(res => {
+				const r = res.data;
+				if (!r) {
+					// console.log('data: ' + r);
+					reject('服务器错误，请稍后再试');
+				} else if (r.code !== '0') {
+					// console.log('message: ' + r.message);
+					reject(r.message || '服务器错误，请稍后再试');
+				} else {
+					resolve(r)
+				}
+			}).catch(error => {
+				console.log(error);
+				reject('服务器错误，请稍后再试');
+			})
+		})
+	}
+
+	new Vue({
+		el: '#app',
+		data() {
+			return {
+				isMobile: document.body.getBoundingClientRect().width < 1024,
+
+				userLoading: false,
+				userTotal: 0,
+				userData: [],
+				userSelectData: [], // 列表选中列
+
+				q: {
+					Gid: 0,
+					Page: 1
+				},
+
+				userGroup: [{value: 1, label: '管理员'}, {value: 2, label: '普通用户'}],
+
+				// 创建&编辑
+				formDialog: false,
+				formDisabled: false,
+				formTitle: '',
+				formUrl: '',
+				formData: {},
+				formRules: {
+					Name: [{required: true, trigger: 'blur', message: '请输入用户名'}],
+					Mobile: [{required: true, trigger: 'blur', message: '请输入手机号'}],
+				},
+			}
+		},
+		mounted() {
+			this.getList()
+		},
+		methods: {
+			// 选项卡点击
+			tabsClick(tab) {
+				this.q.Gid = tab.name;
+				this.q.Page = 1;
+				this.getList();
+			},
+
+			// 对话框: 添加用户
+			dialogCreate() {
+				this.formTitle = '添加用户';
+				this.formUrl = '/UserCreate';
+				this.formData = {
+					Gid: 2,
+				};
+				this.formDialog = true;
+			},
+
+			// 对话框: 编辑用户
+			dialogUpdate(row) {
+				this.formTitle = '编辑用户';
+				this.formUrl = '/UserUpdate';
+				aPost('/UserRead', {Uid: row.Uid}).then(r => {
+					this.formData = r.data || {};
+					this.formDialog = true;
+				}).catch(error => {
+					this.$message.error(error)
+				})
+			},
+
+			// 表单提交
+			dialogSubmit() {
+				this.$refs.formData.validate(valid => {
+					if (valid) {
+						this.formDisabled = true;
+						const d = Object.assign({}, this.formData);
+						if (d.Password) d.Password = md5(d.Password);
+						aPost(this.formUrl, d).then(r => {
+							this.$message.success(r.message);
+							this.formDisabled = false;
+							this.formDialog = false;
+							this.getList();
+						}).catch(error => {
+							this.$message.error(error);
+							this.formDisabled = false;
+						})
+					}
+				})
+			},
+
+			// 批量选择
+			userSelect(val) {
+				this.userSelectData = val
+			},
+
+			// 批量删除用户
+			batchDelete() {
+				this.$confirm('删除选中的用户不可逆, 是否继续? ', '提示', {type: 'warning'}).then(() => {
+					!(async () => {
+						const failDate = []; // 记录失败
+						for (const k in this.userSelectData) {
+							const v = this.userSelectData[k];
+							await aPost('/UserDelete', {'Uid': v.Uid}).catch(error => {
+								failDate.push({error: error});
+								this.$message.error(error);
+							})
+						}
+						if (failDate.length > 0) {
+							this.$message.error('删除失败 ' + failDate.length + ' 次')
+						} else {
+							this.$message.success('删除成功');
+							this.getList()
+						}
+					})()
+				}).catch(_ => {
+				})
+			},
+
+			// 删除用户
+			userDelete(row) {
+				this.$confirm('删除用户不可逆, 是否继续? ', '提示', {type: 'warning'}).then(() => {
+					aPost('/UserDelete', {'Uid': row.Uid}).then(r => {
+						this.$message.success(r.message);
+						this.getList()
+					}).catch(error => {
+						this.$message.error(error)
+					})
+				}).catch(_ => {
+				})
+			},
+
+			// 分页
+			userCurrentChange(val) {
+				this.q.page = val;
+				this.getList();
+			},
+
+			// 获取列表
+			getList() {
+				this.userLoading = true;
+				aPost('/UserList', {Gid: Number(this.q.Gid)}).then(r => {
+					this.userData = r.list || [];
+					this.userTotal = r.total || 0;
+					this.userLoading = false;
+				}).catch(error => {
+					this.$message.error(error);
+					this.userLoading = false;
+				})
+			}
+		}
+	})
+</script>
+</body>
+</html>

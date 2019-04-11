@@ -79,8 +79,8 @@
                 <!--表格-->
                 <el-table v-loading="tableLoading" :data="tableData" border @selection-change="tableSelect">
                     <el-table-column type="selection" width="50"></el-table-column>
-                    <el-table-column label="规则名称" prop="Name"></el-table-column>
-                    <el-table-column label="规则备注" prop="Brief"></el-table-column>
+                    <el-table-column label="规则名称" prop="Name" min-width="250"></el-table-column>
+                    <el-table-column label="规则备注" prop="Brief" min-width="250"></el-table-column>
                     <el-table-column label="数据库名称" prop="DateBase" width="150"></el-table-column>
                     <el-table-column label="修改时间" prop="UpdateDate" width="180"></el-table-column>
                     <el-table-column label="添加时间" prop="CreateDate" width="180"></el-table-column>
