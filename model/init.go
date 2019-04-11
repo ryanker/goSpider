@@ -108,7 +108,7 @@ func cronLog(t time.Duration, format string, args ...interface{}) {
 // 任务
 func cron() {
 	for {
-		time.Sleep(10 * time.Second)
+		time.Sleep(1 * time.Minute)
 
 		// 读取需要采集的规则
 		list, err := RuleList(dbs.H{"Status >": 1}, 0, 0)
