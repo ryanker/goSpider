@@ -15,6 +15,25 @@ import (
 	"../lib/misc"
 )
 
+type ListUrl struct {
+	Lid int64
+	Url string
+}
+
+type ListHtml struct {
+	Lid  int64
+	Html string
+}
+
+type ListDown struct {
+	Id     int64
+	Lid    int64
+	Field  string
+	OldUrl string
+	NewUrl string
+	Sort   int64
+}
+
 var err error
 var db *dbs.DB
 var dbLog *dbs.DB
@@ -268,11 +287,6 @@ func getContent(dbc *dbs.DB, ParamContent *[]RuleParam, row *Rule) {
 	newNum := 0     // 新增入库数
 	errorNum := 0   // 错误入库数
 
-	type st struct {
-		Lid int64
-		Url string
-	}
-
 	where := dbs.H{"Status": 1}
 	n, err := dbc.Count("List", where)
 	if err != nil {
@@ -284,20 +298,17 @@ func getContent(dbc *dbs.DB, ParamContent *[]RuleParam, row *Rule) {
 	pageMax := int64(math.Ceil(float64(n / pageSize)))
 
 	for page := int64(1); page <= pageMax; page++ {
-		rows, err := dbc.Find("List", "`Lid`,`Url`", where, "Lid DESC", page, pageSize)
+		st := ListUrl{}
+		rows, err := dbc.Find("List", "`Lid`,`Url`", []interface{}{&st.Lid, &st.Url}, &st, where, "Lid DESC", page, pageSize)
 		if err != nil {
 			cronErrorLog(0, "列表读取失败: %v", err.Error())
 			return
 		}
-		var list []st
-		for rows.Next() {
-			st := st{}
-			err = rows.Scan(&st.Lid, &st.Url)
-			if err != nil {
-				cronErrorLog(0, "Url绑定失败: %v", err.Error())
-				return
+		var list []ListUrl
+		for _, val := range rows {
+			if row, ok := val.(ListUrl); ok {
+				list = append(list, row)
 			}
-			list = append(list, st)
 		}
 
 		for _, lv := range list {
@@ -383,11 +394,6 @@ func downInitList(dbc *dbs.DB, ParamList *[]RuleParam, row *Rule) {
 			repeatNum := 0  // 重复入库数
 			errorNum := 0   // 错误入库数
 
-			type st struct {
-				Lid int64
-				Url string
-			}
-
 			where := dbs.H{}
 			n, err := dbc.Count("List", where)
 			if err != nil {
@@ -399,20 +405,17 @@ func downInitList(dbc *dbs.DB, ParamList *[]RuleParam, row *Rule) {
 			pageMax := int64(math.Ceil(float64(n / pageSize)))
 
 			for page := int64(1); page <= pageMax; page++ {
-				rows, err := dbc.Find("List", "`Lid`,`"+v.Field+"`", where, "Lid ASC", page, pageSize)
+				st := ListUrl{}
+				rows, err := dbc.Find("List", "`Lid`,`"+v.Field+"`", []interface{}{&st.Lid, &st.Url}, &st, where, "Lid ASC", page, pageSize)
 				if err != nil {
 					cronErrorLog(0, "列表读取失败: %v", err.Error())
 					return
 				}
-				var list []st
-				for rows.Next() {
-					st := st{}
-					err = rows.Scan(&st.Lid, &st.Url)
-					if err != nil {
-						cronErrorLog(0, "绑定失败: %v", err.Error())
-						continue
+				var list []ListUrl
+				for _, val := range rows {
+					if row, ok := val.(ListUrl); ok {
+						list = append(list, row)
 					}
-					list = append(list, st)
 				}
 
 				for _, lv := range list {
@@ -458,11 +461,6 @@ func downInitList(dbc *dbs.DB, ParamList *[]RuleParam, row *Rule) {
 			repeatNum := 0  // 重复入库数
 			errorNum := 0   // 错误入库数
 
-			type st struct {
-				Lid  int64
-				Html string
-			}
-
 			where := dbs.H{}
 			n, err := dbc.Count("List", where)
 			if err != nil {
@@ -474,20 +472,17 @@ func downInitList(dbc *dbs.DB, ParamList *[]RuleParam, row *Rule) {
 			pageMax := int64(math.Ceil(float64(n / pageSize)))
 
 			for page := int64(1); page <= pageMax; page++ {
-				rows, err := dbc.Find("List", "`Lid`,`"+v.Field+"`", where, "Lid ASC", page, pageSize)
+				st := ListHtml{}
+				rows, err := dbc.Find("List", "`Lid`,`"+v.Field+"`", []interface{}{&st.Lid, &st.Html}, st, where, "Lid ASC", page, pageSize)
 				if err != nil {
 					cronErrorLog(0, "列表读取失败: %v", err.Error())
 					return
 				}
-				var list []st
-				for rows.Next() {
-					st := st{}
-					err = rows.Scan(&st.Lid, &st.Html)
-					if err != nil {
-						cronErrorLog(0, "绑定失败: %v", err.Error())
-						continue
+				var list []ListHtml
+				for _, val := range rows {
+					if row, ok := val.(ListHtml); ok {
+						list = append(list, row)
 					}
-					list = append(list, st)
 				}
 
 				for _, lv := range list {
@@ -558,11 +553,6 @@ func downInitContent(dbc *dbs.DB, ParamContent *[]RuleParam, row *Rule) {
 			repeatNum := 0  // 重复入库数
 			errorNum := 0   // 错误入库数
 
-			type st struct {
-				Lid int64
-				Url string
-			}
-
 			where := dbs.H{}
 			n, err := dbc.Count("Content", where)
 			if err != nil {
@@ -574,20 +564,17 @@ func downInitContent(dbc *dbs.DB, ParamContent *[]RuleParam, row *Rule) {
 			pageMax := int64(math.Ceil(float64(n / pageSize)))
 
 			for page := int64(1); page <= pageMax; page++ {
-				rows, err := dbc.Find("Content", "`Lid`,`"+v.Field+"`", where, "Lid ASC", page, pageSize)
+				st := ListUrl{}
+				rows, err := dbc.Find("Content", "`Lid`,`"+v.Field+"`", []interface{}{&st.Lid, &st.Url}, st, where, "Lid ASC", page, pageSize)
 				if err != nil {
 					cronErrorLog(0, "内容读取失败: %v", err.Error())
 					return
 				}
-				var list []st
-				for rows.Next() {
-					st := st{}
-					err = rows.Scan(&st.Lid, &st.Url)
-					if err != nil {
-						cronErrorLog(0, "绑定失败: %v", err.Error())
-						continue
+				var list []ListUrl
+				for _, val := range rows {
+					if row, ok := val.(ListUrl); ok {
+						list = append(list, row)
 					}
-					list = append(list, st)
 				}
 
 				for _, lv := range list {
@@ -633,11 +620,6 @@ func downInitContent(dbc *dbs.DB, ParamContent *[]RuleParam, row *Rule) {
 			repeatNum := 0  // 重复入库数
 			errorNum := 0   // 错误入库数
 
-			type st struct {
-				Lid  int64
-				Html string
-			}
-
 			where := dbs.H{}
 			n, err := dbc.Count("Content", where)
 			if err != nil {
@@ -649,20 +631,17 @@ func downInitContent(dbc *dbs.DB, ParamContent *[]RuleParam, row *Rule) {
 			pageMax := int64(math.Ceil(float64(n / pageSize)))
 
 			for page := int64(1); page <= pageMax; page++ {
-				rows, err := dbc.Find("Content", "`Lid`,`"+v.Field+"`", where, "Lid ASC", page, pageSize)
+				st := ListHtml{}
+				rows, err := dbc.Find("Content", "`Lid`,`"+v.Field+"`", []interface{}{&st.Lid, &st.Html}, st, where, "Lid ASC", page, pageSize)
 				if err != nil {
 					cronErrorLog(0, "内容读取失败: %v", err.Error())
 					return
 				}
-				var list []st
-				for rows.Next() {
-					st := st{}
-					err = rows.Scan(&st.Lid, &st.Html)
-					if err != nil {
-						cronErrorLog(0, "绑定失败: %v", err.Error())
-						continue
+				var list []ListHtml
+				for _, val := range rows {
+					if row, ok := val.(ListHtml); ok {
+						list = append(list, row)
 					}
-					list = append(list, st)
 				}
 
 				for _, lv := range list {
@@ -731,16 +710,6 @@ func downList(dbc *dbs.DB, row *Rule) {
 	repeatNum := 0  // 重复入库数
 	errorNum := 0   // 错误入库数
 
-	fields := "`Id`,`Lid`,`Field`,`OldUrl`,`NewUrl`,`Sort`"
-	type st struct {
-		Id     int64
-		Lid    int64
-		Field  string
-		OldUrl string
-		NewUrl string
-		Sort   int64
-	}
-
 	where := dbs.H{"Status": 1}
 	n, err := dbc.Count("ListDownload", where)
 	if err != nil {
@@ -752,21 +721,19 @@ func downList(dbc *dbs.DB, row *Rule) {
 	pageMax := int64(math.Ceil(float64(n / pageSize)))
 
 	for page := int64(1); page <= pageMax; page++ {
-		rows, err := dbc.Find("ListDownload", fields, where, "Id ASC", 0, pageSize)
+		fields := "`Id`,`Lid`,`Field`,`OldUrl`,`NewUrl`,`Sort`"
+		st := ListDown{}
+		scanArr := []interface{}{&st.Id, &st.Lid, &st.Field, &st.OldUrl, &st.NewUrl, &st.Sort}
+		rows, err := dbc.Find("ListDownload", fields, scanArr, st, where, "Id ASC", 0, pageSize)
 		if err != nil {
 			cronErrorLog(0, "下载列表读取失败: %v", err.Error())
 			return
 		}
-
-		var list []st
-		for rows.Next() {
-			st := st{}
-			err = rows.Scan(&st.Id, &st.Lid, &st.Field, &st.OldUrl, &st.NewUrl, &st.Sort)
-			if err != nil {
-				cronErrorLog(0, "绑定失败: %v", err.Error())
-				return
+		var list []ListDown
+		for _, val := range rows {
+			if row, ok := val.(ListDown); ok {
+				list = append(list, row)
 			}
-			list = append(list, st)
 		}
 
 		for _, lv := range list {
@@ -823,16 +790,6 @@ func downContent(dbc *dbs.DB, row *Rule) {
 	repeatNum := 0  // 重复入库数
 	errorNum := 0   // 错误入库数
 
-	fields := "`Id`,`Lid`,`Field`,`OldUrl`,`NewUrl`,`Sort`"
-	type st struct {
-		Id     int64
-		Lid    int64
-		Field  string
-		OldUrl string
-		NewUrl string
-		Sort   int64
-	}
-
 	where := dbs.H{"Status": 1}
 	n, err := dbc.Count("ContentDownload", where)
 	if err != nil {
@@ -844,21 +801,19 @@ func downContent(dbc *dbs.DB, row *Rule) {
 	pageMax := int64(math.Ceil(float64(n / pageSize)))
 
 	for page := int64(1); page <= pageMax; page++ {
-		rows, err := dbc.Find("ContentDownload", fields, where, "Id ASC", 0, pageSize)
+		st := ListDown{}
+		fields := "`Id`,`Lid`,`Field`,`OldUrl`,`NewUrl`,`Sort`"
+		scanArr := []interface{}{&st.Id, &st.Lid, &st.Field, &st.OldUrl, &st.NewUrl, &st.Sort}
+		rows, err := dbc.Find("ContentDownload", fields, scanArr, st, where, "Id ASC", 0, pageSize)
 		if err != nil {
 			cronErrorLog(0, "下载列表读取失败: %v", err.Error())
 			return
 		}
-
-		var list []st
-		for rows.Next() {
-			st := st{}
-			err = rows.Scan(&st.Id, &st.Lid, &st.Field, &st.OldUrl, &st.NewUrl, &st.Sort)
-			if err != nil {
-				cronErrorLog(0, "绑定失败: %v", err.Error())
-				return
+		var list []ListDown
+		for _, val := range rows {
+			if row, ok := val.(ListDown); ok {
+				list = append(list, row)
 			}
-			list = append(list, st)
 		}
 
 		for _, lv := range list {
