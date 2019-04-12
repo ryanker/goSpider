@@ -144,7 +144,7 @@ func (db *DB) Count(table string, where H) (n int64, err error) {
 	return
 }
 
-func (db *DB) Find(table, fields string, where H, order string, page, pageSize int64) (rows *sql.Rows, err error) {
+func (db *DB) Find(table, fields string, scanArr []interface{}, data interface{}, where H, order string, page, pageSize int64) (list []interface{}, err error) {
 	whereStr, args := GetSqlWhere(where)
 	orderStr := ""
 	limitStr := ""
@@ -161,12 +161,56 @@ func (db *DB) Find(table, fields string, where H, order string, page, pageSize i
 	s := "SELECT " + fields + " FROM `" + table + "`" + whereStr + orderStr + limitStr
 	LogWrite(s, args...)
 
-	rows, err = db.Query(s, args...)
+	rows, err := db.Query(s, args...)
 	if err != nil {
 		ErrorLogWrite(err, s, args...)
 		return
 	}
 	defer rows.Close()
+
+	for rows.Next() {
+		err = rows.Scan(scanArr...)
+		if err != nil {
+			return
+		}
+		list = append(list, data)
+	}
+	return
+}
+
+func (db *DB) FindMap(table string, where H, order string, page, pageSize int64) (list []map[string]interface{}, columns []string, err error) {
+	whereStr, args := GetSqlWhere(where)
+	orderStr := ""
+	limitStr := ""
+	if order != "" {
+		orderStr = " ORDER BY " + order
+	}
+	if page < 1 {
+		page = 1
+	}
+	if pageSize > 0 {
+		start := (page - 1) * pageSize
+		limitStr = " LIMIT " + strconv.FormatInt(start, 10) + "," + strconv.FormatInt(pageSize, 10)
+	}
+	s := "SELECT * FROM `" + table + "`" + whereStr + orderStr + limitStr
+	LogWrite(s, args...)
+
+	rows, err := db.Query(s, args...)
+	if err != nil {
+		ErrorLogWrite(err, s, args...)
+		return
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		m := map[string]interface{}{}
+		columns, err = MapScan(rows, m)
+		if err != nil {
+			ErrorLogWrite(err, s, args...)
+			return
+		}
+		list = append(list, m)
+	}
 	return
 }
 
