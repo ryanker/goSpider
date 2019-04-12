@@ -35,14 +35,13 @@ func LogCount(h dbs.H) (n int64, err error) {
 
 func LogList(h dbs.H, order string, page, pageSize int64) (list []Log, err error) {
 	data, fields, scanArr := LogMap()
-	rows, err := dbLog.Find("Log", fields, *scanArr, *data, h, order, page, pageSize)
+	err = dbLog.Find("Log", fields, *scanArr, h, order, page, pageSize, data, func(row interface{}) {
+		if v, ok := row.(*Log); ok {
+			list = append(list, *v)
+		}
+	})
 	if err != nil {
 		return
-	}
-	for _, val := range rows {
-		if row, ok := val.(Log); ok {
-			list = append(list, row)
-		}
 	}
 	return
 }
