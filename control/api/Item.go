@@ -42,21 +42,10 @@ func ItemList(c *gin.Context) {
 	}
 
 	// 列表
-	rows, err := dbc.Find(m.Table, "*", dbs.H{}, "", m.Page, 20)
+	list, columns, err := dbc.FindMap(m.Table, dbs.H{}, "", m.Page, 20)
 	if err != nil {
 		c.Message("-1", "读取表失败: "+err.Error())
 		return
-	}
-	var columns []string
-	var list []map[string]interface{}
-	for rows.Next() {
-		m := map[string]interface{}{}
-		columns, err = dbs.MapScan(rows, m)
-		if err != nil {
-			c.Message("-1", "MapScan 失败: "+err.Error())
-			return
-		}
-		list = append(list, m)
 	}
 
 	c.Message("0", "success", gin.H{"total": total, "columns": columns, "list": list})
