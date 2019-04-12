@@ -37,6 +37,7 @@ func (db *DB) Insert(table string, data H) (id int64, err error) {
 		ErrorLogWrite(err, s, args...)
 		return
 	}
+	defer stmt.Close()
 
 	res, err := stmt.Exec(args...)
 	if err != nil {
@@ -62,6 +63,7 @@ func (db *DB) Delete(table string, where H) (n int64, err error) {
 		ErrorLogWrite(err, s, args...)
 		return
 	}
+	defer stmt.Close()
 
 	res, err := stmt.Exec(args...)
 	if err != nil {
@@ -90,6 +92,7 @@ func (db *DB) Update(table string, data H, where H) (n int64, err error) {
 		ErrorLogWrite(err, s, args...)
 		return
 	}
+	defer stmt.Close()
 
 	res, err := stmt.Exec(args...)
 	if err != nil {
@@ -111,6 +114,7 @@ func (db *DB) Read(table string, fields string, scanArr []interface{}, where H) 
 		ErrorLogWrite(err, s, args...)
 		return
 	}
+	defer stmt.Close()
 
 	err = stmt.QueryRow(args...).Scan(scanArr...)
 	if err != nil {
@@ -130,6 +134,7 @@ func (db *DB) Count(table string, where H) (n int64, err error) {
 		ErrorLogWrite(err, s, args...)
 		return
 	}
+	defer stmt.Close()
 
 	err = stmt.QueryRow(args...).Scan(&n)
 	if err != nil {
@@ -161,6 +166,7 @@ func (db *DB) Find(table, fields string, where H, order string, page, pageSize i
 		ErrorLogWrite(err, s, args...)
 		return
 	}
+	defer rows.Close()
 	return
 }
 
