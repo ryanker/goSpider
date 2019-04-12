@@ -204,11 +204,11 @@
 
 			// 列表
 			getList() {
-				this.tableLoading = true;
+				// this.tableLoading = true;
 				aPost('/LogList', this.q).then(r => {
 					this.tableData = r.list || [];
 					this.tableTotal = r.total || 0;
-					this.tableLoading = false;
+					// this.tableLoading = false;
 				}).catch(error => {
 					this.$message.error(error);
 				});
