@@ -32,14 +32,16 @@ func (db *DB) Insert(table string, data H) (id int64, err error) {
 	s := "INSERT INTO `" + table + "`(" + kStr + ") VALUES (" + vStr + ")"
 	LogWrite(s, args...)
 
-	stmt, err := db.Prepare(s)
+	var stmt *sql.Stmt
+	stmt, err = db.Prepare(s)
 	if err != nil {
 		ErrorLogWrite(err, s, args...)
 		return
 	}
 	defer stmt.Close()
 
-	res, err := stmt.Exec(args...)
+	var res sql.Result
+	res, err = stmt.Exec(args...)
 	if err != nil {
 		ErrorLogWrite(err, s, args...)
 		return
@@ -58,14 +60,16 @@ func (db *DB) Delete(table string, where H) (n int64, err error) {
 	s := "DELETE FROM `" + table + "`" + whereStr
 	LogWrite(s, args...)
 
-	stmt, err := db.Prepare(s)
+	var stmt *sql.Stmt
+	stmt, err = db.Prepare(s)
 	if err != nil {
 		ErrorLogWrite(err, s, args...)
 		return
 	}
 	defer stmt.Close()
 
-	res, err := stmt.Exec(args...)
+	var res sql.Result
+	res, err = stmt.Exec(args...)
 	if err != nil {
 		ErrorLogWrite(err, s, args...)
 		return
@@ -87,14 +91,16 @@ func (db *DB) Update(table string, data H, where H) (n int64, err error) {
 	s := "UPDATE `" + table + "` SET " + setStr + whereStr
 	LogWrite(s, args...)
 
-	stmt, err := db.Prepare(s)
+	var stmt *sql.Stmt
+	stmt, err = db.Prepare(s)
 	if err != nil {
 		ErrorLogWrite(err, s, args...)
 		return
 	}
 	defer stmt.Close()
 
-	res, err := stmt.Exec(args...)
+	var res sql.Result
+	res, err = stmt.Exec(args...)
 	if err != nil {
 		ErrorLogWrite(err, s, args...)
 		return
@@ -109,7 +115,8 @@ func (db *DB) Read(table string, fields string, scanArr []interface{}, where H) 
 	s := "SELECT " + fields + " FROM `" + table + "`" + whereStr
 	LogWrite(s, args...)
 
-	stmt, err := db.Prepare(s)
+	var stmt *sql.Stmt
+	stmt, err = db.Prepare(s)
 	if err != nil {
 		ErrorLogWrite(err, s, args...)
 		return
@@ -129,7 +136,8 @@ func (db *DB) Count(table string, where H) (n int64, err error) {
 	s := "SELECT COUNT(*) FROM `" + table + "`" + whereStr
 	LogWrite(s, args...)
 
-	stmt, err := db.Prepare(s)
+	var stmt *sql.Stmt
+	stmt, err = db.Prepare(s)
 	if err != nil {
 		ErrorLogWrite(err, s, args...)
 		return
@@ -196,7 +204,8 @@ func (db *DB) FindMap(table string, where H, order string, page, pageSize int64)
 	s := "SELECT * FROM `" + table + "`" + whereStr + orderStr + limitStr
 	LogWrite(s, args...)
 
-	rows, err := db.Query(s, args...)
+	var rows *sql.Rows
+	rows, err = db.Query(s, args...)
 	if err != nil {
 		ErrorLogWrite(err, s, args...)
 		return
