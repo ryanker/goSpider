@@ -113,15 +113,14 @@ CREATE TABLE user
 	fmt.Printf("Read: %+v\n", u)
 
 	// 读取多条(到结构体)
-	rows, err := db.Find("user", fields, *scanArr, *data, dbs.H{}, "", 1, 20)
+	var list []User
+	err = db.Find("user", fields, *scanArr, dbs.H{}, "", 1, 20, data, func(row interface{}) {
+		if v, ok := row.(*User); ok {
+			list = append(list, *v)
+		}
+	})
 	if err != nil {
 		panic(err)
-	}
-	var list []User
-	for _, val := range rows {
-		if row, ok := val.(User); ok {
-			list = append(list, row)
-		}
 	}
 	fmt.Println("List:", list)
 	b, _ := json.Marshal(list)
