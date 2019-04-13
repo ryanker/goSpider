@@ -6,44 +6,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.5.4/theme-chalk/index.css">
-    <style>
-        body {
-            margin: 0;
-        }
-
-        .el-header {
-            min-height: 60px;
-            padding: 0;
-        }
-
-        .el-main {
-            min-height: 160px;
-        }
-
-        .el-footer {
-            line-height: 60px;
-            text-align: center;
-        }
-
-        .el-menu-item {
-            padding: 0;
-        }
-
-        .el-menu-item > a {
-            display: block;
-            height: 100%;
-            padding: 0 20px;
-        }
-
-        .mt-1 {
-            margin-top: 50px;
-        }
-
-        .mr-1 {
-            width: 300px;
-            margin-right: 10px
-        }
-    </style>
+    <link rel="stylesheet" href="/static/css/main.css">
 </head>
 <body>
 <div id="app">
@@ -73,7 +36,7 @@
                             <el-input v-model="m.NumGoroutine" disabled></el-input>
                         </el-form-item>
 
-                        <el-form-item label="当前使用内存" class="mt-1">
+                        <el-form-item label="当前使用内存" class="mt-2">
                             <el-input v-model="m.Alloc" disabled></el-input>
                         </el-form-item>
                         <el-form-item label="累积使用内存">
@@ -83,7 +46,7 @@
                             <el-input v-model="m.Sys" disabled></el-input>
                         </el-form-item>
 
-                        <el-form-item label="指针查找次数" class="mt-1">
+                        <el-form-item label="指针查找次数" class="mt-2">
                             <el-input v-model="m.Lookups" disabled></el-input>
                         </el-form-item>
                         <el-form-item label="内存分配次数">
@@ -93,7 +56,7 @@
                             <el-input v-model="m.Frees" disabled></el-input>
                         </el-form-item>
 
-                        <el-form-item label="当前 Heap 内存使用量" class="mt-1">
+                        <el-form-item label="当前 Heap 内存使用量" class="mt-2">
                             <el-input v-model="m.HeapAlloc" disabled></el-input>
                         </el-form-item>
                         <el-form-item label="Heap 内存占用量">
@@ -112,7 +75,7 @@
                             <el-input v-model="m.HeapObjects" disabled></el-input>
                         </el-form-item>
 
-                        <el-form-item label="启动 Stack 使用量" class="mt-1">
+                        <el-form-item label="启动 Stack 使用量" class="mt-2">
                             <el-input v-model="m.StackInuse" disabled></el-input>
                         </el-form-item>
                         <el-form-item label="系统分配的 Stack 内存">
@@ -140,7 +103,7 @@
                             <el-input v-model="m.OtherSys" disabled></el-input>
                         </el-form-item>
 
-                        <el-form-item label="下次 GC 内存回收量" class="mt-1">
+                        <el-form-item label="下次 GC 内存回收量" class="mt-2">
                             <el-input v-model="m.NextGC" disabled></el-input>
                         </el-form-item>
                         <el-form-item label="距离上次 GC 时间">
@@ -156,7 +119,7 @@
                             <el-input v-model="m.NumGC" disabled></el-input>
                         </el-form-item>
 
-                        <el-form-item label="磁盘总大小" class="mt-1">
+                        <el-form-item label="磁盘总大小" class="mt-2">
                             <el-input v-model="disk.All" disabled></el-input>
                         </el-form-item>
                         <el-form-item label="磁盘使用大小">
@@ -177,6 +140,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.7/vue.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.5.4/index.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js"></script>
+<script src="/static/js/main.js"></script>
 <script>
 	new Vue({
 		el: '#app',

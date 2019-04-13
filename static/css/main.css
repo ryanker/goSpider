@@ -1,0 +1,44 @@
+body {
+	margin: 0;
+}
+
+.el-header {
+	min-height: 60px;
+	padding: 0;
+}
+
+.el-main {
+	min-height: 160px;
+}
+
+.el-footer {
+	line-height: 60px;
+	text-align: center;
+}
+
+.el-form-item__content .el-table td, .el-form-item__content .el-table th {
+	line-height: 23px;
+}
+
+.el-menu-item {
+	padding: 0;
+}
+
+.el-menu-item > a {
+	display: block;
+	height: 100%;
+	padding: 0 20px;
+}
+
+.mb-1 {
+	margin-bottom: 20px;
+}
+
+.mb-2 {
+	margin-bottom: 40px;
+}
+
+.mr-1 {
+	width: 300px;
+	margin-right: 10px
+}

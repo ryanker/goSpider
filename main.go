@@ -39,6 +39,7 @@ func StartGin() {
 
 	app := gin.Default()
 	app.Delims("${", "}")
+	app.Static("/static", "./static")
 	app.Static("/upload", "./upload")
 	app.SetFuncMap(template.FuncMap{
 		"htmlTags": func(s string) template.HTML {
@@ -57,6 +58,7 @@ func StartGin() {
 	app.GET("/User", front.User)
 	app.GET("/Log", front.Log)
 	app.GET("/Sys", front.Sys)
+	app.GET("/Login", front.Login)
 
 	// ========== Api ==========
 	// User

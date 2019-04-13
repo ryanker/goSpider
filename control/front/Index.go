@@ -27,3 +27,7 @@ func Log(c *gin.Context) {
 func Sys(c *gin.Context) {
 	c.HTML(http.StatusOK, "Sys.html", gin.H{})
 }
+
+func Login(c *gin.Context) {
+	c.HTML(http.StatusOK, "Login.html", gin.H{})
+}
