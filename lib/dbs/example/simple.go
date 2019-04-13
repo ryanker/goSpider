@@ -114,10 +114,8 @@ CREATE TABLE user
 
 	// 读取多条(到结构体)
 	var list []User
-	err = db.Find("user", fields, *scanArr, dbs.H{}, "", 1, 20, data, func(row interface{}) {
-		if v, ok := row.(*User); ok {
-			list = append(list, *v)
-		}
+	err = db.Find("user", fields, *scanArr, dbs.H{}, "", 1, 20, func() {
+		list = append(list, *data)
 	})
 	if err != nil {
 		panic(err)

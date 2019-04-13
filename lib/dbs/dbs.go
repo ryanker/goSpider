@@ -152,7 +152,7 @@ func (db *DB) Count(table string, where H) (n int64, err error) {
 	return
 }
 
-func (db *DB) Find(table, fields string, scanArr []interface{}, where H, order string, page, pageSize int64, data interface{}, callback func(row interface{})) (err error) {
+func (db *DB) Find(table, fields string, scanArr []interface{}, where H, order string, page, pageSize int64, callback func()) (err error) {
 	whereStr, args := GetSqlWhere(where)
 	orderStr := ""
 	limitStr := ""
@@ -182,7 +182,7 @@ func (db *DB) Find(table, fields string, scanArr []interface{}, where H, order s
 		if err != nil {
 			return
 		}
-		callback(data)
+		callback()
 	}
 	return
 }
