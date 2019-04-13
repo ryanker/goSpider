@@ -151,11 +151,9 @@ func UserCount(h dbs.H) (n int64, err error) {
 
 func UserList(h dbs.H, page, pageSize int64) (list []User, err error) {
 	data, fields, scanArr := UserMap()
-	err = db.Find("User", fields, *scanArr, h, "Uid DESC", page, pageSize, data, func(row interface{}) {
-		if v, ok := row.(*User); ok {
-			v.UserFormatSafe() // 格式化
-			list = append(list, *v)
-		}
+	err = db.Find("User", fields, *scanArr, h, "Uid DESC", page, pageSize, func() {
+		data.UserFormatSafe() // 格式化
+		list = append(list, *data)
 	})
 	if err != nil {
 		return

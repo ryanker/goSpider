@@ -125,10 +125,8 @@ func RuleCount(h dbs.H) (n int64, err error) {
 
 func RuleList(h dbs.H, page, pageSize int64) (list []Rule, err error) {
 	data, fields, scanArr := RuleMap()
-	err = db.Find("Rule", fields, *scanArr, h, "Rid DESC", page, pageSize, data, func(row interface{}) {
-		if v, ok := row.(*Rule); ok {
-			list = append(list, *v)
-		}
+	err = db.Find("Rule", fields, *scanArr, h, "Rid DESC", page, pageSize, func() {
+		list = append(list, *data)
 	})
 	if err != nil {
 		return
