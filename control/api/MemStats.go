@@ -95,7 +95,7 @@ func MemStatsInfo(c *gin.Context) {
 	mem.NextGC = misc.HumanSize(ms.NextGC)
 	mem.LastGC = fmt.Sprintf("%.4f S", float64(time.Now().UnixNano()-int64(ms.LastGC))/ts)
 	mem.PauseTotalNs = fmt.Sprintf("%.4f S", float64(ms.PauseTotalNs)/ts)
-	mem.PauseNs = fmt.Sprintf("%.4f S", float64(ms.PauseNs[(ms.NumGC+255)%256])/ts)
+	mem.PauseNs = fmt.Sprintf("%.6f S", float64(ms.PauseNs[(ms.NumGC+255)%256])/ts)
 	mem.NumGC = ms.NumGC
 
 	c.Message("0", "success", mem)
