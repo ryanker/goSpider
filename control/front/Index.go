@@ -37,5 +37,4 @@ func Login(c *gin.Context) {
 func Logout(c *gin.Context) {
 	api.UserSetCookie(c, "", 1)
 	c.Redirect(http.StatusFound, "/")
-	// c.HTML(http.StatusOK, "Logout.html", gin.H{})
 }
