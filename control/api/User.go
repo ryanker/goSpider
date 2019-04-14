@@ -134,7 +134,7 @@ func UserCreate(c *gin.Context) {
 	}
 
 	// password 为 md5 以后的数据
-	m.Salt = strconv.Itoa(rand.Intn(999999))
+	m.Salt = strconv.Itoa(rand.Intn(99999999))
 	m.Password = misc.Md5(m.Password + m.Salt)
 	m.CreateIP = c.ClientIP()
 
@@ -205,8 +205,9 @@ func UserUpdate(c *gin.Context) {
 	}
 	if m.Password != "" {
 		if len(m.Password) == 32 && m.Password != misc.Md5("") {
-			h["Salt"] = strconv.Itoa(rand.Intn(999999))
-			h["Password"] = misc.Md5(m.Password + u.Salt)
+			salt := rand.Intn(99999999)
+			h["Salt"] = salt
+			h["Password"] = misc.Md5(m.Password + strconv.Itoa(salt))
 		}
 	}
 
