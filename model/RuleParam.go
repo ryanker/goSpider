@@ -27,7 +27,7 @@ type RuleParam struct {
 	DownValueAttr string
 	DownFileType  string
 	DownTimeout   int64
-	CreateDate    string
+	CreateDate    time.Time `time_format:"sql_datetime" time_location:"UTC"`
 }
 
 func RuleParamMap() (ptr *RuleParam, fields string, args *[]interface{}) {

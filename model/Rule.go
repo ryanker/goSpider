@@ -35,12 +35,12 @@ type Rule struct {
 	IsContentDownAna int64
 	IsContentDownRun int64
 
-	LastStartDate string
-	LastEndData   string
-	NextStartDate string
+	LastStartDate time.Time `time_format:"sql_datetime" time_location:"UTC"`
+	LastEndData   time.Time `time_format:"sql_datetime" time_location:"UTC"`
+	NextStartDate time.Time `time_format:"sql_datetime" time_location:"UTC"`
 
-	UpdateDate string
-	CreateDate string
+	UpdateDate time.Time `time_format:"sql_datetime" time_location:"UTC"`
+	CreateDate time.Time `time_format:"sql_datetime" time_location:"UTC"`
 }
 
 func RuleMap() (ptr *Rule, fields string, args *[]interface{}) {

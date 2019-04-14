@@ -2,6 +2,7 @@ package model
 
 import (
 	"os"
+	"time"
 
 	"../lib/dbs"
 )
@@ -11,7 +12,7 @@ type Log struct {
 	Status     int64
 	Runtime    string
 	Message    string
-	CreateDate string
+	CreateDate time.Time `time_format:"sql_datetime" time_location:"UTC"`
 }
 
 func LogMap() (ptr *Log, fields string, args *[]interface{}) {

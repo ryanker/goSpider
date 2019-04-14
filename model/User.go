@@ -21,10 +21,10 @@ type User struct {
 	Salt       string
 	LoginNum   int64
 	LastIP     string
-	LastDate   string
+	LastDate   time.Time `time_format:"sql_datetime" time_location:"UTC"`
 	CreateIP   string
-	CreateDate string
-	UpdateDate string
+	CreateDate time.Time `time_format:"sql_datetime" time_location:"UTC"`
+	UpdateDate time.Time `time_format:"sql_datetime" time_location:"UTC"`
 }
 
 type UserToken struct {
