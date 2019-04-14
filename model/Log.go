@@ -9,7 +9,7 @@ import (
 type Log struct {
 	LogId      int64
 	Status     int64
-	Runtime    float64
+	Runtime    string
 	Message    string
 	CreateDate string
 }

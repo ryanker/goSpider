@@ -5,7 +5,7 @@
     <title>狗狗采集器</title>
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.7.0/theme-chalk/index.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.7.2/theme-chalk/index.css">
     <link rel="stylesheet" href="/static/css/main.css">
 </head>
 <body>
@@ -24,15 +24,36 @@
                                  @change="autoChange"></el-checkbox>
                 </el-row>
 
-                <!--筛选-->
-                <el-radio-group v-model="q.Status" class="mb-1" @change="tableChange">
+                <!--类型-->
+                <el-radio-group v-model="q.Status" class="mb-1" @change="changeStatus">
                     <el-radio-button :label="0">全部</el-radio-button>
                     <el-radio-button :label="1">普通日志</el-radio-button>
                     <el-radio-button :label="2">错误日志</el-radio-button>
                 </el-radio-group>
 
+                <!--排序-->
+                <div class="mb-1">
+                    排序：
+                    <el-radio-group v-model="q.Order" @change="changeOrder">
+                        <el-radio label="">最新</el-radio>
+                        <el-radio label="Runtime">耗时</el-radio>
+                    </el-radio-group>
+                </div>
+
+                <!--时间线-->
+                <el-timeline :reverse="true">
+                    <el-timeline-item v-for="(v, i) in tableData" :key="i" :timestamp="v.CreateDateFmt" placement="top">
+                        <el-tag v-if="v.Status === 1" type="info">普通日志</el-tag>
+                        <el-tag v-else-if="v.Status === 2" type="danger">错误日志</el-tag>
+                        <el-tag v-else type="danger">-</el-tag>
+                        <el-tag v-if="v.Runtime > 0" type="success">{[v.Runtime]}</el-tag>
+                        #{[v.LogId]}
+                        | {[v.Message]}
+                    </el-timeline-item>
+                </el-timeline>
+
                 <!--表格-->
-                <el-table v-loading="tableLoading" :data="tableData" border height="666" @sort-change="sortChange">
+                <!--<el-table v-loading="tableLoading" :data="tableData" border height="666" @sort-change="sortChange">
                     <el-table-column label="日志ID" prop="LogId" width="100"></el-table-column>
                     <el-table-column label="状态" width="100" align="center">
                         <template slot-scope="scope">
@@ -45,10 +66,10 @@
                     <el-table-column label="执行耗时" prop="Runtime" width="120"
                                      :sort-orders="['ascending', 'descending']" sortable="custom"></el-table-column>
                     <el-table-column f label="日志内容" prop="Message" min-width="200"></el-table-column>
-                </el-table>
+                </el-table>-->
 
                 <!--分页-->
-                <el-row type="flex" justify="end" style="margin-top:15px">
+                <el-row type="flex" justify="end">
                     <el-pagination v-if="tableTotal > 0" :current-page="q.Page" :page-size="20" :total="tableTotal"
                                    background layout="total, prev, pager, next, jumper"
                                    @current-change="tableCurrentChange"/>
@@ -61,12 +82,14 @@
 </body>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.7.0/index.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.7.2/index.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
 <script src="/static/js/main.js"></script>
 <script>
 	new Vue({
 		el: '#app',
+		delimiters: ['{[', ']}'],
 		data() {
 			return {
 				tableLoading: false,
@@ -97,17 +120,22 @@
 			},
 
 			// 表筛选
-			tableChange(val) {
+			changeStatus(val) {
 				this.q.Status = val;
 				this.q.Page = 1;
 				this.getList();
 			},
 
 			// 排序
-			sortChange(obj) {
-				this.q.Order = obj.order === 'descending' ? 'Runtime' : '';
-				this.getList()
+			changeOrder(val) {
+				this.q.Order = val;
+				this.q.Page = 1;
+				this.getList();
 			},
+			// sortChange(obj) {
+			// 	this.q.Order = obj.order === 'descending' ? 'Runtime' : '';
+			// 	this.getList()
+			// },
 
 			// 自动刷新
 			autoChange() {
@@ -143,6 +171,12 @@
 			getList() {
 				// this.tableLoading = true;
 				aPost('/LogList', this.q).then(r => {
+					const list = [];
+					r.list && r.list.map(v => {
+						Object.assign(v, {
+							CreateDateFmt: moment(v.CreateDate).format('YYYY-MM-DD HH:mm:ss'),
+						})
+					});
 					this.tableData = r.list || [];
 					this.tableTotal = r.total || 0;
 					// this.tableLoading = false;
