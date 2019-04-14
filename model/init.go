@@ -42,7 +42,7 @@ var logSql = `CREATE TABLE Log
 (
   LogId      INTEGER PRIMARY KEY AUTOINCREMENT,   -- 日志ID
   Status     INTEGER        NOT NULL DEFAULT '0', -- 日志状态 1:普通日志 2:错误日志
-  Runtime    DECIMAL(10, 6) NOT NULL DEFAULT '0', -- 执行耗时
+  Runtime    DECIMAL(10, 4) NOT NULL DEFAULT '0', -- 执行耗时
   Message    TEXT                    DEFAULT '',  -- 日志内容
   CreateDate DATETIME                DEFAULT CURRENT_TIMESTAMP
 );`
@@ -103,7 +103,7 @@ func InitDbLog() {
 func cronErrorLog(t time.Duration, format string, args ...interface{}) {
 	_, err := dbLog.Insert("Log", dbs.H{
 		"Status":     2,
-		"Runtime":    fmt.Sprintf("%.6f", float64(t)/float64(time.Second)),
+		"Runtime":    fmt.Sprintf("%.4f", float64(t)/float64(time.Second)),
 		"Message":    fmt.Sprintf(format, args...),
 		"CreateDate": time.Now().Format("2006-01-02 15:04:05"),
 	})
@@ -115,7 +115,7 @@ func cronErrorLog(t time.Duration, format string, args ...interface{}) {
 func cronLog(t time.Duration, format string, args ...interface{}) {
 	_, err := dbLog.Insert("Log", dbs.H{
 		"Status":     1,
-		"Runtime":    fmt.Sprintf("%.6f", float64(t)/float64(time.Second)),
+		"Runtime":    fmt.Sprintf("%.4f", float64(t)/float64(time.Second)),
 		"Message":    fmt.Sprintf(format, args...),
 		"CreateDate": time.Now().Format("2006-01-02 15:04:05"),
 	})

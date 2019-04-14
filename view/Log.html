@@ -46,7 +46,7 @@
                         <el-tag v-if="v.Status === 1" type="info">普通日志</el-tag>
                         <el-tag v-else-if="v.Status === 2" type="danger">错误日志</el-tag>
                         <el-tag v-else type="danger">-</el-tag>
-                        <el-tag v-if="v.Runtime > 0" type="success">{[v.Runtime]}</el-tag>
+                        <el-tag v-if="v.Runtime > 0" type="success">{[v.Runtime]}秒</el-tag>
                         #{[v.LogId]}
                         | {[v.Message]}
                     </el-timeline-item>
