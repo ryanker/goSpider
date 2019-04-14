@@ -38,7 +38,7 @@
                     <el-table-column type="selection" width="50"></el-table-column>
                     <el-table-column label="规则名称" prop="Name" min-width="250"></el-table-column>
                     <el-table-column label="规则备注" prop="Brief" min-width="250"></el-table-column>
-                    <el-table-column label="数据库名称" prop="DateBase" width="150"></el-table-column>
+                    <el-table-column label="数据库名称" prop="Database" width="150"></el-table-column>
                     <el-table-column label="修改时间" prop="UpdateDate" width="180"></el-table-column>
                     <el-table-column label="添加时间" prop="CreateDate" width="180"></el-table-column>
                     <el-table-column label="状态" width="100" align="center">
@@ -87,7 +87,7 @@
                 <el-dialog :visible.sync="cronDialogVisible" title="采集任务" fullscreen>
                     <el-form ref="cronData" :model="cronData" label-width="130px" style="width:95%">
                         <el-form-item label="数据库">
-                            <el-radio-group v-model="cronDateBase.Type">
+                            <el-radio-group v-model="cronDatabase.Type">
                                 <el-radio :label="0">不操作</el-radio>
                                 <el-radio :label="1">创建表</el-radio>
                                 <el-radio :label="2">备份表</el-radio>
@@ -158,7 +158,7 @@
                                 <el-input v-model="ruleData.Brief" placeholder=""/>
                             </el-form-item>
                             <el-form-item label="数据库名称">
-                                <el-input v-model="ruleData.DateBase" placeholder=""/>
+                                <el-input v-model="ruleData.Database" placeholder=""/>
                             </el-form-item>
                             <el-form-item label="登录Cookie">
                                 <el-input v-model="ruleData.Cookie" type="textarea" :autosize="{minRows: 2, maxRows: 5}"
@@ -434,7 +434,7 @@
 				cronDialogVisible: false,
 				cronButtonDisabled: false,
 				cronData: {},
-				cronDateBase: {},
+				cronDatabase: {},
 
 				// 规则: 添加&编辑
 				ruleTitle: '',
@@ -495,7 +495,7 @@
 				this.cronDialogVisible = true;
 				aPost('/RuleRead', {Rid: row.Rid}).then(r => {
 					const d = r.data;
-					this.cronDateBase = {
+					this.cronDatabase = {
 						Rid: d.Rid,
 						Type: 0,
 					};
@@ -519,7 +519,7 @@
 			// 采集任务设置保存
 			cronDataSubmit() {
 				this.cronButtonDisabled = true;
-				aPost('/DatabaseCreate', this.cronDateBase).then(r => {
+				aPost('/DatabaseCreate', this.cronDatabase).then(r => {
 					this.cronData.IntervalHour = Number(this.cronData.IntervalHour);
 					aPost('/RuleUpdateCron', this.cronData).then(r => {
 						this.$message.success(r.message);

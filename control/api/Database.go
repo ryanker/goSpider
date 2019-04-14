@@ -30,7 +30,7 @@ func DatabaseCreate(c *gin.Context) {
 		c.Message("-1", "读取规则失败: "+err.Error())
 		return
 	}
-	if row.DateBase == "" || strings.ToLower(row.DateBase) == "data" {
+	if row.Database == "" || strings.ToLower(row.Database) == "data" {
 		c.Message("-1", "数据库名称错误")
 		return
 	}
@@ -43,7 +43,7 @@ func DatabaseCreate(c *gin.Context) {
 	}
 
 	// 3、创建数据表
-	err = createDatabase(m.Type, row.DateBase, s)
+	err = createDatabase(m.Type, row.Database, s)
 	if err != nil {
 		c.Message("-1", "创建数据库失败: "+err.Error())
 		return
@@ -133,8 +133,8 @@ CREATE TABLE ContentDownload
 }
 
 // 创建数据库
-func createDatabase(Type int64, DateBase string, s string) error {
-	dbFile := "./db/" + DateBase + ".db"
+func createDatabase(Type int64, Database string, s string) error {
+	dbFile := "./db/" + Database + ".db"
 	db, err := dbs.Open(dbFile)
 	if err != nil {
 		return err

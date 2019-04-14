@@ -140,7 +140,7 @@ func cron() {
 
 		for _, row := range list {
 			// 打开采集入库数据库
-			dbFile := "./db/" + row.DateBase + ".db"
+			dbFile := "./db/" + row.Database + ".db"
 			dbc, err := dbs.Open(dbFile + loc)
 			if err != nil {
 				cronErrorLog(0, "打开采集入库数据库失败: %v", err.Error())
@@ -722,7 +722,7 @@ func downList(dbc *dbs.DB, row *Rule) {
 
 		for _, lv := range list {
 			// 存放目录
-			path := fmt.Sprintf("/upload/%s/list/%s/%03d/%d/", row.DateBase, lv.Field,
+			path := fmt.Sprintf("/upload/%s/list/%s/%03d/%d/", row.Database, lv.Field,
 				int64(math.Floor(float64(lv.Lid/1000))), lv.Lid)
 			dir := "." + path
 			err = os.MkdirAll(dir, os.ModePerm)
@@ -799,7 +799,7 @@ func downContent(dbc *dbs.DB, row *Rule) {
 
 		for _, lv := range list {
 			// 存放目录
-			path := fmt.Sprintf("/upload/%s/content/%s/%03d/%d/", row.DateBase, lv.Field,
+			path := fmt.Sprintf("/upload/%s/content/%s/%03d/%d/", row.Database, lv.Field,
 				int64(math.Floor(float64(lv.Lid/1000))), lv.Lid)
 			dir := "." + path
 			err = os.MkdirAll(dir, os.ModePerm)

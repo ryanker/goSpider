@@ -7,7 +7,7 @@ CREATE TABLE Rule
   Name             VARCHAR(255) NOT NULL DEFAULT '',                -- 规则名称
   Brief            VARCHAR(255) NOT NULL DEFAULT '',                -- 规则备注
 
-  DateBase         VARCHAR(255) NOT NULL DEFAULT '',                -- 数据库名称
+  Database         VARCHAR(255) NOT NULL DEFAULT '',                -- 数据库名称
   Cookie           TEXT                  DEFAULT '',                -- 登录抓取 Cookie
   Charset          VARCHAR(255) NOT NULL DEFAULT '',                -- 抓取网页的编码
   Timeout          INTEGER      NOT NULL DEFAULT '0',               -- 抓取超时时间(秒)
@@ -29,7 +29,7 @@ CREATE TABLE Rule
   IsContentDownRun INTEGER      NOT NULL DEFAULT '0',               -- 是否抓取内容页资源
 
   LastStartDate    DATETIME              DEFAULT CURRENT_TIMESTAMP, -- 上次采集开始时间
-  LastEndData      DATETIME              DEFAULT CURRENT_TIMESTAMP, -- 上次采集结束时间
+  LastEndDate      DATETIME              DEFAULT CURRENT_TIMESTAMP, -- 上次采集结束时间
   NextStartDate    DATETIME              DEFAULT CURRENT_TIMESTAMP, -- 下次采集开始时间
 
   UpdateDate       DATETIME              DEFAULT CURRENT_TIMESTAMP,

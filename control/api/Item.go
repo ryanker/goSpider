@@ -28,7 +28,7 @@ func ItemList(c *gin.Context) {
 	}
 
 	// 打开数据库
-	dbFile := "./db/" + row.DateBase + ".db"
+	dbFile := "./db/" + row.Database + ".db"
 	dbc, err := dbs.Open(dbFile)
 	if err != nil {
 		c.Message("-1", "打开数据库失败: "+err.Error())

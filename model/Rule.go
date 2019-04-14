@@ -14,7 +14,7 @@ type Rule struct {
 	Name  string
 	Brief string
 
-	DateBase string
+	Database string
 	Cookie   string
 	Charset  string
 	Timeout  int64
@@ -36,7 +36,7 @@ type Rule struct {
 	IsContentDownRun int64
 
 	LastStartDate time.Time `time_format:"sql_datetime" time_location:"UTC"`
-	LastEndData   time.Time `time_format:"sql_datetime" time_location:"UTC"`
+	LastEndDate   time.Time `time_format:"sql_datetime" time_location:"UTC"`
 	NextStartDate time.Time `time_format:"sql_datetime" time_location:"UTC"`
 
 	UpdateDate time.Time `time_format:"sql_datetime" time_location:"UTC"`
@@ -51,7 +51,7 @@ func RuleMap() (ptr *Rule, fields string, args *[]interface{}) {
 		"IntervalHour":     &row.IntervalHour,
 		"Name":             &row.Name,
 		"Brief":            &row.Brief,
-		"DateBase":         &row.DateBase,
+		"Database":         &row.Database,
 		"Cookie":           &row.Cookie,
 		"Charset":          &row.Charset,
 		"Timeout":          &row.Timeout,
@@ -69,7 +69,7 @@ func RuleMap() (ptr *Rule, fields string, args *[]interface{}) {
 		"IsContentDownAna": &row.IsContentDownAna,
 		"IsContentDownRun": &row.IsContentDownRun,
 		"LastStartDate":    &row.LastStartDate,
-		"LastEndData":      &row.LastEndData,
+		"LastEndDate":      &row.LastEndDate,
 		"NextStartDate":    &row.NextStartDate,
 		"UpdateDate":       &row.UpdateDate,
 		"CreateDate":       &row.CreateDate,
