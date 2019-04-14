@@ -42,7 +42,7 @@
 
                 <!--时间线-->
                 <el-timeline :reverse="true">
-                    <el-timeline-item v-for="(v, i) in tableData" :key="i" :timestamp="v.CreateDateFmt" placement="top">
+                    <el-timeline-item v-for="(v, i) in tableData" :key="i" :timestamp="v.CreateDate" placement="top">
                         <el-tag v-if="v.Status === 1" type="info">普通日志</el-tag>
                         <el-tag v-else-if="v.Status === 2" type="danger">错误日志</el-tag>
                         <el-tag v-else type="danger">-</el-tag>
@@ -84,7 +84,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.7.2/index.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
 <script src="/static/js/main.js"></script>
 <script>
 	new Vue({
@@ -171,12 +170,6 @@
 			getList() {
 				// this.tableLoading = true;
 				aPost('/LogList', this.q).then(r => {
-					const list = [];
-					r.list && r.list.map(v => {
-						Object.assign(v, {
-							CreateDateFmt: moment(v.CreateDate).subtract(8, 'h').format('YYYY-MM-DD HH:mm:ss'),
-						})
-					});
 					this.tableData = r.list || [];
 					this.tableTotal = r.total || 0;
 					// this.tableLoading = false;

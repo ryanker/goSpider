@@ -55,3 +55,25 @@ body {
 	display: block;
 	width: 100%;
 }
+
+.item-list .el-card__body {
+	text-align: center;
+	padding: 10px 5px;
+}
+
+.item-list .el-card__body .img {
+	height: 250px;
+}
+
+.item-list .el-card__body .img img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+.item-list .el-card__body .info {
+	height: 24px;
+	line-height: 24px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
