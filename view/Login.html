@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>狗狗采集器</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.7.0/theme-chalk/index.css">
+    <link rel="stylesheet" href="/static/css/main.css">
+</head>
+<body>
+<div id="app">
+    <template>
+        <div style="margin: 220px auto;max-width: 520px;padding:0 10px;">
+            <el-form ref="form" :model="form">
+                <el-form-item>
+                    <el-input placeholder="请输入手机" v-model="form.Mobile">
+                        <template slot="prepend">手机</template>
+                    </el-input>
+                </el-form-item>
+
+                <el-form-item>
+                    <el-input placeholder="请输入密码" v-model="form.Password" show-password>
+                        <template slot="prepend">密码</template>
+                    </el-input>
+                </el-form-item>
+
+                <el-form-item>
+                    <el-button type="primary" @click="onSubmit" :disabled="loading" style="width:100%">登录</el-button>
+                </el-form-item>
+            </el-form>
+        </div>
+    </template>
+</div>
+</body>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.7.0/index.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/js-cookie/2.2.0/js.cookie.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/blueimp-md5/2.10.0/js/md5.min.js"></script>
+<script src="/static/js/main.js"></script>
+<script>
+	new Vue({
+		el: '#app',
+		data() {
+			return {
+				loading: false,
+				form: {
+					Mobile: '',
+					Password: '',
+				},
+			}
+		},
+		methods: {
+			// 登录
+			onSubmit() {
+				this.loading = true;
+				aPost('/UserLogin', {
+					Mobile: this.form.Mobile,
+					Password: md5(this.form.Password),
+				}).then(r => {
+					Cookies.set('token', r.token, {expires: 365});
+					setTimeout(function () {
+						window.location = '/';
+					}, 100);
+					this.loading = false;
+				}).catch(error => {
+					this.$message.error(error);
+					this.loading = false;
+				});
+			},
+		}
+	})
+</script>
+</body>
+</html>
