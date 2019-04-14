@@ -5,7 +5,7 @@
     <title>狗狗采集器</title>
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.7.0/theme-chalk/index.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.7.2/theme-chalk/index.css">
     <link rel="stylesheet" href="/static/css/main.css">
 </head>
 <body>
@@ -14,29 +14,43 @@
         <el-container>
             {{template "incHeader.html" .}}
             <el-main>
-                <!--筛选-->
-                <el-radio-group v-model="q.Table" class="mb-1" @change="tableChange">
-                    <el-radio-button label="List">列表</el-radio-button>
-                    <el-radio-button label="Content">内容</el-radio-button>
-                    <el-radio-button label="ListDownload">列表下载</el-radio-button>
-                    <el-radio-button label="ContentDownload">内容下载</el-radio-button>
-                </el-radio-group>
+                <!--类型-->
+                <div class="mb-1">
+                    类型：
+                    <el-radio-group v-model="q.Table" @change="changeTable">
+                        <el-radio label="List">列表</el-radio>
+                        <el-radio label="Content">内容</el-radio>
+                        <el-radio label="ListDownload">列表下载</el-radio>
+                        <el-radio label="ContentDownload">内容下载</el-radio>
+                    </el-radio-group>
+                </div>
+
+                <!--状态-->
+                <div class="mb-1" v-if="q.Table !== 'Content'">
+                    状态：
+                    <el-radio-group v-model="q.Status" @change="changeStatus">
+                        <el-radio :label="0">全部</el-radio>
+                        <el-radio :label="1">待下载</el-radio>
+                        <el-radio :label="2">下载完成</el-radio>
+                        <el-radio :label="3">下载失败</el-radio>
+                    </el-radio-group>
+                </div>
 
                 <!--表格-->
                 <el-table v-loading="tableLoading" :data="tableData" border height="666">
-                    <el-table-column v-for="item in tableColumns" :fixed="item==='Name' ? true : false" :label="item"
-                                     min-width="200">
+                    <el-table-column v-for="f in tableColumns" :label="f" :fixed="fixedInit(f)"
+                                     :min-width="widthInit(f)">
                         <template slot-scope="scope">
-                            <el-input v-model="scope.row[item]"></el-input>
+                            <el-input v-model="scope.row[f]"></el-input>
                         </template>
                     </el-table-column>
                 </el-table>
 
                 <!--分页-->
-                <el-row type="flex" justify="end" style="margin-top:15px">
+                <el-row type="flex" justify="end" class="mt-1">
                     <el-pagination v-if="tableTotal > 0" :current-page="q.Page" :page-size="20" :total="tableTotal"
                                    background layout="total, prev, pager, next, jumper"
-                                   @current-change="tableCurrentChange"/>
+                                   @current-change="changePage"/>
                 </el-row>
             </el-main>
             <el-footer>@2019</el-footer>
@@ -46,7 +60,7 @@
 </body>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.7.0/index.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.7.2/index.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js"></script>
 <script src="/static/js/main.js"></script>
 <script>
@@ -62,7 +76,8 @@
 				q: {
 					Rid: Number('{{.Rid}}'),
 					Table: '{{.Table}}' || 'List',
-					Page: 1
+					Status: 0,
+					Page: 1,
 				},
 			}
 		},
@@ -70,17 +85,53 @@
 			this.getList();
 		},
 		methods: {
-			// 表筛选
-			tableChange(val) {
+			// 表
+			changeTable(val) {
 				this.q.Table = val;
 				this.q.Page = 1;
 				this.getList();
 			},
 
-			// 分页
-			tableCurrentChange(page) {
-				this.q.Page = page;
+			// 状态
+			changeStatus(val) {
+				this.q.Status = val;
+				this.q.Page = 1;
 				this.getList();
+			},
+
+			// 分页
+			changePage(val) {
+				this.q.Page = val;
+				this.getList();
+			},
+
+			// 固定列
+			fixedInit(field) {
+				return field === 'Name';
+			},
+
+			// 列宽度
+			widthInit(f) {
+				let r = 210;
+				if (f === 'Name') {
+					r = 350;
+				} else if (f === 'Lid'
+					|| f === 'Id'
+					|| f === 'Views'
+					|| f === 'Sort'
+					|| f.substr(-3).toLowerCase() === 'num'
+				) {
+					r = 100;
+				} else if (f === 'Status') {
+					r = 80;
+				} else if (f.substr(-3).toLowerCase() === 'url'
+					|| f.substr(0, 3).toLowerCase() === 'url'
+					|| f.substr(-5).toLowerCase() === 'image'
+					|| f.substr(0, 5).toLowerCase() === 'image'
+				) {
+					r = 600;
+				}
+				return r;
 			},
 
 			// 列表

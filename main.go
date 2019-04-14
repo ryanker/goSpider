@@ -53,6 +53,7 @@ func StartGin() {
 	})
 	upload.Static("/upload", "./upload")
 
+	// 模板
 	r.SetFuncMap(template.FuncMap{
 		"htmlTags": func(s string) template.HTML {
 			return template.HTML(s)
@@ -65,7 +66,7 @@ func StartGin() {
 	r.GET("/Logout", front.Logout)
 	r.POST("/UserLogin", api.UserLogin)
 
-	// ========== Front ==========
+	// ========== 前台页面 ==========
 	app := r.Group("/", func(c *gin.Context) {
 		err := api.UserTokenGet(c)
 		if err != nil {
@@ -79,7 +80,7 @@ func StartGin() {
 	app.GET("/Log", front.Log)
 	app.GET("/Sys", front.Sys)
 
-	// ========== Api ==========
+	// ========== 后台接口 ==========
 	admin := r.Group("/", func(c *gin.Context) {
 		err := api.UserTokenGet(c)
 		if err != nil {
