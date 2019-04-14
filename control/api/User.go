@@ -97,6 +97,13 @@ func UserTokenGet(c *gin.Context) error {
 	return nil
 }
 
+func UserGet(c *gin.Context) (u model.User) {
+	if val, ok := c.Get("User"); ok && val != nil {
+		u, _ = val.(model.User)
+	}
+	return
+}
+
 func UserCreate(c *gin.Context) {
 	m := model.User{}
 	err := c.ShouldBind(&m)

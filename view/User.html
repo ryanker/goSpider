@@ -82,7 +82,8 @@
                 </el-row>
 
                 <!--编辑用户-->
-                <el-dialog :visible.sync="formDialog" :title="formTitle" :fullscreen="isMobile" width="60%" top="5vh">
+                <el-dialog :visible.sync="formDialog" :title="formTitle" :fullscreen="isMobile"
+                           :close-on-click-modal="false" width="60%" center>
                     <el-form ref="formData" :model="formData" :rules="formRules" label-width="130px" style="width:95%">
                         <el-form-item label="用户名" prop="Name">
                             <el-input v-model="formData.Name" width="80%" placeholder="如：张三"/>
@@ -94,7 +95,7 @@
                             <el-input v-model="formData.Email" width="80%" placeholder="如：zhangsan@qq.com"/>
                         </el-form-item>
                         <el-form-item label="密码" prop="Password">
-                            <el-input v-model="formData.Password" width="80%" placeholder=""/>
+                            <el-input v-model="formData.Password" width="80%" placeholder="" show-password/>
                         </el-form-item>
                         <el-form-item label="用户组">
                             <el-select v-model="formData.Gid" placeholder="请选择用户组">
