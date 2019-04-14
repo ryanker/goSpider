@@ -47,6 +47,8 @@ var logSql = `CREATE TABLE Log
   CreateDate DATETIME                DEFAULT CURRENT_TIMESTAMP
 );`
 
+var loc = "?_loc=Asia%2FShanghai"
+
 func init() {
 	dbs.LogFile = "./log/db.log"
 	dbs.ErrorLogFile = "./log/db.error.log"
@@ -59,8 +61,8 @@ func init() {
 
 // 打开主库
 func InitDB() {
-	dbFile := "./db/data.db?_loc=Asia%2FShanghai"
-	db, err = dbs.Open(dbFile)
+	dbFile := "./db/data.db"
+	db, err = dbs.Open(dbFile + loc)
 	if err != nil {
 		panic(err)
 	}
@@ -81,8 +83,8 @@ func InitDB() {
 
 // 打开日志库
 func InitDbLog() {
-	dbFile := "./db/log.db?_loc=Asia%2FShanghai"
-	dbLog, err = dbs.Open(dbFile)
+	dbFile := "./db/log.db"
+	dbLog, err = dbs.Open(dbFile + loc)
 	if err != nil {
 		panic(err)
 	}
@@ -138,8 +140,8 @@ func cron() {
 
 		for _, row := range list {
 			// 打开采集入库数据库
-			dbFile := "./db/" + row.DateBase + ".db?_loc=Asia%2FShanghai"
-			dbc, err := dbs.Open(dbFile)
+			dbFile := "./db/" + row.DateBase + ".db"
+			dbc, err := dbs.Open(dbFile + loc)
 			if err != nil {
 				cronErrorLog(0, "打开采集入库数据库失败: %v", err.Error())
 				continue
