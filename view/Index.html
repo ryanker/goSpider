@@ -68,7 +68,9 @@
                                            @click="exportDialog(scope.row)"/>
                             </el-tooltip>
                             <a :href="'/Item?Rid='+scope.row.Rid" target="_blank" style="margin-left:10px">
-                                <el-button size="small" circle icon="el-icon-search"/>
+                                <el-tooltip effect="dark" content="查看数据" placement="top">
+                                    <el-button size="small" circle icon="el-icon-tickets"/>
+                                </el-tooltip>
                             </a>
                         </template>
                     </el-table-column>
