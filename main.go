@@ -40,7 +40,19 @@ func StartGin() {
 
 	r := gin.Default()
 	r.Static("/static", "./static")
-	r.Static("/upload", "./upload")
+
+	// 附件目录，登录后才能查看
+	upload := r.Group("/", func(c *gin.Context) {
+		err := api.UserTokenGet(c)
+		if err != nil {
+			// c.Writer.Header().Add("Author", "goSpider 1.0")
+			c.String(http.StatusNotFound, "404 page not found")
+			c.Abort()
+			return
+		}
+	})
+	upload.Static("/upload", "./upload")
+
 	r.SetFuncMap(template.FuncMap{
 		"htmlTags": func(s string) template.HTML {
 			return template.HTML(s)
@@ -60,7 +72,6 @@ func StartGin() {
 			c.Redirect(http.StatusFound, "/Login")
 			return
 		}
-		c.Next()
 	})
 	app.GET("/", front.Index)
 	app.GET("/Item", front.Item)
@@ -75,7 +86,6 @@ func StartGin() {
 			c.Message("-1", err.Error())
 			return
 		}
-		c.Next()
 	})
 
 	// User
