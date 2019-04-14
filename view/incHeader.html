@@ -1,0 +1,21 @@
+{{define "incHeader.html"}}
+    <div class="header">
+        <div class="logo">
+            <a href="/">狗狗采集器</a>
+        </div>
+        <div style="float:right">
+            <el-dropdown>
+                <span class="el-dropdown-link">
+                    dog <i class="el-icon-arrow-down el-icon--right"></i>
+                </span>
+                <el-dropdown-menu slot="dropdown">
+                    <el-dropdown-item><a href="/">采集规则</a></el-dropdown-item>
+                    <el-dropdown-item><a href="/Log">采集日志</a></el-dropdown-item>
+                    <el-dropdown-item><a href="/User">用户管理</a></el-dropdown-item>
+                    <el-dropdown-item><a href="/Sys">系统信息</a></el-dropdown-item>
+                    <el-dropdown-item divided><a href="/Logout">退出</a></el-dropdown-item>
+                </el-dropdown-menu>
+            </el-dropdown>
+        </div>
+    </div>
+{{end}}

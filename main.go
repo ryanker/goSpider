@@ -38,7 +38,6 @@ func StartGin() {
 	gin.DefaultErrorWriter = io.MultiWriter(webErrorLog, os.Stdout)
 
 	app := gin.Default()
-	app.Delims("${", "}")
 	app.Static("/static", "./static")
 	app.Static("/upload", "./upload")
 	app.SetFuncMap(template.FuncMap{
@@ -59,6 +58,7 @@ func StartGin() {
 	app.GET("/Log", front.Log)
 	app.GET("/Sys", front.Sys)
 	app.GET("/Login", front.Login)
+	app.GET("/Logout", front.Logout)
 
 	// ========== Api ==========
 	// User

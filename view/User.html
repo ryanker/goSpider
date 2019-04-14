@@ -12,14 +12,7 @@
 <div id="app">
     <template>
         <el-container>
-            <el-header>
-                <el-menu :default-active="4" mode="horizontal">
-                    <el-menu-item :index="1"><a href="/">采集规则</a></el-menu-item>
-                    <el-menu-item :index="2"><a href="/Log">采集日志</a></el-menu-item>
-                    <el-menu-item :index="3"><a href="/Sys">系统信息</a></el-menu-item>
-                    <el-menu-item :index="4"><a href="/User">用户管理</a></el-menu-item>
-                </el-menu>
-            </el-header>
+            {{template "incHeader.html" .}}
             <el-main>
                 <el-row>
                     <el-button type="primary" @click="dialogCreate" class="mb-1">添加用户</el-button>
@@ -41,9 +34,9 @@
                     <el-table-column label="UID" prop="Uid" width="60" align="center"></el-table-column>
                     <el-table-column label="用户信息" min-width="300">
                         <template slot-scope="scope">
-                            用户：{{ scope.row.Name }}<br>
-                            手机：{{ scope.row.Mobile }}<br>
-                            邮箱：{{ scope.row.Email }}<br>
+                            用户：{[ scope.row.Name ]}<br>
+                            手机：{[ scope.row.Mobile ]}<br>
+                            邮箱：{[ scope.row.Email ]}<br>
                         </template>
                     </el-table-column>
                     <el-table-column label="用户组" width="100" align="center">
@@ -55,16 +48,16 @@
                     </el-table-column>
                     <el-table-column label="登录信息" width="250">
                         <template slot-scope="scope">
-                            登录次数：{{ scope.row.LoginNum }}<br>
-                            最后登录：{{ scope.row.LastDate }}<br>
-                            最后登录IP：{{ scope.row.LastIP }}<br>
+                            登录次数：{[ scope.row.LoginNum ]}<br>
+                            最后登录：{[ scope.row.LastDate ]}<br>
+                            最后登录IP：{[ scope.row.LastIP ]}<br>
                         </template>
                     </el-table-column>
                     <el-table-column label="创建信息" width="250">
                         <template slot-scope="scope">
-                            修改时间：{{ scope.row.UpdateDate }}<br>
-                            创建时间：{{ scope.row.CreateDate }}<br>
-                            创建时的IP：{{ scope.row.CreateIP }}<br>
+                            修改时间：{[ scope.row.UpdateDate ]}<br>
+                            创建时间：{[ scope.row.CreateDate ]}<br>
+                            创建时的IP：{[ scope.row.CreateIP ]}<br>
                         </template>
                     </el-table-column>
                     <el-table-column label="操作" width="100">
@@ -123,12 +116,12 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.7.0/index.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/js-cookie/2.2.0/js.cookie.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/blueimp-md5/2.10.0/js/md5.min.js"></script>
 <script src="/static/js/main.js"></script>
 <script>
 	new Vue({
 		el: '#app',
+		delimiters: ['{[', ']}'],
 		data() {
 			return {
 				isMobile: document.body.getBoundingClientRect().width < 1024,

@@ -49,9 +49,16 @@ func UserLogin(c *gin.Context) {
 		return
 	}
 
-	c.Message("0", "登录成功", gin.H{
-		"token": model.UserTokenEncode(u.Uid, u.Password, c.ClientIP()),
-	})
+	// 登录 token
+	token := model.UserTokenEncode(u.Uid, u.Password, c.ClientIP())
+	UserSetCookie(c, token, time.Now().Unix()+365*24*60*60)
+
+	c.Message("0", "登录成功", gin.H{"token": token})
+}
+
+// 登录/退出 使用
+func UserSetCookie(c *gin.Context, token string, maxAge int64) {
+	c.SetCookie("token", token, int(maxAge), "/", "", false, true)
 }
 
 func UserCreate(c *gin.Context) {

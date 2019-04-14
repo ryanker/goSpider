@@ -4,6 +4,8 @@ import (
 	"net/http"
 
 	"github.com/xiuno/gin"
+
+	"../api"
 )
 
 func Index(c *gin.Context) {
@@ -30,4 +32,9 @@ func Sys(c *gin.Context) {
 
 func Login(c *gin.Context) {
 	c.HTML(http.StatusOK, "Login.html", gin.H{})
+}
+
+func Logout(c *gin.Context) {
+	api.UserSetCookie(c, "", 1)
+	c.HTML(http.StatusOK, "Logout.html", gin.H{})
 }

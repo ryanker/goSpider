@@ -2,11 +2,6 @@ body {
 	margin: 0;
 }
 
-.el-header {
-	min-height: 60px;
-	padding: 0;
-}
-
 .el-main {
 	min-height: 160px;
 }
@@ -20,16 +15,6 @@ body {
 	line-height: 23px;
 }
 
-.el-menu-item {
-	padding: 0;
-}
-
-.el-menu-item > a {
-	display: block;
-	height: 100%;
-	padding: 0 20px;
-}
-
 .mb-1 {
 	margin-bottom: 20px;
 }
@@ -41,4 +26,24 @@ body {
 .mr-1 {
 	width: 300px;
 	margin-right: 10px
+}
+
+.header {
+	border-bottom: solid 1px #e6e6e6;
+	padding: 0 20px;
+	line-height: 60px;
+	height: 60px;
+}
+
+.header a, .el-dropdown-menu a {
+	color: inherit;
+}
+
+.header .logo {
+	float: left;
+}
+
+.el-dropdown-menu a {
+	display: block;
+	width: 100%;
 }
