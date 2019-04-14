@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"html/template"
 	"io"
+	"net/http"
 	"os"
 	"runtime"
 
@@ -37,74 +38,93 @@ func StartGin() {
 	}
 	gin.DefaultErrorWriter = io.MultiWriter(webErrorLog, os.Stdout)
 
-	app := gin.Default()
-	app.Static("/static", "./static")
-	app.Static("/upload", "./upload")
-	app.SetFuncMap(template.FuncMap{
+	r := gin.Default()
+	r.Static("/static", "./static")
+	r.Static("/upload", "./upload")
+	r.SetFuncMap(template.FuncMap{
 		"htmlTags": func(s string) template.HTML {
 			return template.HTML(s)
 		},
 	})
-	app.LoadHTMLGlob("./view/*")
+	r.LoadHTMLGlob("./view/*")
 
-	// 内存信息 && 磁盘信息
-	app.GET("/MemStatsInfo", api.MemStatsInfo)
-	app.GET("/DiskInfo", api.DiskInfo)
+	// ========== 不用登录 ==========
+	r.GET("/Login", front.Login)
+	r.GET("/Logout", front.Logout)
+	r.POST("/UserLogin", api.UserLogin)
 
 	// ========== Front ==========
+	app := r.Group("/", func(c *gin.Context) {
+		err := api.UserTokenGet(c)
+		if err != nil {
+			c.Redirect(http.StatusFound, "/Login")
+			return
+		}
+		c.Next()
+	})
 	app.GET("/", front.Index)
 	app.GET("/Item", front.Item)
 	app.GET("/User", front.User)
 	app.GET("/Log", front.Log)
 	app.GET("/Sys", front.Sys)
-	app.GET("/Login", front.Login)
-	app.GET("/Logout", front.Logout)
 
 	// ========== Api ==========
+	admin := r.Group("/", func(c *gin.Context) {
+		err := api.UserTokenGet(c)
+		if err != nil {
+			c.Message("-1", err.Error())
+			return
+		}
+		c.Next()
+	})
+
 	// User
-	app.POST("/UserLogin", api.UserLogin)
-	app.POST("/UserCreate", api.UserCreate)
-	app.POST("/UserUpdate", api.UserUpdate)
-	app.POST("/UserRead", api.UserRead)
-	app.POST("/UserDelete", api.UserDelete)
-	app.POST("/UserList", api.UserList)
+	admin.POST("/UserCreate", api.UserCreate)
+	admin.POST("/UserUpdate", api.UserUpdate)
+	admin.POST("/UserRead", api.UserRead)
+	admin.POST("/UserDelete", api.UserDelete)
+	admin.POST("/UserList", api.UserList)
 
 	// Rule
-	app.POST("/RuleCreate", api.RuleCreate)
-	app.POST("/RuleUpdate", api.RuleUpdate)
-	app.POST("/RuleUpdateCron", api.RuleUpdateCron)
-	app.POST("/RuleRead", api.RuleRead)
-	app.POST("/RuleDelete", api.RuleDelete)
-	app.POST("/RuleList", api.RuleList)
-	app.POST("/RuleExport", api.RuleExport)
-	app.POST("/RuleImport", api.RuleImport)
+	admin.POST("/RuleCreate", api.RuleCreate)
+	admin.POST("/RuleUpdate", api.RuleUpdate)
+	admin.POST("/RuleUpdateCron", api.RuleUpdateCron)
+	admin.POST("/RuleRead", api.RuleRead)
+	admin.POST("/RuleDelete", api.RuleDelete)
+	admin.POST("/RuleList", api.RuleList)
+	admin.POST("/RuleExport", api.RuleExport)
+	admin.POST("/RuleImport", api.RuleImport)
 
 	// RuleParam
-	app.POST("/RuleParamCreate", api.RuleParamCreate)
-	app.POST("/RuleParamUpdate", api.RuleParamUpdate)
-	app.POST("/RuleParamRead", api.RuleParamRead)
-	app.POST("/RuleParamDelete", api.RuleParamDelete)
-	app.POST("/RuleParamList", api.RuleParamList)
+	admin.POST("/RuleParamCreate", api.RuleParamCreate)
+	admin.POST("/RuleParamUpdate", api.RuleParamUpdate)
+	admin.POST("/RuleParamRead", api.RuleParamRead)
+	admin.POST("/RuleParamDelete", api.RuleParamDelete)
+	admin.POST("/RuleParamList", api.RuleParamList)
 
 	// HttpGet
-	app.POST("/HttpGetPage", api.HttpGetPage)
-	app.POST("/HttpGetList", api.HttpGetList)
-	app.POST("/HttpGetListRule", api.HttpGetListRule)
-	app.POST("/HttpGetContentRule", api.HttpGetContentRule)
-	app.POST("/HttpGetListRuleDown", api.HttpGetListRuleDown)
-	app.POST("/HttpGetContentRuleDown", api.HttpGetContentRuleDown)
+	admin.POST("/HttpGetPage", api.HttpGetPage)
+	admin.POST("/HttpGetList", api.HttpGetList)
+	admin.POST("/HttpGetListRule", api.HttpGetListRule)
+	admin.POST("/HttpGetContentRule", api.HttpGetContentRule)
+	admin.POST("/HttpGetListRuleDown", api.HttpGetListRuleDown)
+	admin.POST("/HttpGetContentRuleDown", api.HttpGetContentRuleDown)
 
 	// Database
-	app.POST("/DatabaseCreate", api.DatabaseCreate)
+	admin.POST("/DatabaseCreate", api.DatabaseCreate)
 
 	// Item
-	app.POST("/ItemList", api.ItemList)
+	admin.POST("/ItemList", api.ItemList)
 
 	// Log
-	app.POST("/LogList", api.LogList)
-	app.POST("/LogDeleteDB", api.LogDeleteDB)
+	admin.POST("/LogList", api.LogList)
+	admin.POST("/LogDeleteDB", api.LogDeleteDB)
 
-	err = app.Run("0.0.0.0:3333")
+	// 内存信息 && 磁盘信息
+	admin.GET("/MemStatsInfo", api.MemStatsInfo)
+	admin.GET("/DiskInfo", api.DiskInfo)
+
+	err = r.Run("0.0.0.0:3333")
 	if err != nil {
 		panic(err)
 	}

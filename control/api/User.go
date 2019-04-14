@@ -2,6 +2,7 @@ package api
 
 import (
 	"database/sql"
+	"errors"
 	"math/rand"
 	"strconv"
 	"time"
@@ -50,7 +51,7 @@ func UserLogin(c *gin.Context) {
 	}
 
 	// 登录 token
-	token := model.UserTokenEncode(u.Uid, u.Password, c.ClientIP())
+	token := model.UserTokenEncode(u.Uid, misc.Md5(u.Password), c.ClientIP())
 	UserSetCookie(c, token, time.Now().Unix()+365*24*60*60)
 
 	c.Message("0", "登录成功", gin.H{"token": token})
@@ -59,6 +60,41 @@ func UserLogin(c *gin.Context) {
 // 登录/退出 使用
 func UserSetCookie(c *gin.Context, token string, maxAge int64) {
 	c.SetCookie("token", token, int(maxAge), "/", "", false, true)
+}
+
+// 支持 Post、Cookie 和 Header
+func UserTokenGet(c *gin.Context) error {
+	token := c.PostForm("token")
+	if token == "" {
+		token, _ = c.Cookie("token")
+		if token == "" {
+			token = c.Request.Header.Get("token")
+		}
+	}
+
+	Token, err := model.UserTokenDecode(token)
+	if err != nil {
+		return err
+	}
+
+	// 判断是否登录
+	if Token.Uid < 1 {
+		return errors.New("无权限访问，请登录后再试")
+	}
+
+	// 读取用户
+	User, err := model.UserRead(Token.Uid)
+	if err != nil {
+		return err
+	}
+
+	// 验证密码是否被修改
+	if misc.Md5(User.Password) != Token.Password {
+		return errors.New("密码已经被修改，请重新登录")
+	}
+
+	c.Set("User", User)
+	return nil
 }
 
 func UserCreate(c *gin.Context) {
