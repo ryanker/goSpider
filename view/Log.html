@@ -174,7 +174,7 @@
 					const list = [];
 					r.list && r.list.map(v => {
 						Object.assign(v, {
-							CreateDateFmt: moment(v.CreateDate).format('YYYY-MM-DD HH:mm:ss'),
+							CreateDateFmt: moment(v.CreateDate).subtract(8, 'h').format('YYYY-MM-DD HH:mm:ss'),
 						})
 					});
 					this.tableData = r.list || [];
