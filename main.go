@@ -121,8 +121,8 @@ func StartGin() {
 	admin.POST("/LogDeleteDB", api.LogDeleteDB)
 
 	// 内存信息 && 磁盘信息
-	admin.GET("/MemStatsInfo", api.MemStatsInfo)
-	admin.GET("/DiskInfo", api.DiskInfo)
+	admin.POST("/MemStatsInfo", api.MemStatsInfo)
+	admin.POST("/DiskInfo", api.DiskInfo)
 
 	err = r.Run("0.0.0.0:3333")
 	if err != nil {

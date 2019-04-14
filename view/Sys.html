@@ -159,15 +159,15 @@
 		methods: {
 			// 内存信息
 			MemStatsInfo() {
-				axios.get('/MemStatsInfo').then(res => {
-					this.m = res.data.data || {};
-				})
+				aPost('/MemStatsInfo').then(r => {
+					this.m = r.data || {};
+				});
 			},
 			// 磁盘信息
 			DiskInfo() {
-				axios.get('/DiskInfo').then(res => {
-					this.disk = res.data.data || {};
-				})
+				aPost('/DiskInfo').then(r => {
+					this.disk = r.data || {};
+				});
 			},
 		}
 	})

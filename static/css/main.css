@@ -15,6 +15,14 @@ body {
 	line-height: 23px;
 }
 
+.mt-1 {
+	margin-top: 20px;
+}
+
+.mt-2 {
+	margin-top: 40px;
+}
+
 .mb-1 {
 	margin-bottom: 20px;
 }
