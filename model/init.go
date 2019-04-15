@@ -745,6 +745,13 @@ func downList(dbc *dbs.DB, row *Rule) {
 			if err != nil {
 				errorNum++
 				cronErrorLog(time.Since(t2), "下载文件失败: %v, 大小: %v, File: %v, Url: %v", err.Error(), FileSize, dir+filename, lv.OldUrl)
+
+				// 更新状态为下载失败
+				_, err = dbc.Update("ListDownload", dbs.H{"Status": 3}, dbs.H{"Id": lv.Id})
+				if err != nil {
+					errorNum++
+					cronErrorLog(0, "更新数据库失败: %v", err.Error())
+				}
 				continue
 			}
 			cronLog(time.Since(t2), "下载文件完成, 大小: %v, File: %v, Url: %v", FileSize, dir+filename, lv.OldUrl)
@@ -822,6 +829,13 @@ func downContent(dbc *dbs.DB, row *Rule) {
 			if err != nil {
 				errorNum++
 				cronErrorLog(time.Since(t2), "下载文件失败: %v, 大小: %v, File: %v, Url: %v", err.Error(), FileSize, dir+filename, lv.OldUrl)
+
+				// 更新状态为下载失败
+				_, err = dbc.Update("ContentDownload", dbs.H{"Status": 3}, dbs.H{"Id": lv.Id})
+				if err != nil {
+					errorNum++
+					cronErrorLog(0, "更新数据库失败: %v", err.Error())
+				}
 				continue
 			}
 			cronLog(time.Since(t2), "下载文件完成, 大小: %v, File: %v, Url: %v", FileSize, dir+filename, lv.OldUrl)
