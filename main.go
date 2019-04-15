@@ -75,10 +75,11 @@ func StartGin() {
 		}
 	})
 	app.GET("/", front.Index)
-	app.GET("/Item", front.Item)
-	app.GET("/User", front.User)
 	app.GET("/Log", front.Log)
+	app.GET("/User", front.User)
 	app.GET("/Sys", front.Sys)
+	app.GET("/Item", front.Item)
+	app.GET("/Show", front.Show)
 
 	// ========== 后台接口 ==========
 	admin := r.Group("/", func(c *gin.Context) {
@@ -126,6 +127,9 @@ func StartGin() {
 
 	// Item
 	admin.POST("/ItemList", api.ItemList)
+
+	// Show
+	admin.POST("/ShowList", api.ShowList)
 
 	// Log
 	admin.POST("/LogList", api.LogList)
