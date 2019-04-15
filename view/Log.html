@@ -40,6 +40,13 @@
                     </el-radio-group>
                 </div>
 
+                <!--分页-->
+                <el-row type="flex" justify="end">
+                    <el-pagination v-if="tableTotal > 0" :current-page="q.Page" :page-size="20" :total="tableTotal"
+                                   background layout="total, prev, pager, next, jumper"
+                                   @current-change="tableCurrentChange"/>
+                </el-row>
+
                 <!--时间线-->
                 <el-timeline :reverse="true">
                     <el-timeline-item v-for="(v, i) in tableData" :key="i" :timestamp="v.CreateDate" placement="top">
