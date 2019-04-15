@@ -50,11 +50,10 @@
 
                 <el-row class="item-list mt-1">
                     <el-col :lg="4" :sm="6" :xs="24" v-for="v in listData">
-                        <el-card shadow="always" :title="v.Name">
-                            <div class="img"><img :title="v.Image"
-                                                  src="https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=1791956069,2618293542&fm=27&gp=0.jpg"/>
-                            </div>
-                            <div class="info">{[v.Name]}</div>
+                        <el-card>
+                            <el-card>
+                                <div class="img"><img :src="v.Status === 2 ? v.NewUrl : v.OldUrl"/></div>
+                            </el-card>
                         </el-card>
                     </el-col>
                 </el-row>
