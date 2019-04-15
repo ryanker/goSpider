@@ -19,6 +19,28 @@ func RuleCreate(c *gin.Context) {
 		return
 	}
 
+	if m.Name == "" {
+		c.Message("-1", "采集规则名称不能为空")
+		return
+	}
+	if m.Database == "" {
+		c.Message("-1", "数据库名称不能为空")
+		return
+	}
+	if m.Database == "data" || m.Database == "log" {
+		c.Message("-1", "数据库名称已经被使用")
+		return
+	}
+	n, err := model.RuleCount(dbs.H{"Database": m.Database})
+	if err != nil {
+		c.Message("-1", err.Error())
+		return
+	}
+	if n > 0 {
+		c.Message("-1", "数据库名称已经被使用")
+		return
+	}
+
 	Rid, err := model.RuleCreate(dbs.H{
 		"Status":           1,
 		"IntervalHour":     1,
@@ -55,6 +77,28 @@ func RuleUpdate(c *gin.Context) {
 	err := c.ShouldBind(&m)
 	if err != nil {
 		c.Message("-1", "参数不正确："+err.Error())
+		return
+	}
+
+	if m.Name == "" {
+		c.Message("-1", "采集规则名称不能为空")
+		return
+	}
+	if m.Database == "" {
+		c.Message("-1", "数据库名称不能为空")
+		return
+	}
+	if m.Database == "data" || m.Database == "log" {
+		c.Message("-1", "数据库名称已经被使用")
+		return
+	}
+	n, err := model.RuleCount(dbs.H{"Database": m.Database})
+	if err != nil {
+		c.Message("-1", err.Error())
+		return
+	}
+	if n > 0 {
+		c.Message("-1", "数据库名称已经被使用")
 		return
 	}
 
