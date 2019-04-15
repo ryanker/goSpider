@@ -17,22 +17,22 @@
                 <!--类型-->
                 <div class="mb-1">
                     类型：
-                    <el-radio-group v-model="q.Table" @change="changeTable">
-                        <el-radio label="List">列表页</el-radio>
-                        <el-radio label="Content">内容页</el-radio>
-                        <el-radio label="ListDownload">列表下载</el-radio>
-                        <el-radio label="ContentDownload">内容下载</el-radio>
+                    <el-radio-group v-model="q.Table" @change="changeTable" size="medium">
+                        <el-radio-button label="List">列表页</el-radio-button>
+                        <el-radio-button label="Content">内容页</el-radio-button>
+                        <el-radio-button label="ListDownload">内容页下载</el-radio-button>
+                        <el-radio-button label="ContentDownload">内容页下载</el-radio-button>
                     </el-radio-group>
                 </div>
 
                 <!--状态-->
                 <div class="mb-1" v-if="q.Table !== 'Content'">
                     状态：
-                    <el-radio-group v-model="q.Status" @change="changeStatus">
-                        <el-radio :label="0">全部</el-radio>
-                        <el-radio :label="1">待下载</el-radio>
-                        <el-radio :label="2">下载完成</el-radio>
-                        <el-radio :label="3">下载失败</el-radio>
+                    <el-radio-group v-model="q.Status" @change="changeStatus" size="medium">
+                        <el-radio-button :label="0">全部</el-radio-button>
+                        <el-radio-button :label="1">待下载</el-radio-button>
+                        <el-radio-button :label="2">下载完成</el-radio-button>
+                        <el-radio-button :label="3">下载失败</el-radio-button>
                     </el-radio-group>
                 </div>
 
