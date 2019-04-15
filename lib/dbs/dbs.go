@@ -187,7 +187,7 @@ func (db *DB) Find(table, fields string, scanArr []interface{}, where H, order s
 	return
 }
 
-func (db *DB) FindMap(table string, where H, order string, page, pageSize int64) (list []map[string]interface{}, columns []string, err error) {
+func (db *DB) FindMap(table, fields string, where H, order string, page, pageSize int64) (list []map[string]interface{}, columns []string, err error) {
 	whereStr, args := GetSqlWhere(where)
 	orderStr := ""
 	limitStr := ""
@@ -201,7 +201,7 @@ func (db *DB) FindMap(table string, where H, order string, page, pageSize int64)
 		start := (page - 1) * pageSize
 		limitStr = " LIMIT " + strconv.FormatInt(start, 10) + "," + strconv.FormatInt(pageSize, 10)
 	}
-	s := "SELECT * FROM `" + table + "`" + whereStr + orderStr + limitStr
+	s := "SELECT " + fields + " FROM `" + table + "`" + whereStr + orderStr + limitStr
 	LogWrite(s, args...)
 
 	var rows *sql.Rows

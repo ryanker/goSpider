@@ -125,7 +125,7 @@ CREATE TABLE user
 	fmt.Println("Json:", string(b))
 
 	// 读取多条(到 Map)
-	listMap, columns, err := db.FindMap("user", dbs.H{}, "", 1, 20)
+	listMap, columns, err := db.FindMap("user", "*", dbs.H{}, "", 1, 20)
 	if err != nil {
 		panic(err)
 	}
