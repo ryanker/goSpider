@@ -34,8 +34,7 @@
                 <!--分页-->
                 <el-row v-if="pageType === 2 && listTotal > 0" type="flex" justify="end" class="mt-1">
                     <el-pagination :current-page="q.Page" :page-size="q.PageSize" :total="listTotal"
-                                   background layout="total, prev, pager, next, jumper"
-                                   @current-change="changePage"/>
+                                   background :layout="pageLayout" @current-change="changePage"/>
                 </el-row>
 
                 <el-row class="item-list mt-1">
@@ -52,8 +51,7 @@
                 <!--分页-->
                 <el-row v-if="pageType === 2 && listTotal > 0" type="flex" justify="end" class="mt-1">
                     <el-pagination :current-page="q.Page" :page-size="q.PageSize" :total="listTotal"
-                                   background layout="total, prev, pager, next, jumper"
-                                   @current-change="changePage"/>
+                                   background :layout="pageLayout" @current-change="changePage"/>
                 </el-row>
 
                 <!--加载更多-->
@@ -77,11 +75,13 @@
 		delimiters: ['{[', ']}'],
 		data() {
 			return {
+				isMobile: document.body.getBoundingClientRect().width < 1024,
 				listTotal: 0,
 				listData: [],
 				listColumns: [],
 				pageType: 1,
 				pageSize: 120,
+				pageLayout: 'total, prev, pager, next, jumper',
 				q: {
 					Rid: Number('{{.Rid}}'),
 					Status: 0,
@@ -91,6 +91,9 @@
 			}
 		},
 		mounted() {
+			if (this.isMobile) {
+				this.pageLayout = 'total, prev, next, jumper';
+			}
 			this.getList();
 		},
 		methods: {
