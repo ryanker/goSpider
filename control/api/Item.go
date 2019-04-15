@@ -20,6 +20,12 @@ func ItemList(c *gin.Context) {
 		return
 	}
 
+	// 验证表名称
+	if m.Table != "List" && m.Table != "Content" && m.Table != "ListDownload" && m.Table != "ContentDownload" {
+		c.Message("-1", "Table value is error")
+		return
+	}
+
 	// 读取规则
 	row, err := model.RuleRead(m.Rid)
 	if err != nil {
@@ -47,8 +53,16 @@ func ItemList(c *gin.Context) {
 		return
 	}
 
+	// 排序
+	order := ""
+	if m.Table == "List" || m.Table == "Content" {
+		order = "Lid DESC"
+	} else if m.Table == "ListDownload" || m.Table == "ContentDownload" {
+		order = "Id DESC"
+	}
+
 	// 列表
-	list, columns, err := dbc.FindMap(m.Table, h, "", m.Page, 20)
+	list, columns, err := dbc.FindMap(m.Table, h, order, m.Page, 20)
 	if err != nil {
 		c.Message("-1", "读取表失败: "+err.Error())
 		return
