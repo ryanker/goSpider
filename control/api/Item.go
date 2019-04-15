@@ -62,7 +62,7 @@ func ItemList(c *gin.Context) {
 	}
 
 	// 列表
-	list, columns, err := dbc.FindMap(m.Table, h, order, m.Page, 20)
+	list, columns, err := dbc.FindMap(m.Table, "*", h, order, m.Page, 20)
 	if err != nil {
 		c.Message("-1", "读取表失败: "+err.Error())
 		return

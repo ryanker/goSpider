@@ -18,8 +18,8 @@
                 <div class="mb-1">
                     类型：
                     <el-radio-group v-model="q.Table" @change="changeTable">
-                        <el-radio label="List">列表</el-radio>
-                        <el-radio label="Content">内容</el-radio>
+                        <el-radio label="List">列表页</el-radio>
+                        <el-radio label="Content">内容页</el-radio>
                         <el-radio label="ListDownload">列表下载</el-radio>
                         <el-radio label="ContentDownload">内容下载</el-radio>
                     </el-radio-group>
@@ -119,9 +119,10 @@
 					|| f === 'Id'
 					|| f === 'Views'
 					|| f === 'Sort'
-					|| f.substr(-3).toLowerCase() === 'num'
 				) {
 					r = 100;
+				} else if (f.substr(-3).toLowerCase() === 'num') {
+					r = 150;
 				} else if (f === 'Status') {
 					r = 80;
 				} else if (f.substr(-3).toLowerCase() === 'url'
