@@ -77,3 +77,8 @@ body {
 	text-overflow: ellipsis;
 	white-space: nowrap;
 }
+
+.more {
+	display: block;
+	margin: 0 auto;
+}

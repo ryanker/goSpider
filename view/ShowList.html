@@ -56,7 +56,7 @@
 
                 <!--加载更多-->
                 <div v-if="pageType === 1 && q.Page < Math.ceil(listTotal/q.PageSize)" class="mt-1">
-                    <el-button type="primary" style="display:block;margin:0 auto" @click="onMore">加载更多</el-button>
+                    <el-button type="primary" class="more" :disabled="moreDisabled" @click="onMore">加载更多</el-button>
                 </div>
             </el-main>
             <el-footer>@2019</el-footer>
@@ -88,6 +88,7 @@
 					PageSize: 120,
 					Page: 1,
 				},
+				moreDisabled: false,
 			}
 		},
 		mounted() {
@@ -124,6 +125,7 @@
 
 			// 列表
 			getList() {
+				this.moreDisabled = true;
 				aPost('/ShowList', this.q).then(r => {
 					this.listTotal = r.total || 0;
 					// this.listColumns = r.columns || [];
@@ -134,8 +136,10 @@
 					} else {
 						this.listData = r.list || [];
 					}
+					this.moreDisabled = false;
 				}).catch(error => {
 					this.$message.error(error);
+					this.moreDisabled = false;
 				});
 			},
 		}
