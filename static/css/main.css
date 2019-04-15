@@ -45,10 +45,12 @@ body {
 
 .header a, .el-dropdown-menu a {
 	color: inherit;
+	text-decoration: none;
 }
 
 .header .logo {
 	float: left;
+	text-decoration: none;
 }
 
 .el-dropdown-menu a {
@@ -81,4 +83,15 @@ body {
 .more {
 	display: block;
 	margin: 0 auto;
+}
+
+.menu-list .el-radio-button__inner {
+	padding: 0;
+}
+
+.menu-list .el-radio-button__inner a {
+	display: block;
+	padding: 12px 20px;
+	color: inherit;
+	text-decoration: none;
 }

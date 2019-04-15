@@ -95,11 +95,12 @@
 				pageLayout: 'prev, pager, next, jumper',
 				q: {
 					Rid: Number('{{.Rid}}'),
+					Table: 'ListDownload',
 					Status: 0,
 					PageSize: 120,
 					Page: 1,
 				},
-				menuValue: 1,
+				menuValue: 3,
 				menuList: [
 					{Key: 1, Name: '列表页', Url: '?Rid={{.Rid}}'},
 					{Key: 2, Name: '内容页', Url: '?Rid={{.Rid}}&Table=Content'},
@@ -144,7 +145,7 @@
 			// 列表
 			getList() {
 				this.moreDisabled = true;
-				aPost('/ShowList', this.q).then(r => {
+				aPost('/ShowDownload', this.q).then(r => {
 					this.listTotal = r.total || 0;
 					// this.listColumns = r.columns || [];
 					if (this.pageType === 1) {
