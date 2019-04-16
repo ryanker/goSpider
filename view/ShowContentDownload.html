@@ -76,6 +76,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.7.2/index.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/intense-images/1.0.7/intense.min.js"></script>
 <script src="/static/js/main.js"></script>
 <script>
 	new Vue({
@@ -152,6 +153,10 @@
 						this.listData = r.list || [];
 					}
 					this.moreDisabled = false;
+
+					setTimeout(function () {
+						Intense(document.querySelectorAll('.img img'));
+					}, 1000);
 				}).catch(error => {
 					this.$message.error(error);
 					this.moreDisabled = false;
