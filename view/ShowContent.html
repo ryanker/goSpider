@@ -17,7 +17,7 @@
                 <!--浏览导航-->
                 <div class="menu-list">
                     浏览导航：
-                    <el-radio-group v-model="menuValue">
+                    <el-radio-group v-model="menuValue" size="medium">
                         <el-radio-button v-for="v in menuList" :label="v.Key">
                             <a :href="v.Url">{[v.Name]}</a>
                         </el-radio-button>
@@ -27,7 +27,7 @@
                 <!--翻页方式-->
                 <div class="mt-1">
                     翻页方式：
-                    <el-radio-group v-model="pageType" @change="changePageType">
+                    <el-radio-group v-model="pageType" @change="changePageType" size="medium">
                         <el-radio-button :label="1">单页</el-radio-button>
                         <el-radio-button :label="2">多页</el-radio-button>
                     </el-radio-group>
@@ -99,10 +99,10 @@
 				},
 				menuValue: 2,
 				menuList: [
-					{Key: 1, Name: '列表页', Url: '?Rid={{.Rid}}'},
-					{Key: 2, Name: '内容页', Url: '?Rid={{.Rid}}&Table=Content'},
-					{Key: 3, Name: '列表页下载', Url: '?Rid={{.Rid}}&Table=ListDownload'},
-					{Key: 4, Name: '内容页下载', Url: '?Rid={{.Rid}}&Table=ContentDownload'},
+					{Key: 1, Name: '列表', Url: '?Rid={{.Rid}}'},
+					{Key: 2, Name: '内容', Url: '?Rid={{.Rid}}&Table=Content'},
+					{Key: 3, Name: '列表下载', Url: '?Rid={{.Rid}}&Table=ListDownload'},
+					{Key: 4, Name: '内容下载', Url: '?Rid={{.Rid}}&Table=ContentDownload'},
 				],
 				moreDisabled: false,
 			}
