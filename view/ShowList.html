@@ -33,6 +33,17 @@
                     </el-radio-group>
                 </div>
 
+                <!--状态-->
+                <div class="mt-1">
+                    下载状态：
+                    <el-radio-group v-model="q.Status" @change="changeStatus" size="medium">
+                        <el-radio-button :label="0">全部</el-radio-button>
+                        <el-radio-button :label="1">待下载</el-radio-button>
+                        <el-radio-button :label="2">下载完成</el-radio-button>
+                        <el-radio-button :label="3">下载失败</el-radio-button>
+                    </el-radio-group>
+                </div>
+
                 <!--显示数量-->
                 <div class="mt-1">
                     显示数量：
@@ -64,8 +75,12 @@
                 </el-row>
 
                 <!--加载更多-->
-                <div v-if="pageType === 1 && q.Page < Math.ceil(listTotal/q.PageSize)" class="mt-1">
-                    <el-button type="primary" class="more" :disabled="moreDisabled" @click="onMore">加载更多</el-button>
+                <div v-if="pageType === 1" class="mt-1">
+                    <el-button v-if="q.Page < Math.ceil(listTotal/q.PageSize)" type="primary" class="more"
+                               :disabled="moreDisabled" @click="onMore">
+                        加载更多 ({[q.Page*q.PageSize]}/{[listTotal]})
+                    </el-button>
+                    <el-button v-else type="primary" class="more">加载完毕 (共 {[listTotal]} 条)</el-button>
                 </div>
             </el-main>
             <el-footer>@2019</el-footer>
@@ -120,6 +135,13 @@
 				this.getList();
 			},
 
+			// 状态
+			changeStatus(val) {
+				this.q.Status = val;
+				this.q.Page = 1;
+				this.getList();
+			},
+
 			// 每页数量
 			onPageSize() {
 				this.q.PageSize = Number(this.pageSize);
@@ -146,6 +168,9 @@
 					this.listTotal = r.total || 0;
 					// this.listColumns = r.columns || [];
 					if (this.pageType === 1) {
+						if (this.q.Page === 1) {
+							this.listData = []
+						}
 						r.list && r.list.map(v => {
 							this.listData.push(v)
 						});
