@@ -62,7 +62,7 @@
                 <el-row class="item-list mt-1">
                     <el-col :lg="4" :sm="6" :xs="24" v-for="v in listData">
                         <el-card :title="v.Name">
-                            <div class="img"><img :src="v.Image"/></div>
+                            <div v-if="isDown" class="img"><img :src="v.Image"/></div>
                             <div class="info">{[v.Name]}</div>
                         </el-card>
                     </el-col>
@@ -103,6 +103,7 @@
 				listTotal: 0,
 				listData: [],
 				listColumns: [],
+				isDown: 0,
 				pageType: 1,
 				pageSize: 120,
 				pageLayout: 'prev, pager, next, jumper',
@@ -165,6 +166,7 @@
 			getList() {
 				this.moreDisabled = true;
 				aPost('/ShowList', this.q).then(r => {
+					this.isDown = r.isDown || 0;
 					this.listTotal = r.total || 0;
 					// this.listColumns = r.columns || [];
 					if (this.pageType === 1) {
