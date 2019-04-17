@@ -133,6 +133,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.7.2/index.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
 <script src="/static/js/main.js"></script>
 <script>
 	new Vue({
@@ -161,8 +162,35 @@
 			MemStatsInfo() {
 				aPost('/MemStatsInfo').then(r => {
 					this.m = r.data || {};
+					this.m.Uptime = this.HumanTime(this.m.Uptime)
 				});
 			},
+
+			// 人性化时间显示
+			HumanTime(s) {
+				const t = moment().valueOf() - moment(s).valueOf();
+				const sec = 1000;
+				const min = sec * 60;
+				const hour = min * 60;
+				const day = hour * 24;
+				if (t < min) {
+					return Math.floor(t / sec) + ' 秒';
+				} else if (t < hour) {
+					return Math.floor(t / min) + ' 分 ' + Math.floor(t % min / sec) + ' 秒';
+				} else if (t < 24 * hour) {
+					const h = Math.floor(t / hour);
+					const m = Math.floor((t - h * hour) / min);
+					const s = Math.floor((t - (h * hour) - (m * min)) / sec);
+					return h + ' 小时 ' + m + ' 分 ' + s + ' 秒';
+				} else {
+					const d = Math.floor(t / day);
+					const h = Math.floor((t - (d * day)) / hour);
+					const m = Math.floor((t - (d * day) - (h * hour)) / min);
+					const s = Math.floor((t - (d * day) - (h * hour) - (m * min)) / sec);
+					return d + ' 天 ' + h + ' 小时 ' + m + ' 分 ' + s + ' 秒';
+				}
+			},
+
 			// 磁盘信息
 			DiskInfo() {
 				aPost('/DiskInfo').then(r => {
