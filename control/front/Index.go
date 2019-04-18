@@ -58,3 +58,14 @@ func Show(c *gin.Context) {
 		"Rid":  Rid,
 	})
 }
+
+func Read(c *gin.Context) {
+	User := api.UserGet(c)
+	Rid := c.Query("Rid")
+	Lid := c.Query("Lid")
+	c.HTML(http.StatusOK, "Read.html", gin.H{
+		"User": User,
+		"Rid":  Rid,
+		"Lid":  Lid,
+	})
+}

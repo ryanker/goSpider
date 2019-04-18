@@ -80,6 +80,7 @@ func StartGin() {
 	app.GET("/Sys", front.Sys)
 	app.GET("/Item", front.Item)
 	app.GET("/Show", front.Show)
+	app.GET("/Read", front.Read)
 
 	// ========== 后台接口 ==========
 	admin := r.Group("/", func(c *gin.Context) {
