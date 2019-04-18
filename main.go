@@ -129,6 +129,7 @@ func StartGin() {
 	admin.POST("/ItemList", api.ItemList)
 
 	// Show
+	admin.POST("/ShowRead", api.ShowRead)
 	admin.POST("/ShowList", api.ShowList)
 	admin.POST("/ShowContent", api.ShowContent)
 	admin.POST("/ShowDownload", api.ShowDownload)
