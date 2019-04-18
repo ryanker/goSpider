@@ -112,6 +112,18 @@ CREATE TABLE user
 	u := *data
 	fmt.Printf("Read: %+v\n", u)
 
+	// 读取(到 Map)
+	rowMap, columns, err := db.ReadMap("user", "*", dbs.H{
+		"uid": uid,
+	})
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("row Map:", rowMap)
+	bRowMap, _ := json.Marshal(rowMap)
+	fmt.Println("Json Map:", string(bRowMap))
+	fmt.Println("columns:", columns)
+
 	// 读取多条(到结构体)
 	var list []User
 	err = db.Find("user", fields, *scanArr, dbs.H{}, "", 1, 20, func() {

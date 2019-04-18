@@ -131,6 +131,31 @@ func (db *DB) Read(table string, fields string, scanArr []interface{}, where H) 
 	return
 }
 
+func (db *DB) ReadMap(table string, fields string, where H) (row map[string]interface{}, columns []string, err error) {
+	whereStr, args := GetSqlWhere(where)
+	s := "SELECT " + fields + " FROM `" + table + "`" + whereStr
+	LogWrite(s, args...)
+
+	var rows *sql.Rows
+	rows, err = db.Query(s, args...)
+	if err != nil {
+		ErrorLogWrite(err, s, args...)
+		return
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		m := map[string]interface{}{}
+		columns, err = MapScan(rows, m)
+		if err != nil {
+			ErrorLogWrite(err, s, args...)
+			return
+		}
+		row = m
+	}
+	return
+}
+
 func (db *DB) Count(table string, where H) (n int64, err error) {
 	whereStr, args := GetSqlWhere(where)
 	s := "SELECT COUNT(*) FROM `" + table + "`" + whereStr
