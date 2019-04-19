@@ -436,12 +436,17 @@ func downInitList(dbc *dbs.DB, ParamList *[]RuleParam, row *Rule) {
 						continue
 					}
 
+					// 存放路径
+					NumDir := int64(math.Floor(float64(lv.Lid / 1000)))
+					NewUrl := fmt.Sprintf("/upload/%s/list/%s/%03d/%d%s", row.Database, v.Field, NumDir, lv.Lid, filepath.Ext(lv.Url))
+
 					// 写入数据库
 					_, err = dbc.Insert("ListDownload", dbs.H{
 						"Lid":    lv.Lid,
 						"Status": 1,
 						"Field":  v.Field,
 						"OldUrl": lv.Url,
+						"NewUrl": NewUrl,
 					})
 					if err != nil {
 						errorNum++
@@ -515,12 +520,18 @@ func downInitList(dbc *dbs.DB, ParamList *[]RuleParam, row *Rule) {
 							return
 						}
 
+						// 存放路径
+						NumDir := int64(math.Floor(float64(lv.Lid / 1000)))
+						Sort := i + 1
+						NewUrl := fmt.Sprintf("/upload/%s/list/%s/%03d/%d/%02d%s", row.Database, v.Field, NumDir, lv.Lid, Sort, filepath.Ext(Url))
+
 						// 写入数据库
 						_, err = dbc.Insert("ListDownload", dbs.H{
 							"Lid":    lv.Lid,
 							"Status": 1,
 							"Field":  v.Field,
 							"OldUrl": Url,
+							"NewUrl": NewUrl,
 							"Sort":   i,
 						})
 						if err != nil {
@@ -589,12 +600,17 @@ func downInitContent(dbc *dbs.DB, ParamContent *[]RuleParam, row *Rule) {
 						continue
 					}
 
+					// 存放路径
+					NumDir := int64(math.Floor(float64(lv.Lid / 1000)))
+					NewUrl := fmt.Sprintf("/upload/%s/list/%s/%03d/%d%s", row.Database, v.Field, NumDir, lv.Lid, filepath.Ext(lv.Url))
+
 					// 写入数据库
 					_, err = dbc.Insert("ContentDownload", dbs.H{
 						"Lid":    lv.Lid,
 						"Status": 1,
 						"Field":  v.Field,
 						"OldUrl": lv.Url,
+						"NewUrl": NewUrl,
 					})
 					if err != nil {
 						errorNum++
@@ -668,13 +684,19 @@ func downInitContent(dbc *dbs.DB, ParamContent *[]RuleParam, row *Rule) {
 							return
 						}
 
+						// 存放路径
+						NumDir := int64(math.Floor(float64(lv.Lid / 1000)))
+						Sort := i + 1
+						NewUrl := fmt.Sprintf("/upload/%s/list/%s/%03d/%d/%02d%s", row.Database, v.Field, NumDir, lv.Lid, Sort, filepath.Ext(Url))
+
 						// 写入数据库
 						_, err = dbc.Insert("ContentDownload", dbs.H{
 							"Lid":    lv.Lid,
 							"Status": 1,
 							"Field":  v.Field,
 							"OldUrl": Url,
-							"Sort":   i,
+							"NewUrl": NewUrl,
+							"Sort":   Sort,
 						})
 						if err != nil {
 							errorNum++
