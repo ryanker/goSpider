@@ -144,7 +144,7 @@ func (db *DB) ReadMap(table string, fields string, where H) (row map[string]inte
 	}
 	defer rows.Close()
 
-	for rows.Next() {
+	if rows.Next() {
 		m := map[string]interface{}{}
 		columns, err = MapScan(rows, m)
 		if err != nil {
