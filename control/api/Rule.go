@@ -92,12 +92,12 @@ func RuleUpdate(c *gin.Context) {
 		c.Message("-1", "数据库名称已经被使用")
 		return
 	}
-	n, err := model.RuleCount(dbs.H{"Database": m.Database})
+	row, err := model.RuleReadByDatabase(m.Database)
 	if err != nil {
 		c.Message("-1", err.Error())
 		return
 	}
-	if n > 0 {
+	if row.Rid != m.Rid {
 		c.Message("-1", "数据库名称已经被使用")
 		return
 	}

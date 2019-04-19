@@ -102,6 +102,15 @@ func RuleRead(Rid int64) (row Rule, err error) {
 	return
 }
 
+func RuleReadByDatabase(Database string) (row Rule, err error) {
+	data, fields, scanArr := RuleMap()
+	err = db.Read("Rule", fields, *scanArr, dbs.H{
+		"Database": Database,
+	})
+	row = *data
+	return
+}
+
 func RuleDelete(Rid int64) (err error) {
 	row, err := RuleRead(Rid)
 	if err != nil {
