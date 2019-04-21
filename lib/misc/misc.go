@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"path/filepath"
 	"regexp"
 	"strings"
 	"time"
@@ -96,6 +97,10 @@ func HttpGet(url string) (bodyByte []byte, err error) {
 
 // 下载文件
 func DownloadFile(Url string, DstFile string) (size int64, err error) {
+	err = os.MkdirAll(filepath.Dir(DstFile), os.ModePerm)
+	if err != nil {
+		return
+	}
 	var req *grab.Request
 	var resp *grab.Response
 	for i := 1; i <= 5; i++ {
