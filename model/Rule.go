@@ -1,6 +1,8 @@
 package model
 
 import (
+	"database/sql"
+	"errors"
 	"time"
 
 	"../lib/dbs"
@@ -102,11 +104,17 @@ func RuleRead(Rid int64) (row Rule, err error) {
 	return
 }
 
+var RuleErrNoRows = errors.New("规则不存在")
+
 func RuleReadByDatabase(Database string) (row Rule, err error) {
 	data, fields, scanArr := RuleMap()
 	err = db.Read("Rule", fields, *scanArr, dbs.H{
 		"Database": Database,
 	})
+	if err == sql.ErrNoRows {
+		err = RuleErrNoRows
+		return
+	}
 	row = *data
 	return
 }

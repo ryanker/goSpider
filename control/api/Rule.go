@@ -94,18 +94,19 @@ func RuleUpdate(c *gin.Context) {
 	}
 	row, err := model.RuleReadByDatabase(m.Database)
 	if err != nil {
-		c.Message("-1", err.Error())
-		return
-	}
-	if row.Rid != m.Rid {
-		c.Message("-1", "数据库名称已经被使用")
-		return
+		if err != model.RuleErrNoRows {
+			c.Message("-1", err.Error())
+			return
+		}
+	} else {
+		if row.Rid != m.Rid {
+			c.Message("-1", "数据库名称已经被使用")
+			return
+		}
 	}
 
 	_, err = model.RuleRead(m.Rid)
 	if err != nil {
-		c.Message("-1", err.Error())
-		return
 	}
 
 	err = model.RuleUpdate(dbs.H{
