@@ -6,6 +6,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.7.2/theme-chalk/index.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/video.js/7.5.4/video-js.min.css">
     <link rel="stylesheet" href="/static/css/main.css">
 </head>
 <body>
@@ -39,8 +40,18 @@
                     </div>
                     <el-form label-width="120px">
                         <el-form-item v-for="v in columns" :label="v">
-                            <div v-if="pageType === 1" v-html="data[v]"></div>
-                            <el-input v-if="pageType === 2" v-model="data[v]"></el-input>
+                            <div v-if="pageType === 1">
+                                <div v-if="v === 'PlayUrl'">
+                                    <video id="my-player" class="video-js vjs-big-play-centered" controls preload="auto"
+                                           data-setup='{}' width="1024" height="576">
+                                        <source :src="data[v]"></source>
+                                    </video>
+                                </div>
+                                <div v-else>
+                                    <div v-html="data[v]"></div>
+                                </div>
+                            </div>
+                            <el-input v-else-if="pageType === 2" v-model="data[v]"></el-input>
                         </el-form-item>
                     </el-form>
                 </el-card>
@@ -54,7 +65,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.7.2/index.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/video.js/7.5.4/video.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/video.js/7.5.4/lang/zh-CN.js"></script>
 <script src="/static/js/main.js"></script>
 <script>
 	new Vue({
@@ -86,6 +98,25 @@
 				aPost('/ShowRead', {Rid: this.Rid, Lid: this.Lid}).then(r => {
 					r.data && (this.data = r.data);
 					r.columns && (this.columns = r.columns);
+
+					setTimeout(function () {
+						if (/ipad|iphone|ipod|android/.test(navigator.userAgent.toLowerCase())) {
+							document.getElementById("my-player").play();
+						} else {
+							const options = {};
+							const player = videojs('my-player', options, function onPlayerReady() {
+								videojs.log('Your player is ready!');
+
+								// In this context, `this` is the player that was created by Video.js.
+								this.play();
+
+								// How about an event listener?
+								this.on('ended', function () {
+									videojs.log('Awww...over so soon?!');
+								});
+							});
+						}
+					}, 2000)
 				});
 			},
 		}
