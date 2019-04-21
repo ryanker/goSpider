@@ -63,7 +63,9 @@
                     <el-col :lg="4" :sm="6" :xs="24" v-for="v in listData">
                         <el-card>
                             <el-card>
-                                <div class="img"><img :src="v.Status === 2 ? v.NewUrl : v.OldUrl"/></div>
+                                <div class="img">
+                                    <a :href="v.ReadUrl"><img :src="v.Status === 2 ? v.NewUrl : v.OldUrl"/></a>
+                                </div>
                             </el-card>
                         </el-card>
                     </el-col>
@@ -174,9 +176,13 @@
 							this.listData = []
 						}
 						r.list && r.list.map(v => {
+							v.ReadUrl = '/Read?Rid=' + this.q.Rid + "&Lid=" + v.Lid;
 							this.listData.push(v)
 						});
 					} else {
+						r.list && r.list.map(v => {
+							v.ReadUrl = '/Read?Rid=' + this.q.Rid + "&Lid=" + v.Lid;
+						});
 						this.listData = r.list || [];
 					}
 					this.moreDisabled = false;

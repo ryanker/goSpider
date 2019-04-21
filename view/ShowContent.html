@@ -51,8 +51,8 @@
                 <el-row class="item-list mt-1">
                     <el-col :lg="4" :sm="6" :xs="24" v-for="v in listData">
                         <el-card :title="v.Name">
-                            <div v-if="isDown" class="img"><img :src="v.Image"/></div>
-                            <div class="info">{[v.Name]}</div>
+                            <div v-if="isDown" class="img"><a :href="v.ReadUrl"><img :src="v.Image"/></a></div>
+                            <div class="info"><a :href="v.ReadUrl">{[v.Name]}</a></div>
                         </el-card>
                     </el-col>
                 </el-row>
@@ -156,9 +156,13 @@
 							this.listData = []
 						}
 						r.list && r.list.map(v => {
+							v.ReadUrl = '/Read?Rid=' + this.q.Rid + "&Lid=" + v.Lid;
 							this.listData.push(v)
 						});
 					} else {
+						r.list && r.list.map(v => {
+							v.ReadUrl = '/Read?Rid=' + this.q.Rid + "&Lid=" + v.Lid;
+						});
 						this.listData = r.list || [];
 					}
 					this.moreDisabled = false;
