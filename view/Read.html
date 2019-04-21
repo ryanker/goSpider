@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>小白采集器</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.7.2/theme-chalk/index.css">
+    <link rel="stylesheet" href="/static/css/main.css">
+</head>
+<body>
+<div id="app">
+    <template>
+        <el-container>
+            {{template "incHeader.html" .}}
+            <el-main>
+                <!--展示方式-->
+                <div class="mb-1">
+                    展示方式：
+                    <el-radio-group v-model="pageType" size="medium">
+                        <el-radio-button :label="1">可视模式</el-radio-button>
+                        <el-radio-button :label="2">源码模式</el-radio-button>
+                    </el-radio-group>
+                </div>
+
+                <el-card class="box-card">
+                    <div slot="header" class="clearfix">
+                        <span>{[data.Name]}</span>
+                    </div>
+                    <el-form label-width="120px">
+                        <el-form-item v-for="(v,k) in data" :label="k">
+                            <div v-if="pageType === 1" v-html="v"></div>
+                            <el-input v-if="pageType === 2" v-model="v"></el-input>
+                        </el-form-item>
+                    </el-form>
+                </el-card>
+            </el-main>
+            <el-footer>@2019</el-footer>
+        </el-container>
+    </template>
+</div>
+</body>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.7.2/index.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
+<script src="/static/js/main.js"></script>
+<script>
+	new Vue({
+		el: '#app',
+		delimiters: ['{[', ']}'],
+		data() {
+			return {
+				isMobile: document.body.getBoundingClientRect().width < 1024,
+				Rid: Number({{.Rid}}),
+				Lid: Number({{.Lid}}),
+				pageType: 1,
+				data: {},
+				columns: {},
+			}
+		},
+		mounted() {
+			this.ContentInit();
+		},
+		methods: {
+			ContentInit() {
+				aPost('/ShowRead', {Rid: this.Rid, Lid: this.Lid}).then(r => {
+					r.data && (this.data = r.data);
+					r.columns && (this.columns = r.columns);
+				});
+			},
+		}
+	})
+</script>
+</body>
+</html>
