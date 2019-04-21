@@ -31,9 +31,16 @@ body {
 	margin-bottom: 40px;
 }
 
+.ml-1 {
+	margin-left: 10px
+}
+
 .mr-1 {
-	width: 300px;
 	margin-right: 10px
+}
+
+.w-1 {
+	width: 300px;
 }
 
 .header {

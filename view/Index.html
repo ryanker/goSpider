@@ -16,7 +16,7 @@
             <el-main>
                 <!--搜索栏-->
                 <el-row>
-                    <el-input v-model="q.Name" placeholder="请输入规则" class="mb-1 mr-1" clearable>
+                    <el-input v-model="q.Name" placeholder="请输入规则" class="mb-1 mr-1 w-1" clearable>
                         <el-button slot="append" icon="el-icon-search" @click="searchClick"/>
                     </el-input>
                     <el-button type="primary" class="mb-1" @click="createDialog">添加规则</el-button>
@@ -67,12 +67,12 @@
                                 <el-button type="warning" size="small" circle icon="el-icon-download"
                                            @click="exportDialog(scope.row)"/>
                             </el-tooltip>
-                            <a :href="'/Item?Rid='+scope.row.Rid" target="_blank" style="margin-left:10px">
+                            <a :href="'/Item?Rid='+scope.row.Rid" class="ml-1">
                                 <el-tooltip effect="dark" content="查看数据" placement="top">
                                     <el-button size="small" circle icon="el-icon-tickets"/>
                                 </el-tooltip>
                             </a>
-                            <a :href="'/Show?Rid='+scope.row.Rid" target="_blank" style="margin-left:10px">
+                            <a :href="'/Show?Rid='+scope.row.Rid" class="ml-1">
                                 <el-tooltip effect="dark" content="浏览图片" placement="top">
                                     <el-button size="small" circle icon="el-icon-view"/>
                                 </el-tooltip>
