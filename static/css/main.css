@@ -11,6 +11,11 @@ body {
 	text-align: center;
 }
 
+.el-form-item__content {
+	word-wrap: break-word;
+	word-break: break-all;
+}
+
 .el-form-item__content .el-table td, .el-form-item__content .el-table th {
 	line-height: 23px;
 }
