@@ -38,12 +38,12 @@
                     <div slot="header" class="clearfix">
                         <span>{[data.Name]}</span>
                     </div>
-                    <el-form label-width="120px">
+                    <el-form :label-position="p" label-width="120px">
                         <el-form-item v-for="v in columns" :label="v">
                             <div v-if="pageType === 1">
                                 <div v-if="v === 'PlayUrl'">
                                     <video id="my-player" class="video-js vjs-big-play-centered" controls preload="auto"
-                                           data-setup='{}' width="1024" height="576">
+                                           data-setup='{}' style="height: 576px;width: 100%">
                                         <source :src="data[v]"></source>
                                     </video>
                                 </div>
@@ -77,6 +77,7 @@
 				isMobile: document.body.getBoundingClientRect().width < 1024,
 				Rid: Number({{.Rid}}),
 				Lid: Number({{.Lid}}),
+				p: 'right',
 				pageType: 1,
 				data: {},
 				columns: {},
@@ -91,6 +92,7 @@
 			}
 		},
 		mounted() {
+			this.p = this.isMobile ? 'top' : 'right';
 			this.ContentInit();
 		},
 		methods: {
