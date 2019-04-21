@@ -14,23 +14,33 @@
         <el-container>
             {{template "incHeader.html" .}}
             <el-main>
-                <!--展示方式-->
-                <div class="mb-1">
-                    展示方式：
-                    <el-radio-group v-model="pageType" size="medium">
-                        <el-radio-button :label="1">可视模式</el-radio-button>
-                        <el-radio-button :label="2">源码模式</el-radio-button>
+                <!--浏览导航-->
+                <div class="menu-list">
+                    浏览导航：
+                    <el-radio-group v-model="menuValue" size="medium">
+                        <el-radio-button v-for="v in menuList" :label="v.Key">
+                            <a :href="v.Url">{[v.Name]}</a>
+                        </el-radio-button>
                     </el-radio-group>
                 </div>
 
-                <el-card class="box-card">
+                <!--展示方式-->
+                <div class="mt-1">
+                    展示方式：
+                    <el-radio-group v-model="pageType" size="medium">
+                        <el-radio-button :label="1">可视</el-radio-button>
+                        <el-radio-button :label="2">源码</el-radio-button>
+                    </el-radio-group>
+                </div>
+
+                <el-card class="box-card mt-1">
                     <div slot="header" class="clearfix">
                         <span>{[data.Name]}</span>
                     </div>
                     <el-form label-width="120px">
-                        <el-form-item v-for="(v,k) in data" :label="k">
-                            <div v-if="pageType === 1" v-html="v"></div>
-                            <el-input v-if="pageType === 2" v-model="v"></el-input>
+                        <el-form-item v-for="v in columns" :label="v">
+                            <div v-if="pageType === 1" v-html="data[v]"></div>
+                            <el-input v-if="pageType === 2" v-model="data[v]"></el-input>
                         </el-form-item>
                     </el-form>
                 </el-card>
@@ -58,6 +68,14 @@
 				pageType: 1,
 				data: {},
 				columns: {},
+
+				menuValue: 1,
+				menuList: [
+					{Key: 1, Name: '列表', Url: '/Show?Rid={{.Rid}}'},
+					{Key: 2, Name: '内容', Url: '/Show?Rid={{.Rid}}&Table=Content'},
+					{Key: 3, Name: '列表下载', Url: '/Show?Rid={{.Rid}}&Table=ListDownload'},
+					{Key: 4, Name: '内容下载', Url: '/Show?Rid={{.Rid}}&Table=ContentDownload'},
+				],
 			}
 		},
 		mounted() {
