@@ -14,8 +14,10 @@
                         <el-dropdown-item><a href="/Log">采集日志</a></el-dropdown-item>
                         <el-dropdown-item><a href="/User">用户管理</a></el-dropdown-item>
                         <el-dropdown-item><a href="/Sys">系统信息</a></el-dropdown-item>
+                        <el-dropdown-item divided><a href="/Logout">退出</a></el-dropdown-item>
+                    {{else}}
+                        <el-dropdown-item><a href="/Logout">退出</a></el-dropdown-item>
                     {{end}}
-                    <el-dropdown-item divided><a href="/Logout">退出</a></el-dropdown-item>
                 </el-dropdown-menu>
             </el-dropdown>
         </div>
