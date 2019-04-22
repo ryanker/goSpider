@@ -58,8 +58,8 @@ func UserLogin(c *gin.Context) {
 }
 
 // 登录/退出 使用
-func UserSetCookie(c *gin.Context, token string, maxAge int64) {
-	c.SetCookie("token", token, int(maxAge), "/", "", false, true)
+func UserSetCookie(c *gin.Context, token string, maxAge int) {
+	c.SetCookie("token", token, maxAge, "/", "", false, true)
 }
 
 // 支持 Post、Cookie 和 Header
