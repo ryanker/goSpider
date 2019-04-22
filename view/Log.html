@@ -20,19 +20,19 @@
                         <el-button slot="append" icon="el-icon-search" @click="searchClick"/>
                     </el-input>
                     <el-button type="danger" class="mb-1" @click="deleteDialog">清空日志</el-button>
-                    <el-checkbox v-model="autoRefresh" label="刷新日志" border style="margin-left:10px"
+                    <el-checkbox v-model="autoRefresh" label="刷新日志" border class="mb-1 ml-1"
                                  @change="autoChange"></el-checkbox>
                 </el-row>
 
                 <!--类型-->
-                <el-radio-group v-model="q.Status" class="mb-1" @change="changeStatus">
+                <el-radio-group v-model="q.Status" @change="changeStatus">
                     <el-radio-button :label="0">全部</el-radio-button>
                     <el-radio-button :label="1">普通日志</el-radio-button>
                     <el-radio-button :label="2">错误日志</el-radio-button>
                 </el-radio-group>
 
                 <!--排序-->
-                <div class="mb-1">
+                <div class="mt-1">
                     排序：
                     <el-radio-group v-model="q.Order" @change="changeOrder">
                         <el-radio label="">最新</el-radio>
@@ -41,14 +41,13 @@
                 </div>
 
                 <!--分页-->
-                <el-row type="flex" justify="end">
+                <el-row type="flex" justify="end" class="mt-1">
                     <el-pagination v-if="tableTotal > 0" :current-page="q.Page" :page-size="20" :total="tableTotal"
-                                   background layout="total, prev, pager, next, jumper"
-                                   @current-change="tableCurrentChange"/>
+                                   background :layout="pageLayout" @current-change="tableCurrentChange"/>
                 </el-row>
 
                 <!--时间线-->
-                <el-timeline :reverse="true">
+                <el-timeline :reverse="true" class="mt-1">
                     <el-timeline-item v-for="(v, i) in tableData" :key="i" :timestamp="v.CreateDate" placement="top">
                         <el-tag v-if="v.Status === 1" type="info">普通日志</el-tag>
                         <el-tag v-else-if="v.Status === 2" type="danger">错误日志</el-tag>
@@ -76,10 +75,9 @@
                 </el-table>-->
 
                 <!--分页-->
-                <el-row type="flex" justify="end">
+                <el-row type="flex" justify="end" class="mt-1">
                     <el-pagination v-if="tableTotal > 0" :current-page="q.Page" :page-size="20" :total="tableTotal"
-                                   background layout="total, prev, pager, next, jumper"
-                                   @current-change="tableCurrentChange"/>
+                                   background :layout="pageLayout" @current-change="tableCurrentChange"/>
                 </el-row>
             </el-main>
             <el-footer>@2019</el-footer>
@@ -98,6 +96,7 @@
 		delimiters: ['{[', ']}'],
 		data() {
 			return {
+				isMobile: document.body.getBoundingClientRect().width < 1024,
 				tableLoading: false,
 				tableTotal: 0,
 				tableData: [],
@@ -105,6 +104,8 @@
 				// 自动刷新日志
 				autoRefresh: true,
 				autoT: null,
+
+				pageLayout: 'total, prev, pager, next, jumper',
 
 				q: {
 					Status: 0,
@@ -115,6 +116,9 @@
 			}
 		},
 		mounted() {
+			if (this.isMobile) {
+				this.pageLayout = 'total, prev, next, jumper';
+			}
 			this.getList();
 			this.autoChange();
 		},
