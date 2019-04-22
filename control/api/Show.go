@@ -105,21 +105,21 @@ func ShowList(c *gin.Context) {
 		f := v.Field + " LIKE"
 		if k == 0 && m.Keyword1 != "" {
 			h[f] = "%" + m.Keyword1 + "%"
-		} else if k == 1 && m.Keyword1 != "" {
+		} else if k == 1 && m.Keyword2 != "" {
 			h[f] = "%" + m.Keyword2 + "%"
-		} else if k == 2 && m.Keyword2 != "" {
+		} else if k == 2 && m.Keyword3 != "" {
 			h[f] = "%" + m.Keyword3 + "%"
-		} else if k == 3 && m.Keyword3 != "" {
+		} else if k == 3 && m.Keyword4 != "" {
 			h[f] = "%" + m.Keyword4 + "%"
-		} else if k == 4 && m.Keyword4 != "" {
+		} else if k == 4 && m.Keyword5 != "" {
 			h[f] = "%" + m.Keyword5 + "%"
-		} else if k == 5 && m.Keyword5 != "" {
+		} else if k == 5 && m.Keyword6 != "" {
 			h[f] = "%" + m.Keyword6 + "%"
-		} else if k == 6 && m.Keyword6 != "" {
+		} else if k == 6 && m.Keyword7 != "" {
 			h[f] = "%" + m.Keyword7 + "%"
-		} else if k == 7 && m.Keyword7 != "" {
+		} else if k == 7 && m.Keyword8 != "" {
 			h[f] = "%" + m.Keyword8 + "%"
-		} else if k == 8 && m.Keyword8 != "" {
+		} else if k == 8 && m.Keyword9 != "" {
 			h[f] = "%" + m.Keyword9 + "%"
 		}
 	}
@@ -205,21 +205,21 @@ func ShowContent(c *gin.Context) {
 		f := v.Field + " LIKE"
 		if k == 0 && m.Keyword1 != "" {
 			h[f] = "%" + m.Keyword1 + "%"
-		} else if k == 1 && m.Keyword1 != "" {
+		} else if k == 1 && m.Keyword2 != "" {
 			h[f] = "%" + m.Keyword2 + "%"
-		} else if k == 2 && m.Keyword2 != "" {
+		} else if k == 2 && m.Keyword3 != "" {
 			h[f] = "%" + m.Keyword3 + "%"
-		} else if k == 3 && m.Keyword3 != "" {
+		} else if k == 3 && m.Keyword4 != "" {
 			h[f] = "%" + m.Keyword4 + "%"
-		} else if k == 4 && m.Keyword4 != "" {
+		} else if k == 4 && m.Keyword5 != "" {
 			h[f] = "%" + m.Keyword5 + "%"
-		} else if k == 5 && m.Keyword5 != "" {
+		} else if k == 5 && m.Keyword6 != "" {
 			h[f] = "%" + m.Keyword6 + "%"
-		} else if k == 6 && m.Keyword6 != "" {
+		} else if k == 6 && m.Keyword7 != "" {
 			h[f] = "%" + m.Keyword7 + "%"
-		} else if k == 7 && m.Keyword7 != "" {
+		} else if k == 7 && m.Keyword8 != "" {
 			h[f] = "%" + m.Keyword8 + "%"
-		} else if k == 8 && m.Keyword8 != "" {
+		} else if k == 8 && m.Keyword9 != "" {
 			h[f] = "%" + m.Keyword9 + "%"
 		}
 	}

@@ -14,9 +14,9 @@
         <el-container>
             {{template "incHeader.html" .}}
             <el-main>
-                <!--浏览导航-->
+                <!--导航-->
                 <div class="menu-list">
-                    浏览导航：
+                    导航：
                     <el-radio-group v-model="menuValue" size="medium">
                         <el-radio-button v-for="v in menuList" :label="v.Key">
                             <a :href="v.Url">{[v.Name]}</a>
@@ -24,9 +24,9 @@
                     </el-radio-group>
                 </div>
 
-                <!--翻页方式-->
+                <!--翻页-->
                 <div class="mt-1">
-                    翻页方式：
+                    翻页：
                     <el-radio-group v-model="pageType" @change="changePageType" size="medium">
                         <el-radio-button :label="1">单页</el-radio-button>
                         <el-radio-button :label="2">多页</el-radio-button>
@@ -35,20 +35,31 @@
 
                 <!--状态-->
                 <div class="mt-1">
-                    下载状态：
+                    状态：
                     <el-radio-group v-model="q.Status" @change="changeStatus" size="medium">
                         <el-radio-button :label="0">全部</el-radio-button>
-                        <el-radio-button :label="1">待下载</el-radio-button>
-                        <el-radio-button :label="2">下载完成</el-radio-button>
-                        <el-radio-button :label="3">下载失败</el-radio-button>
+                        <el-radio-button :label="1">待采集</el-radio-button>
+                        <el-radio-button :label="2">采集完成</el-radio-button>
+                        <el-radio-button :label="3">采集失败</el-radio-button>
                     </el-radio-group>
                 </div>
 
-                <!--每页数量-->
+                <!--每页-->
                 <div class="mt-1">
-                    每页数量：
-                    <el-input placeholder="请输入数量" v-model="pageSize" style="max-width:200px">
+                    每页：
+                    <el-input placeholder="请输入数量" v-model="pageSize" style="max-width:150px">
                         <el-button slot="append" icon="el-icon-d-arrow-right" @click="onPageSize"></el-button>
+                    </el-input>
+                </div>
+
+                <!--搜索-->
+                <div v-if="listKeywordsShow" class="mt-1">
+                    搜索：
+                    <el-input placeholder="请输入内容" v-model="listKeywordsVal" style="max-width:400px">
+                        <el-select v-model="listKeywordsSel" slot="prepend" placeholder="请选择" style="width:120px">
+                            <el-option v-for="(v, k) in listKeywords" :label="k" :value="v"></el-option>
+                        </el-select>
+                        <el-button slot="append" icon="el-icon-search" @click="onSearch"></el-button>
                     </el-input>
                 </div>
 
@@ -105,6 +116,12 @@
 				listTotal: 0,
 				listData: [],
 				listColumns: [],
+
+				listKeywords: {},
+				listKeywordsVal: '',
+				listKeywordsSel: 'Keyword1',
+				listKeywordsShow: false,
+
 				isDown: 0,
 				pageType: 1,
 				pageSize: 120,
@@ -152,6 +169,12 @@
 				this.getList();
 			},
 
+			// 搜索
+			onSearch() {
+				this.q.Page = 1;
+				this.getList();
+			},
+
 			// 加载更多
 			onMore() {
 				this.q.Page++;
@@ -167,9 +190,19 @@
 			// 列表
 			getList() {
 				this.moreDisabled = true;
-				aPost('/ShowList', this.q).then(r => {
+				const cond = Object.assign({}, this.q);
+				cond[this.listKeywordsSel] = this.listKeywordsVal;
+				aPost('/ShowList', cond).then(r => {
 					this.isDown = r.isDown || 0;
 					this.listTotal = r.total || 0;
+
+					// 搜索框
+					this.listKeywords = r.keywords || {};
+					for (let k in this.listKeywords) {
+						this.listKeywordsShow = true;
+						break;
+					}
+
 					// this.listColumns = r.columns || [];
 					if (this.pageType === 1) {
 						if (this.q.Page === 1) {
