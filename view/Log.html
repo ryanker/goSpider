@@ -41,8 +41,8 @@
                 </div>
 
                 <!--分页-->
-                <el-row type="flex" justify="end" class="mt-1">
-                    <el-pagination v-if="tableTotal > 0" :current-page="q.Page" :page-size="20" :total="tableTotal"
+                <el-row v-if="tableTotal > 0" type="flex" justify="end" class="mt-1">
+                    <el-pagination :current-page="q.Page" :page-size="20" :total="tableTotal"
                                    background :layout="pageLayout" @current-change="tableCurrentChange"/>
                 </el-row>
 
@@ -75,10 +75,13 @@
                 </el-table>-->
 
                 <!--分页-->
-                <el-row type="flex" justify="end" class="mt-1">
-                    <el-pagination v-if="tableTotal > 0" :current-page="q.Page" :page-size="20" :total="tableTotal"
+                <el-row v-if="tableTotal > 0" type="flex" justify="end" class="mt-1">
+                    <el-pagination :current-page="q.Page" :page-size="20" :total="tableTotal"
                                    background :layout="pageLayout" @current-change="tableCurrentChange"/>
                 </el-row>
+
+                <!--暂无数据-->
+                <el-alert v-if="tableTotal === 0" title="暂无数据" type="warning" :closable="false" show-icon></el-alert>
             </el-main>
             <el-footer>@2019</el-footer>
         </el-container>

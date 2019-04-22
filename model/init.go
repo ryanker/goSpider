@@ -272,12 +272,12 @@ func getList(dbc *dbs.DB, ParamList *[]RuleParam, row *Rule, Url string) {
 		}
 
 		// 写入数据库
-		id, err := dbc.Insert("List", data)
+		_, err := dbc.Insert("List", data)
 		if err != nil {
 			cronErrorLog(0, "列表页写入数据库失败: %v", err.Error())
 			return
 		}
-		cronLog(0, "列表页写入数据库成功: %v", id)
+		// cronLog(0, "列表页写入数据库成功: %v", id)
 	})
 	cronLog(time.Since(t3), "Url: %v 抓取完成", Url)
 }
