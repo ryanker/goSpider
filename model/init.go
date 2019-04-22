@@ -302,7 +302,7 @@ func getContent(dbc *dbs.DB, ParamContent *[]RuleParam, row *Rule) {
 	for page := int64(1); page <= pageMax; page++ {
 		st := ListUrl{}
 		var list []ListUrl
-		err = dbc.Find("List", "`Lid`,`Url`", []interface{}{&st.Lid, &st.Url}, where, "Lid DESC", page, pageSize, func() {
+		err = dbc.Find("List", "`Lid`,`Url`", []interface{}{&st.Lid, &st.Url}, where, "Lid DESC", 0, pageSize, func() {
 			list = append(list, st)
 		})
 		if err != nil {
@@ -343,7 +343,7 @@ func getContent(dbc *dbs.DB, ParamContent *[]RuleParam, row *Rule) {
 			cronLog(time.Since(t2), "抓取内容页完成, 请求次数: %v, Url: %v", i, lv.Url)
 
 			// 解析代码
-			t3 := time.Now()
+			// t3 := time.Now()
 			doc, err := goquery.NewDocumentFromReader(strings.NewReader(string(bodyByte)))
 			if err != nil {
 				errorNum++
@@ -372,14 +372,28 @@ func getContent(dbc *dbs.DB, ParamContent *[]RuleParam, row *Rule) {
 			}
 
 			// 写入数据库
-			id, err := dbc.Insert("Content", data)
+			_, err = dbc.Insert("Content", data)
 			if err != nil {
 				errorNum++
 				cronErrorLog(0, "内容页写入数据库失败: %v", err.Error())
+
+				// 更新状态为抓取失败
+				_, err = dbc.Update("List", dbs.H{"Status": 3}, dbs.H{"Lid": lv.Lid})
+				if err != nil {
+					errorNum++
+					cronErrorLog(0, "更新数据库失败: %v", err.Error())
+				}
 				continue
 			}
+			// cronLog(time.Since(t3), "内容页写入数据库成功: %v", id)
+
+			// 抓取完成
+			_, err = dbc.Update("List", dbs.H{"Status": 2}, dbs.H{"Lid": lv.Lid})
+			if err != nil {
+				errorNum++
+				cronErrorLog(0, "更新数据库失败: %v", err.Error())
+			}
 			newNum++
-			cronLog(time.Since(t3), "内容页写入数据库成功: %v", id)
 		}
 	}
 	cronLog(time.Since(t), "内容页下载资源完成, 总数: %v, 重复: %v, 新增: %v, 错误: %v", n, repeatNum, newNum, errorNum)
