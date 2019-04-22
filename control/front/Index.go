@@ -19,31 +19,11 @@ func Logout(c *gin.Context) {
 
 func Index(c *gin.Context) {
 	User := api.UserGet(c)
-	c.HTML(http.StatusOK, "Index.html", gin.H{"User": User})
-}
-
-func Log(c *gin.Context) {
-	User := api.UserGet(c)
-	c.HTML(http.StatusOK, "Log.html", gin.H{"User": User})
-}
-
-func User(c *gin.Context) {
-	User := api.UserGet(c)
-	c.HTML(http.StatusOK, "User.html", gin.H{"User": User})
-}
-
-func Sys(c *gin.Context) {
-	User := api.UserGet(c)
-	c.HTML(http.StatusOK, "Sys.html", gin.H{"User": User})
-}
-
-func Table(c *gin.Context) {
-	User := api.UserGet(c)
-	c.HTML(http.StatusOK, "Table.html", gin.H{
-		"User":  User,
-		"Rid":   c.Query("Rid"),
-		"Table": c.Query("Table"),
-	})
+	name := "Index.html"
+	if User.Gid != 1 {
+		name = "UserIndex.html" // 普通用户首页
+	}
+	c.HTML(http.StatusOK, name, gin.H{"User": User})
 }
 
 func Show(c *gin.Context) {
@@ -67,5 +47,29 @@ func Read(c *gin.Context) {
 		"User": User,
 		"Rid":  Rid,
 		"Lid":  Lid,
+	})
+}
+
+func Log(c *gin.Context) {
+	User := api.UserGet(c)
+	c.HTML(http.StatusOK, "Log.html", gin.H{"User": User})
+}
+
+func User(c *gin.Context) {
+	User := api.UserGet(c)
+	c.HTML(http.StatusOK, "User.html", gin.H{"User": User})
+}
+
+func Sys(c *gin.Context) {
+	User := api.UserGet(c)
+	c.HTML(http.StatusOK, "Sys.html", gin.H{"User": User})
+}
+
+func Table(c *gin.Context) {
+	User := api.UserGet(c)
+	c.HTML(http.StatusOK, "Table.html", gin.H{
+		"User":  User,
+		"Rid":   c.Query("Rid"),
+		"Table": c.Query("Table"),
 	})
 }

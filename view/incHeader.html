@@ -9,10 +9,12 @@
                     {{.User.Name}} <i class="el-icon-arrow-down el-icon--right"></i>
                 </span>
                 <el-dropdown-menu slot="dropdown">
-                    <el-dropdown-item><a href="/">采集规则</a></el-dropdown-item>
-                    <el-dropdown-item><a href="/Log">采集日志</a></el-dropdown-item>
-                    <el-dropdown-item><a href="/User">用户管理</a></el-dropdown-item>
-                    <el-dropdown-item><a href="/Sys">系统信息</a></el-dropdown-item>
+                    {{if eq .User.Gid 1}}
+                        <el-dropdown-item><a href="/">采集规则</a></el-dropdown-item>
+                        <el-dropdown-item><a href="/Log">采集日志</a></el-dropdown-item>
+                        <el-dropdown-item><a href="/User">用户管理</a></el-dropdown-item>
+                        <el-dropdown-item><a href="/Sys">系统信息</a></el-dropdown-item>
+                    {{end}}
                     <el-dropdown-item divided><a href="/Logout">退出</a></el-dropdown-item>
                 </el-dropdown-menu>
             </el-dropdown>

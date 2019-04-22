@@ -87,6 +87,7 @@ func StartGin() {
 			return
 		}
 	})
+	appApi.POST("/UserRuleList", api.RuleList)
 	appApi.POST("/ShowRead", api.ShowRead)
 	appApi.POST("/ShowList", api.ShowList)
 	appApi.POST("/ShowContent", api.ShowContent)

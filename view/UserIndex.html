@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>小白采集器</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.7.2/theme-chalk/index.css">
+    <link rel="stylesheet" href="/static/css/main.css">
+</head>
+<body>
+<div id="app">
+    <template>
+        <el-container>
+            {{template "incHeader.html" .}}
+            <el-main>
+                <el-row class="item-list mt-1">
+                    <el-col :lg="4" :sm="6" :xs="24" v-for="v in listData">
+                        <el-card :title="v.Name">
+                            <div class="info"><a :href="v.ShowUrl">{[v.Name]}</a></div>
+                        </el-card>
+                    </el-col>
+                </el-row>
+
+                <!--分页-->
+                <el-row v-if="listTotal > 0" type="flex" justify="end" class="mt-1">
+                    <el-pagination :current-page="q.Page" :page-size="q.PageSize" :total="listTotal"
+                                   background :layout="pageLayout" @current-change="changePage"/>
+                </el-row>
+            </el-main>
+            <el-footer>@2019</el-footer>
+        </el-container>
+    </template>
+</div>
+</body>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.7.2/index.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js"></script>
+<script src="/static/js/main.js"></script>
+<script>
+	new Vue({
+		el: '#app',
+		delimiters: ['{[', ']}'],
+		data() {
+			return {
+				isMobile: document.body.getBoundingClientRect().width < 1024,
+				listTotal: 0,
+				listData: [],
+				pageLayout: 'prev, pager, next, jumper',
+				q: {
+					PageSize: 20,
+					Page: 1,
+				},
+			}
+		},
+		mounted() {
+			if (this.isMobile) {
+				this.pageLayout = 'prev, next, jumper';
+			}
+			this.getList();
+		},
+		methods: {
+			// 分页
+			changePage(val) {
+				this.q.Page = val;
+				this.getList();
+			},
+
+			// 列表
+			getList() {
+				this.moreDisabled = true;
+				aPost('/UserRuleList', this.q).then(r => {
+					r.list && r.list.map(v => {
+						v.ShowUrl = '/Show?Rid=' + v.Rid;
+					});
+					this.listData = r.list || [];
+					this.listTotal = r.total || 0;
+					this.tableLoading = false;
+				}).catch(error => {
+					this.$message.error(error);
+					this.moreDisabled = false;
+				});
+			},
+		}
+	})
+</script>
+</body>
+</html>
