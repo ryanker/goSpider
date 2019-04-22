@@ -43,7 +43,7 @@ func StartGin() {
 
 	// 附件目录，登录后才能查看
 	upload := r.Group("/", func(c *gin.Context) {
-		err := api.UserTokenGet(c)
+		_, err := api.UserTokenGet(c)
 		if err != nil {
 			// c.Writer.Header().Add("Author", "goSpider 1.0")
 			c.String(http.StatusNotFound, "404 page not found")
@@ -66,25 +66,45 @@ func StartGin() {
 	r.GET("/Logout", front.Logout)
 	r.POST("/UserLogin", api.UserLogin)
 
-	// ========== 前台页面 ==========
+	// ==============================================================================================================
+	// ========== 所以用户页面 ==========
 	app := r.Group("/", func(c *gin.Context) {
-		err := api.UserTokenGet(c)
+		_, err := api.UserTokenGetByAdmin(c)
 		if err != nil {
 			c.Redirect(http.StatusFound, "/Login")
 			return
 		}
 	})
 	app.GET("/", front.Index)
-	app.GET("/Log", front.Log)
-	app.GET("/User", front.User)
-	app.GET("/Sys", front.Sys)
-	app.GET("/Item", front.Item)
-	app.GET("/Show", front.Show)
-	app.GET("/Read", front.Read)
 
-	// ========== 后台接口 ==========
+	// ========== 所以用户接口 ==========
+	appApi := r.Group("/", func(c *gin.Context) {
+		_, err := api.UserTokenGetByAdmin(c)
+		if err != nil {
+			c.Message("-1", err.Error())
+			return
+		}
+	})
+	appApi.GET("/Show", front.Show)
+	appApi.GET("/Read", front.Read)
+
+	// ==============================================================================================================
+	// ========== 管理员页面 ==========
 	admin := r.Group("/", func(c *gin.Context) {
-		err := api.UserTokenGet(c)
+		_, err := api.UserTokenGetByAdmin(c)
+		if err != nil {
+			c.Redirect(http.StatusFound, "/Login")
+			return
+		}
+	})
+	admin.GET("/Log", front.Log)
+	admin.GET("/User", front.User)
+	admin.GET("/Sys", front.Sys)
+	admin.GET("/Item", front.Item)
+
+	// ========== 管理员接口 ==========
+	adminApi := r.Group("/", func(c *gin.Context) {
+		_, err := api.UserTokenGetByAdmin(c)
 		if err != nil {
 			c.Message("-1", err.Error())
 			return
@@ -92,56 +112,56 @@ func StartGin() {
 	})
 
 	// User
-	admin.POST("/UserCreate", api.UserCreate)
-	admin.POST("/UserUpdate", api.UserUpdate)
-	admin.POST("/UserRead", api.UserRead)
-	admin.POST("/UserDelete", api.UserDelete)
-	admin.POST("/UserList", api.UserList)
+	adminApi.POST("/UserCreate", api.UserCreate)
+	adminApi.POST("/UserUpdate", api.UserUpdate)
+	adminApi.POST("/UserRead", api.UserRead)
+	adminApi.POST("/UserDelete", api.UserDelete)
+	adminApi.POST("/UserList", api.UserList)
 
 	// Rule
-	admin.POST("/RuleCreate", api.RuleCreate)
-	admin.POST("/RuleUpdate", api.RuleUpdate)
-	admin.POST("/RuleUpdateCron", api.RuleUpdateCron)
-	admin.POST("/RuleRead", api.RuleRead)
-	admin.POST("/RuleDelete", api.RuleDelete)
-	admin.POST("/RuleList", api.RuleList)
-	admin.POST("/RuleExport", api.RuleExport)
-	admin.POST("/RuleImport", api.RuleImport)
+	adminApi.POST("/RuleCreate", api.RuleCreate)
+	adminApi.POST("/RuleUpdate", api.RuleUpdate)
+	adminApi.POST("/RuleUpdateCron", api.RuleUpdateCron)
+	adminApi.POST("/RuleRead", api.RuleRead)
+	adminApi.POST("/RuleDelete", api.RuleDelete)
+	adminApi.POST("/RuleList", api.RuleList)
+	adminApi.POST("/RuleExport", api.RuleExport)
+	adminApi.POST("/RuleImport", api.RuleImport)
 
 	// RuleParam
-	admin.POST("/RuleParamCreate", api.RuleParamCreate)
-	admin.POST("/RuleParamUpdate", api.RuleParamUpdate)
-	admin.POST("/RuleParamRead", api.RuleParamRead)
-	admin.POST("/RuleParamDelete", api.RuleParamDelete)
-	admin.POST("/RuleParamList", api.RuleParamList)
+	adminApi.POST("/RuleParamCreate", api.RuleParamCreate)
+	adminApi.POST("/RuleParamUpdate", api.RuleParamUpdate)
+	adminApi.POST("/RuleParamRead", api.RuleParamRead)
+	adminApi.POST("/RuleParamDelete", api.RuleParamDelete)
+	adminApi.POST("/RuleParamList", api.RuleParamList)
 
 	// HttpGet
-	admin.POST("/HttpGetPage", api.HttpGetPage)
-	admin.POST("/HttpGetList", api.HttpGetList)
-	admin.POST("/HttpGetListRule", api.HttpGetListRule)
-	admin.POST("/HttpGetContentRule", api.HttpGetContentRule)
-	admin.POST("/HttpGetListRuleDown", api.HttpGetListRuleDown)
-	admin.POST("/HttpGetContentRuleDown", api.HttpGetContentRuleDown)
+	adminApi.POST("/HttpGetPage", api.HttpGetPage)
+	adminApi.POST("/HttpGetList", api.HttpGetList)
+	adminApi.POST("/HttpGetListRule", api.HttpGetListRule)
+	adminApi.POST("/HttpGetContentRule", api.HttpGetContentRule)
+	adminApi.POST("/HttpGetListRuleDown", api.HttpGetListRuleDown)
+	adminApi.POST("/HttpGetContentRuleDown", api.HttpGetContentRuleDown)
 
 	// Database
-	admin.POST("/DatabaseCreate", api.DatabaseCreate)
+	adminApi.POST("/DatabaseCreate", api.DatabaseCreate)
 
 	// Item
-	admin.POST("/ItemList", api.ItemList)
+	adminApi.POST("/ItemList", api.ItemList)
 
 	// Show
-	admin.POST("/ShowRead", api.ShowRead)
-	admin.POST("/ShowList", api.ShowList)
-	admin.POST("/ShowContent", api.ShowContent)
-	admin.POST("/ShowDownload", api.ShowDownload)
+	adminApi.POST("/ShowRead", api.ShowRead)
+	adminApi.POST("/ShowList", api.ShowList)
+	adminApi.POST("/ShowContent", api.ShowContent)
+	adminApi.POST("/ShowDownload", api.ShowDownload)
 
 	// Log
-	admin.POST("/LogList", api.LogList)
-	admin.POST("/LogDeleteDB", api.LogDeleteDB)
+	adminApi.POST("/LogList", api.LogList)
+	adminApi.POST("/LogDeleteDB", api.LogDeleteDB)
 
 	// 内存信息 && 磁盘信息
-	admin.POST("/MemStatsInfo", api.MemStatsInfo)
-	admin.POST("/DiskInfo", api.DiskInfo)
+	adminApi.POST("/MemStatsInfo", api.MemStatsInfo)
+	adminApi.POST("/DiskInfo", api.DiskInfo)
 
 	err = r.Run("0.0.0.0:3333")
 	if err != nil {

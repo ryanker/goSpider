@@ -52,7 +52,7 @@ func UserLogin(c *gin.Context) {
 
 	// 登录 token
 	token := model.UserTokenEncode(u.Uid, misc.Md5(u.Password), c.ClientIP())
-	UserSetCookie(c, token, time.Now().Unix()+365*24*60*60)
+	UserSetCookie(c, token, 365*24*60*60)
 
 	c.Message("0", "登录成功", gin.H{"token": token})
 }
@@ -63,7 +63,7 @@ func UserSetCookie(c *gin.Context, token string, maxAge int64) {
 }
 
 // 支持 Post、Cookie 和 Header
-func UserTokenGet(c *gin.Context) error {
+func UserTokenGet(c *gin.Context) (u model.User, err error) {
 	token := c.PostForm("token")
 	if token == "" {
 		token, _ = c.Cookie("token")
@@ -74,27 +74,40 @@ func UserTokenGet(c *gin.Context) error {
 
 	Token, err := model.UserTokenDecode(token)
 	if err != nil {
-		return err
+		return u, err
 	}
 
 	// 判断是否登录
 	if Token.Uid < 1 {
-		return errors.New("无权限访问，请登录后再试")
+		return u, errors.New("无权限访问，请登录后再试")
 	}
 
 	// 读取用户
 	User, err := model.UserRead(Token.Uid)
 	if err != nil {
-		return err
+		return u, err
 	}
 
 	// 验证密码是否被修改
 	if misc.Md5(User.Password) != Token.Password {
-		return errors.New("密码已经被修改，请重新登录")
+		return u, errors.New("密码已经被修改，请重新登录")
 	}
 
 	c.Set("User", User)
-	return nil
+	return User, nil
+}
+
+func UserTokenGetByAdmin(c *gin.Context) (u model.User, err error) {
+	u, err = UserTokenGet(c)
+	if err != nil {
+		return
+	}
+
+	if u.Gid != 1 {
+		err = errors.New("您的账号不是管理员，无权访问")
+		return
+	}
+	return
 }
 
 func UserGet(c *gin.Context) (u model.User) {
