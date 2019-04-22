@@ -33,11 +33,10 @@
                     </el-radio-group>
                 </div>
 
-                <!--显示数量-->
+                <!--每页数量-->
                 <div class="mt-1">
-                    显示数量：
-                    <el-input placeholder="请输入数量" v-model="pageSize" style="max-width:300px">
-                        <template slot="prepend">共 {[listTotal]} 条，每页</template>
+                    每页数量：
+                    <el-input placeholder="请输入数量" v-model="pageSize" style="max-width:200px">
                         <el-button slot="append" icon="el-icon-d-arrow-right" @click="onPageSize"></el-button>
                     </el-input>
                 </div>
