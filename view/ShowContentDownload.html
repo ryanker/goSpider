@@ -15,9 +15,9 @@
         <el-container>
             {{template "incHeader.html" .}}
             <el-main>
-                <!--浏览导航-->
+                <!--导航-->
                 <div class="menu-list">
-                    浏览导航：
+                    导航：
                     <el-radio-group v-model="menuValue" size="medium">
                         <el-radio-button v-for="v in menuList" :label="v.Key">
                             <a :href="v.Url">{[v.Name]}</a>
@@ -25,9 +25,9 @@
                     </el-radio-group>
                 </div>
 
-                <!--翻页方式-->
+                <!--翻页-->
                 <div class="mt-1">
-                    翻页方式：
+                    翻页：
                     <el-radio-group v-model="pageType" @change="changePageType" size="medium">
                         <el-radio-button :label="1">单页</el-radio-button>
                         <el-radio-button :label="2">多页</el-radio-button>
@@ -36,7 +36,7 @@
 
                 <!--状态-->
                 <div class="mt-1">
-                    下载状态：
+                    状态：
                     <el-radio-group v-model="q.Status" @change="changeStatus" size="medium">
                         <el-radio-button :label="0">全部</el-radio-button>
                         <el-radio-button :label="1">待下载</el-radio-button>
@@ -45,10 +45,10 @@
                     </el-radio-group>
                 </div>
 
-                <!--每页数量-->
+                <!--每页-->
                 <div class="mt-1">
-                    每页数量：
-                    <el-input placeholder="请输入数量" v-model="pageSize" style="max-width:200px">
+                    每页：
+                    <el-input placeholder="请输入数量" v-model="pageSize" style="max-width:180px">
                         <el-button slot="append" icon="el-icon-d-arrow-right" @click="onPageSize"></el-button>
                     </el-input>
                 </div>
