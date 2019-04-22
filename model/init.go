@@ -297,7 +297,7 @@ func getContent(dbc *dbs.DB, ParamContent *[]RuleParam, row *Rule) {
 	}
 
 	pageSize := int64(100)
-	pageMax := int64(math.Ceil(float64(n / pageSize)))
+	pageMax := int64(math.Ceil(float64(n) / float64(pageSize)))
 
 	for page := int64(1); page <= pageMax; page++ {
 		st := ListUrl{}
@@ -415,7 +415,7 @@ func downInitList(dbc *dbs.DB, ParamList *[]RuleParam, row *Rule) {
 			}
 
 			pageSize := int64(100)
-			pageMax := int64(math.Ceil(float64(n / pageSize)))
+			pageMax := int64(math.Ceil(float64(n) / float64(pageSize)))
 
 			for page := int64(1); page <= pageMax; page++ {
 				st := ListUrl{}
@@ -484,7 +484,7 @@ func downInitList(dbc *dbs.DB, ParamList *[]RuleParam, row *Rule) {
 			}
 
 			pageSize := int64(100)
-			pageMax := int64(math.Ceil(float64(n / pageSize)))
+			pageMax := int64(math.Ceil(float64(n) / float64(pageSize)))
 
 			for page := int64(1); page <= pageMax; page++ {
 				st := ListHtml{}
@@ -579,7 +579,7 @@ func downInitContent(dbc *dbs.DB, ParamContent *[]RuleParam, row *Rule) {
 			}
 
 			pageSize := int64(100)
-			pageMax := int64(math.Ceil(float64(n / pageSize)))
+			pageMax := int64(math.Ceil(float64(n) / float64(pageSize)))
 
 			for page := int64(1); page <= pageMax; page++ {
 				st := ListUrl{}
@@ -648,7 +648,7 @@ func downInitContent(dbc *dbs.DB, ParamContent *[]RuleParam, row *Rule) {
 			}
 
 			pageSize := int64(100)
-			pageMax := int64(math.Ceil(float64(n / pageSize)))
+			pageMax := int64(math.Ceil(float64(n) / float64(pageSize)))
 
 			for page := int64(1); page <= pageMax; page++ {
 				st := ListHtml{}
@@ -740,7 +740,7 @@ func downList(dbc *dbs.DB, row *Rule) {
 	}
 
 	pageSize := int64(100)
-	pageMax := int64(math.Ceil(float64(n / pageSize)))
+	pageMax := int64(math.Ceil(float64(n) / float64(pageSize)))
 
 	for page := int64(1); page <= pageMax; page++ {
 		st := ListDown{}
@@ -804,7 +804,7 @@ func downContent(dbc *dbs.DB, row *Rule) {
 	}
 
 	pageSize := int64(100)
-	pageMax := int64(math.Ceil(float64(n / pageSize)))
+	pageMax := int64(math.Ceil(float64(n) / float64(pageSize)))
 
 	for page := int64(1); page <= pageMax; page++ {
 		st := ListDown{}
