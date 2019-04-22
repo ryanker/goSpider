@@ -14,7 +14,7 @@
         <el-container>
             {{template "incHeader.html" .}}
             <el-main>
-                <el-row class="item-list mt-1">
+                <el-row class="item-list">
                     <el-col :lg="4" :sm="6" :xs="24" v-for="v in listData">
                         <el-card :title="v.Name">
                             <div class="info"><a :href="v.ShowUrl">{[v.Name]}</a></div>
