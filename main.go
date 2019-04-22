@@ -100,7 +100,7 @@ func StartGin() {
 	admin.GET("/Log", front.Log)
 	admin.GET("/User", front.User)
 	admin.GET("/Sys", front.Sys)
-	admin.GET("/Item", front.Item)
+	admin.GET("/Table", front.Table)
 
 	// ========== 管理员接口 ==========
 	adminApi := r.Group("/", func(c *gin.Context) {
@@ -146,8 +146,8 @@ func StartGin() {
 	// Database
 	adminApi.POST("/DatabaseCreate", api.DatabaseCreate)
 
-	// Item
-	adminApi.POST("/ItemList", api.ItemList)
+	// Table
+	adminApi.POST("/TableList", api.TableList)
 
 	// Show
 	adminApi.POST("/ShowRead", api.ShowRead)

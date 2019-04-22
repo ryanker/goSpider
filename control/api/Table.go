@@ -7,7 +7,7 @@ import (
 	"../../model"
 )
 
-func ItemList(c *gin.Context) {
+func TableList(c *gin.Context) {
 	m := struct {
 		Rid    int64
 		Table  string

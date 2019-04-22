@@ -67,13 +67,13 @@
                                 <el-button type="warning" size="small" circle icon="el-icon-download"
                                            @click="exportDialog(scope.row)"/>
                             </el-tooltip>
-                            <a :href="'/Item?Rid='+scope.row.Rid" class="ml-1">
-                                <el-tooltip effect="dark" content="查看数据" placement="top">
+                            <a :href="'/Table?Rid='+scope.row.Rid" class="ml-1">
+                                <el-tooltip effect="dark" content="查看表格" placement="top">
                                     <el-button size="small" circle icon="el-icon-tickets"/>
                                 </el-tooltip>
                             </a>
                             <a :href="'/Show?Rid='+scope.row.Rid" class="ml-1">
-                                <el-tooltip effect="dark" content="浏览图片" placement="top">
+                                <el-tooltip effect="dark" content="浏览数据" placement="top">
                                     <el-button size="small" circle icon="el-icon-view"/>
                                 </el-tooltip>
                             </a>

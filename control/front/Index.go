@@ -37,9 +37,9 @@ func Sys(c *gin.Context) {
 	c.HTML(http.StatusOK, "Sys.html", gin.H{"User": User})
 }
 
-func Item(c *gin.Context) {
+func Table(c *gin.Context) {
 	User := api.UserGet(c)
-	c.HTML(http.StatusOK, "Item.html", gin.H{
+	c.HTML(http.StatusOK, "Table.html", gin.H{
 		"User":  User,
 		"Rid":   c.Query("Rid"),
 		"Table": c.Query("Table"),

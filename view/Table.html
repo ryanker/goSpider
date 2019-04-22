@@ -140,7 +140,7 @@
 				this.tableLoading = true;
 				this.tableData = [];
 				this.tableColumns = [];
-				aPost('/ItemList', this.q).then(r => {
+				aPost('/TableList', this.q).then(r => {
 					this.tableData = r.list || [];
 					this.tableColumns = r.columns || [];
 					this.tableTotal = r.total || 0;
