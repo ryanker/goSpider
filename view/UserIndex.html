@@ -47,7 +47,7 @@
 				isMobile: document.body.getBoundingClientRect().width < 1024,
 				listTotal: 0,
 				listData: [],
-				pageLayout: 'prev, pager, next, jumper',
+				pageLayout: 'total, prev, pager, next, jumper',
 				q: {
 					PageSize: 20,
 					Page: 1,
@@ -56,7 +56,7 @@
 		},
 		mounted() {
 			if (this.isMobile) {
-				this.pageLayout = 'prev, next, jumper';
+				this.pageLayout = 'total, prev, next, jumper';
 			}
 			this.getList();
 		},

@@ -105,7 +105,7 @@
 				isDown: 0,
 				pageType: 1,
 				pageSize: 120,
-				pageLayout: 'prev, pager, next, jumper',
+				pageLayout: 'total, prev, pager, next, jumper',
 				q: {
 					Rid: Number('{{.Rid}}'),
 					Status: 0,
@@ -124,7 +124,7 @@
 		},
 		mounted() {
 			if (this.isMobile) {
-				this.pageLayout = 'prev, next, jumper';
+				this.pageLayout = 'total, prev, next, jumper';
 			}
 			this.getList();
 		},
