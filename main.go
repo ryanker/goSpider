@@ -69,24 +69,28 @@ func StartGin() {
 	// ==============================================================================================================
 	// ========== 所以用户页面 ==========
 	app := r.Group("/", func(c *gin.Context) {
-		_, err := api.UserTokenGetByAdmin(c)
+		_, err := api.UserTokenGet(c)
 		if err != nil {
 			c.Redirect(http.StatusFound, "/Login")
 			return
 		}
 	})
 	app.GET("/", front.Index)
+	app.GET("/Show", front.Show)
+	app.GET("/Read", front.Read)
 
 	// ========== 所以用户接口 ==========
 	appApi := r.Group("/", func(c *gin.Context) {
-		_, err := api.UserTokenGetByAdmin(c)
+		_, err := api.UserTokenGet(c)
 		if err != nil {
 			c.Message("-1", err.Error())
 			return
 		}
 	})
-	appApi.GET("/Show", front.Show)
-	appApi.GET("/Read", front.Read)
+	appApi.POST("/ShowRead", api.ShowRead)
+	appApi.POST("/ShowList", api.ShowList)
+	appApi.POST("/ShowContent", api.ShowContent)
+	appApi.POST("/ShowDownload", api.ShowDownload)
 
 	// ==============================================================================================================
 	// ========== 管理员页面 ==========
@@ -148,12 +152,6 @@ func StartGin() {
 
 	// Table
 	adminApi.POST("/TableList", api.TableList)
-
-	// Show
-	adminApi.POST("/ShowRead", api.ShowRead)
-	adminApi.POST("/ShowList", api.ShowList)
-	adminApi.POST("/ShowContent", api.ShowContent)
-	adminApi.POST("/ShowDownload", api.ShowDownload)
 
 	// Log
 	adminApi.POST("/LogList", api.LogList)
