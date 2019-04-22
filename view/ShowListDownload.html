@@ -77,13 +77,16 @@
                 </el-row>
 
                 <!--加载更多-->
-                <div v-if="pageType === 1" class="mt-1">
+                <div v-if="pageType === 1 && listTotal > 0" class="mt-1">
                     <el-button v-if="q.Page < Math.ceil(listTotal/q.PageSize)" type="primary" class="more"
                                :disabled="moreDisabled" @click="onMore">
                         加载更多 ({[q.Page*q.PageSize]}/{[listTotal]})
                     </el-button>
-                    <el-button v-else type="primary" class="more">加载完毕 (共 {[listTotal]} 条)</el-button>
+                    <el-button v-else disabled class="more">加载完毕 (共 {[listTotal]} 条)</el-button>
                 </div>
+
+                <!--暂无数据-->
+                <el-alert v-if="listTotal === 0" title="暂无数据" type="warning" :closable="false" show-icon></el-alert>
             </el-main>
             <el-footer>@2019</el-footer>
         </el-container>
