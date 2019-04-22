@@ -125,7 +125,9 @@ func (db *DB) Read(table string, fields string, scanArr []interface{}, where H) 
 
 	err = stmt.QueryRow(args...).Scan(scanArr...)
 	if err != nil {
-		ErrorLogWrite(err, s, args...)
+		if err != sql.ErrNoRows {
+			ErrorLogWrite(err, s, args...)
+		}
 		return
 	}
 	return
