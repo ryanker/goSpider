@@ -11,13 +11,24 @@ body {
 	text-align: center;
 }
 
-.el-form-item__content {
+.el-form-item__content, .el-timeline-item__content {
 	word-wrap: break-word;
 	word-break: break-all;
 }
 
 .el-form-item__content .el-table td, .el-form-item__content .el-table th {
 	line-height: 23px;
+}
+
+.el-form-item__content img {
+	width: 100%;
+	height: auto;
+	min-height: 80px;
+	display: block;
+	padding: 5px;
+	border-radius: 3px;
+	border: 1px solid #e6e6e6;
+	margin-top: 10px;
 }
 
 .mt-1 {
@@ -72,16 +83,34 @@ body {
 
 .item-list .el-card__body {
 	text-align: center;
-	padding: 10px 5px;
+	padding: 5px;
 }
 
 .item-list .el-card__body .img {
 	height: 250px;
+	overflow: hidden;
+	border-radius: 3px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.item-list .el-card__body .img a {
+	display: block;
+	width: 100%;
 }
 
 .item-list .el-card__body .img img {
-	max-width: 100%;
-	max-height: 100%;
+	width: 100%;
+	height: auto;
+	border-radius: 3px;
+}
+
+@media only screen and (max-width: 767px) {
+	.item-list .el-card__body .img {
+		height: auto;
+		min-height: 80px;
+	}
 }
 
 .item-list .el-card__body .info {
