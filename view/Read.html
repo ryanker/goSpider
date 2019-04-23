@@ -42,7 +42,7 @@
                         <el-form-item v-for="v in columns" :label="v">
                             <div v-if="pageType === 1">
                                 <div v-if="v === 'PlayUrl'">
-                                    <video id="my-player" class="video-js vjs-fluid placeholder vjs-big-play-centered"
+                                    <video id="my-player" class="video-js vjs-fluid vjs-big-play-centered"
                                            controls preload="auto" data-setup='{}'>
                                         <source :src="data[v]"></source>
                                     </video>
