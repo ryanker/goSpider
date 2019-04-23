@@ -114,6 +114,7 @@ body {
 }
 
 .item-list .el-card__body .info {
+	margin-top: 5px;
 	height: 24px;
 	line-height: 24px;
 	overflow: hidden;
