@@ -27,7 +27,7 @@
                     <el-radio-group v-model="pageType" @change="onPageType" size="medium">
                         <el-radio-button :label="1">可视</el-radio-button>
                         <el-radio-button :label="2">源码</el-radio-button>
-                        <el-radio-button :label="3">图片</el-radio-button>
+                        <el-radio-button :label="3">{[ViewType === 1 ? '图片' : '下载']}</el-radio-button>
                     </el-radio-group>
                 </div>
 
