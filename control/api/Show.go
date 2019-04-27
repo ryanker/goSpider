@@ -1,8 +1,6 @@
 package api
 
 import (
-	"strconv"
-
 	"github.com/xiuno/gin"
 
 	"../../lib/dbs"
@@ -46,19 +44,13 @@ func ShowRead(c *gin.Context) {
 
 func ShowList(c *gin.Context) {
 	m := struct {
-		Rid      int64
-		Status   int64
-		Keyword1 string
-		Keyword2 string
-		Keyword3 string
-		Keyword4 string
-		Keyword5 string
-		Keyword6 string
-		Keyword7 string
-		Keyword8 string
-		Keyword9 string
-		Page     int64
-		PageSize int64
+		Rid         int64
+		Status      int64
+		OrderField  string
+		SearchField string
+		SearchWord  string
+		Page        int64
+		PageSize    int64
 	}{}
 	err := c.ShouldBind(&m)
 	if err != nil {
@@ -81,167 +73,198 @@ func ShowList(c *gin.Context) {
 		return
 	}
 
-	h := dbs.H{}
-	if m.Status > 0 {
-		h["Status"] = m.Status
-	}
-
-	// 判断头图是否勾选下载
-	isDown, err := model.RuleParamCount(dbs.H{"Rid": row.Rid, "Type": "List", "Field": "Image", "DownType": 1})
-	if err != nil {
-		c.Message("-1", "读取表失败: "+err.Error())
-		return
-	}
-
-	// 需要搜索的字段
-	ParamList, err := model.RuleParamList(dbs.H{"Rid": row.Rid, "Type": "List", "IsSearch": 1}, 0, 0)
-	if err != nil {
-		c.Message("-1", err.Error())
-		return
-	}
-	keywords := dbs.H{}
-	for k, v := range ParamList {
-		keywords[v.Field] = "Keyword" + strconv.Itoa(k+1)
-		f := v.Field + " LIKE"
-		if k == 0 && m.Keyword1 != "" {
-			h[f] = "%" + m.Keyword1 + "%"
-		} else if k == 1 && m.Keyword2 != "" {
-			h[f] = "%" + m.Keyword2 + "%"
-		} else if k == 2 && m.Keyword3 != "" {
-			h[f] = "%" + m.Keyword3 + "%"
-		} else if k == 3 && m.Keyword4 != "" {
-			h[f] = "%" + m.Keyword4 + "%"
-		} else if k == 4 && m.Keyword5 != "" {
-			h[f] = "%" + m.Keyword5 + "%"
-		} else if k == 5 && m.Keyword6 != "" {
-			h[f] = "%" + m.Keyword6 + "%"
-		} else if k == 6 && m.Keyword7 != "" {
-			h[f] = "%" + m.Keyword7 + "%"
-		} else if k == 7 && m.Keyword8 != "" {
-			h[f] = "%" + m.Keyword8 + "%"
-		} else if k == 8 && m.Keyword9 != "" {
-			h[f] = "%" + m.Keyword9 + "%"
-		}
-	}
-
-	// 数量
-	total, err := dbc.Count("List", h)
+	// ========== 优先读取优先级： Content -> List ==========
+	// 内容页表总数量
+	totalContent, err := dbc.Count("Content", dbs.H{})
 	if err != nil {
 		c.Message("-1", "获取数量失败: "+err.Error())
 		return
 	}
 
-	// 列表
-	if m.PageSize == 0 {
-		m.PageSize = 20
-	}
-	list, columns, err := dbc.FindMap("List", "*", h, "Lid DESC", m.Page, m.PageSize)
-	if err != nil {
-		c.Message("-1", "读取表失败: "+err.Error())
-		return
-	}
-
-	c.Message("0", "success", gin.H{"total": total, "columns": columns, "list": list, "isDown": isDown, "keywords": keywords})
-}
-
-func ShowContent(c *gin.Context) {
-	m := struct {
-		Rid      int64
-		Status   int64
-		Keyword1 string
-		Keyword2 string
-		Keyword3 string
-		Keyword4 string
-		Keyword5 string
-		Keyword6 string
-		Keyword7 string
-		Keyword8 string
-		Keyword9 string
-		Page     int64
-		PageSize int64
-	}{}
-	err := c.ShouldBind(&m)
-	if err != nil {
-		c.Message("-1", "参数不正确: "+err.Error())
-		return
-	}
-
-	// 读取规则
-	row, err := model.RuleRead(m.Rid)
-	if err != nil {
-		c.Message("-1", err.Error())
-		return
-	}
-
-	// 打开数据库
-	dbFile := "./db/" + row.Database + ".db"
-	dbc, err := dbs.Open(dbFile)
-	if err != nil {
-		c.Message("-1", "打开数据库失败: "+err.Error())
-		return
-	}
-
-	h := dbs.H{}
-	if m.Status > 0 {
-		h["Status"] = m.Status
-	}
-
-	// 判断头图是否勾选下载
-	isDown, err := model.RuleParamCount(dbs.H{"Rid": row.Rid, "Type": "Content", "Field": "Image", "DownType": 1})
-	if err != nil {
-		c.Message("-1", "读取表失败: "+err.Error())
-		return
-	}
-
-	// 需要搜索的字段
-	ParamContent, err := model.RuleParamList(dbs.H{"Rid": row.Rid, "Type": "Content", "IsSearch": 1}, 0, 0)
-	if err != nil {
-		c.Message("-1", err.Error())
-		return
-	}
-	keywords := dbs.H{}
-	for k, v := range ParamContent {
-		keywords[v.Field] = "Keyword" + strconv.Itoa(k+1)
-		f := v.Field + " LIKE"
-		if k == 0 && m.Keyword1 != "" {
-			h[f] = "%" + m.Keyword1 + "%"
-		} else if k == 1 && m.Keyword2 != "" {
-			h[f] = "%" + m.Keyword2 + "%"
-		} else if k == 2 && m.Keyword3 != "" {
-			h[f] = "%" + m.Keyword3 + "%"
-		} else if k == 3 && m.Keyword4 != "" {
-			h[f] = "%" + m.Keyword4 + "%"
-		} else if k == 4 && m.Keyword5 != "" {
-			h[f] = "%" + m.Keyword5 + "%"
-		} else if k == 5 && m.Keyword6 != "" {
-			h[f] = "%" + m.Keyword6 + "%"
-		} else if k == 6 && m.Keyword7 != "" {
-			h[f] = "%" + m.Keyword7 + "%"
-		} else if k == 7 && m.Keyword8 != "" {
-			h[f] = "%" + m.Keyword8 + "%"
-		} else if k == 8 && m.Keyword9 != "" {
-			h[f] = "%" + m.Keyword9 + "%"
-		}
-	}
-
-	// 数量
-	total, err := dbc.Count("Content", h)
+	// 列表页表总数量
+	totalList, err := dbc.Count("List", dbs.H{})
 	if err != nil {
 		c.Message("-1", "获取数量失败: "+err.Error())
 		return
 	}
 
-	// 列表
+	// 筛选条件
+	h := dbs.H{}
+
+	// 每页数量
 	if m.PageSize == 0 {
 		m.PageSize = 20
 	}
-	list, columns, err := dbc.FindMap("Content", "*", h, "Lid DESC", m.Page, m.PageSize)
-	if err != nil {
-		c.Message("-1", "读取表失败: "+err.Error())
-		return
-	}
 
-	c.Message("0", "success", gin.H{"total": total, "columns": columns, "list": list, "isDown": isDown, "keywords": keywords})
+	// 优先读取内容页表
+	if totalContent > 0 {
+		ParamList, err := model.RuleParamList(dbs.H{"Rid": row.Rid, "Type": "Content"}, 0, 0)
+		if err != nil {
+			c.Message("-1", err.Error())
+			return
+		}
+
+		var isName bool           // 是否有标题字段
+		var isImage bool          // 是否有图片字段
+		var isImageDown bool      // 图片字段是否需要下载
+		var searchFields []string // 参与搜索的字段
+		var orderFields []string  // 参与排序的字段
+		order := "Lid DESC"
+		for _, v := range ParamList {
+			if v.Field == "Name" {
+				isName = true
+			} else if v.Field == "Image" {
+				isImage = true
+				if v.DownType == 1 {
+					isImageDown = true
+				}
+			}
+			if v.IsSearch == 1 {
+				searchFields = append(searchFields, v.Field)
+				if m.SearchField == v.Field {
+					h[m.SearchField] = "%" + m.SearchWord + "%"
+				}
+			}
+			if v.IsOrder == 1 {
+				orderFields = append(orderFields, v.Field)
+				if m.OrderField == v.Field {
+					order = "`" + v.Field + "` DESC"
+				}
+			}
+		}
+
+		// 总数
+		total, err := dbc.Count("List", h)
+		if err != nil {
+			c.Message("-1", "获取数量失败: "+err.Error())
+			return
+		}
+
+		fields := "`Lid`"
+		if isName {
+			fields += ",`Name`"
+		}
+		if isImage {
+			fields += ",`Image`"
+		}
+		list, _, err := dbc.FindMap("Content", fields, h, order, m.Page, m.PageSize)
+		if err != nil {
+			c.Message("-1", "读取表失败: "+err.Error())
+			return
+		}
+		if isImageDown {
+			// 用下载完成的图片替换远程图片
+			for k, v := range list {
+				Lid, ok := v["Lid"]
+				if !ok {
+					continue
+				}
+				v2, _, err := dbc.ReadMap("ContentDownload", "`NewUrl`", dbs.H{"Lid": Lid, "Status": 1, "Field": "Image"})
+				if err != nil {
+					NewUrl, ok := v2["NewUrl"]
+					if ok {
+						NewUrl, ok := NewUrl.(string)
+						if ok && NewUrl != "" {
+							list[k]["Image"] = NewUrl
+						}
+					}
+				}
+			}
+		}
+
+		c.Message("0", "success", gin.H{
+			"totalContent": totalContent,
+			"totalList":    totalList,
+			"total":        total,
+			"list":         list,
+			"searchFields": searchFields,
+			"orderFields":  orderFields,
+		})
+	} else {
+		// 如果内容页表没有数据，说明待采集，临时读取列表页数据代替
+		ParamList, err := model.RuleParamList(dbs.H{"Rid": row.Rid, "Type": "List"}, 0, 0)
+		if err != nil {
+			c.Message("-1", err.Error())
+			return
+		}
+
+		var isName bool           // 是否有标题字段
+		var isImage bool          // 是否有图片字段
+		var isImageDown bool      // 图片字段是否需要下载
+		var searchFields []string // 参与搜索的字段
+		var orderFields []string  // 参与排序的字段
+		order := "Lid DESC"
+		for _, v := range ParamList {
+			if v.Field == "Name" {
+				isName = true
+			} else if v.Field == "Image" {
+				isImage = true
+				if v.DownType == 1 {
+					isImageDown = true
+				}
+			}
+			if v.IsSearch == 1 {
+				searchFields = append(searchFields, v.Field)
+				if m.SearchField == v.Field {
+					h[m.SearchField] = "%" + m.SearchWord + "%"
+				}
+			}
+			if v.IsOrder == 1 {
+				orderFields = append(orderFields, v.Field)
+				if m.OrderField == v.Field {
+					order = "`" + v.Field + "` DESC"
+				}
+			}
+		}
+
+		// 总数
+		total, err := dbc.Count("List", h)
+		if err != nil {
+			c.Message("-1", "获取数量失败: "+err.Error())
+			return
+		}
+
+		fields := "`Lid`"
+		if isName {
+			fields += ",`Name`"
+		}
+		if isImage {
+			fields += ",`Image`"
+		}
+		list, _, err := dbc.FindMap("List", fields, h, order, m.Page, m.PageSize)
+		if err != nil {
+			c.Message("-1", "读取表失败: "+err.Error())
+			return
+		}
+		if isImageDown {
+			// 用下载完成的图片替换远程图片
+			for k, v := range list {
+				Lid, ok := v["Lid"]
+				if !ok {
+					continue
+				}
+				v2, _, err := dbc.ReadMap("ListDownload", "`NewUrl`", dbs.H{"Lid": Lid, "Status": 1, "Field": "Image"})
+				if err != nil {
+					NewUrl, ok := v2["NewUrl"]
+					if ok {
+						NewUrl, ok := NewUrl.(string)
+						if ok && NewUrl != "" {
+							list[k]["Image"] = NewUrl
+						}
+					}
+				}
+			}
+		}
+
+		c.Message("0", "success", gin.H{
+			"totalContent": totalContent,
+			"totalList":    totalList,
+			"total":        total,
+			"list":         list,
+			"searchFields": searchFields,
+			"orderFields":  orderFields,
+		})
+	}
 }
 
 func ShowDownload(c *gin.Context) {

@@ -52,7 +52,8 @@ CREATE TABLE RuleParam
   FilterRegexp  VARCHAR(255) NOT NULL DEFAULT '',  -- 过滤正则
   FilterRepl    VARCHAR(255) NOT NULL DEFAULT '',  -- 正则结果
   Sort          INTEGER      NOT NULL DEFAULT '0', -- 排序
-  IsSearch      INTEGER      NOT NULL DEFAULT '0', -- 是否可搜索
+  IsSearch      INTEGER      NOT NULL DEFAULT '0', -- 是否参与搜索
+  IsOrder       INTEGER      NOT NULL DEFAULT '0', -- 是否参与排序
   DownType      INTEGER      NOT NULL DEFAULT '0', -- 下载类型 0:不用下载 1:直接下载 2:规则下载
   DownRule      TEXT                  DEFAULT '',  -- 下载地址匹配规则
   DownValueType VARCHAR(255) NOT NULL DEFAULT '',  -- 下载地址获取类型 值:Text Attr
