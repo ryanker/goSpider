@@ -108,7 +108,7 @@ func ShowList(c *gin.Context) {
 		var isImageDown bool      // 图片字段是否需要下载
 		var searchFields []string // 参与搜索的字段
 		var orderFields []string  // 参与排序的字段
-		order := "Lid DESC"
+		order := "Lid"
 		for _, v := range ParamList {
 			if v.Field == "Name" {
 				isName = true
@@ -127,7 +127,7 @@ func ShowList(c *gin.Context) {
 			if v.IsOrder == 1 {
 				orderFields = append(orderFields, v.Field)
 				if m.OrderField == v.Field {
-					order = "`" + v.Field + "` DESC"
+					order = "`" + v.Field + "`"
 				}
 			}
 		}
@@ -146,7 +146,10 @@ func ShowList(c *gin.Context) {
 		if isImage {
 			fields += ",`Image`"
 		}
-		list, _, err := dbc.FindMap("Content", fields, h, order, m.Page, m.PageSize)
+		if order != "Lid" {
+			fields += "," + order
+		}
+		list, _, err := dbc.FindMap("Content", fields, h, order+" DESC", m.Page, m.PageSize)
 		if err != nil {
 			c.Message("-1", "读取表失败: "+err.Error())
 			return
@@ -251,7 +254,7 @@ func ShowList(c *gin.Context) {
 		var isImageDown bool      // 图片字段是否需要下载
 		var searchFields []string // 参与搜索的字段
 		var orderFields []string  // 参与排序的字段
-		order := "Lid DESC"
+		order := "Lid"
 		for _, v := range ParamList {
 			if v.Field == "Name" {
 				isName = true
@@ -270,7 +273,7 @@ func ShowList(c *gin.Context) {
 			if v.IsOrder == 1 {
 				orderFields = append(orderFields, v.Field)
 				if m.OrderField == v.Field {
-					order = "`" + v.Field + "` DESC"
+					order = "`" + v.Field + "`"
 				}
 			}
 		}
@@ -289,7 +292,10 @@ func ShowList(c *gin.Context) {
 		if isImage {
 			fields += ",`Image`"
 		}
-		list, _, err := dbc.FindMap("List", fields, h, order, m.Page, m.PageSize)
+		if order != "Lid" {
+			fields += "," + order
+		}
+		list, _, err := dbc.FindMap("List", fields, h, order+" DESC", m.Page, m.PageSize)
 		if err != nil {
 			c.Message("-1", "读取表失败: "+err.Error())
 			return
