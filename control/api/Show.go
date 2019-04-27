@@ -152,7 +152,60 @@ func ShowList(c *gin.Context) {
 			c.Message("-1", "读取表失败: "+err.Error())
 			return
 		}
-		if isImageDown {
+
+		// "内容页表"没有"图片字段"，尝试去"列表页表"读取是否有"图片字段"
+		if !isImage {
+			ParamList, err := model.RuleParamList(dbs.H{"Rid": row.Rid, "Type": "List", "Field": "Image"}, 0, 0)
+			if err != nil {
+				c.Message("-1", err.Error())
+				return
+			}
+			for _, v := range ParamList {
+				if v.Field == "Image" {
+					isImage = true
+					if v.DownType == 1 {
+						isImageDown = true
+					}
+					continue
+				}
+			}
+
+			if isImage {
+				for k, v := range list {
+					Lid, ok := v["Lid"]
+					if !ok {
+						continue
+					}
+
+					// 优先去"下载附件表"读取
+					if isImageDown {
+						v2, _, err := dbc.ReadMap("ListDownload", "`NewUrl`", dbs.H{"Lid": Lid, "Status": 1, "Field": "Image"})
+						if err != nil {
+							NewUrl, ok := v2["NewUrl"]
+							if ok {
+								NewUrl, ok := NewUrl.(string)
+								if ok && NewUrl != "" {
+									list[k]["Image"] = NewUrl
+									continue
+								}
+							}
+						}
+					}
+
+					// 如果没有下载完成，再到"列表页表"读取原始图片路径
+					v2, _, err := dbc.ReadMap("List", "`Image`", dbs.H{"Lid": Lid})
+					if err != nil {
+						url, ok := v2["Image"]
+						if ok {
+							url, ok := url.(string)
+							if ok && url != "" {
+								list[k]["Image"] = url
+							}
+						}
+					}
+				}
+			}
+		} else if isImageDown {
 			// 用下载完成的图片替换远程图片
 			for k, v := range list {
 				Lid, ok := v["Lid"]
@@ -179,6 +232,8 @@ func ShowList(c *gin.Context) {
 			"list":         list,
 			"searchFields": searchFields,
 			"orderFields":  orderFields,
+			"isName":       isName,
+			"isImage":      isImage,
 		})
 	} else {
 		// 如果内容页表没有数据，说明待采集，临时读取列表页数据代替
@@ -263,6 +318,8 @@ func ShowList(c *gin.Context) {
 			"list":         list,
 			"searchFields": searchFields,
 			"orderFields":  orderFields,
+			"isName":       isName,
+			"isImage":      isImage,
 		})
 	}
 }
