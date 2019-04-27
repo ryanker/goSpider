@@ -45,7 +45,6 @@ func ShowRead(c *gin.Context) {
 func ShowList(c *gin.Context) {
 	m := struct {
 		Rid         int64
-		Status      int64
 		OrderField  string
 		SearchField string
 		SearchWord  string
@@ -121,8 +120,8 @@ func ShowList(c *gin.Context) {
 			}
 			if v.IsSearch == 1 {
 				searchFields = append(searchFields, v.Field)
-				if m.SearchField == v.Field {
-					h[m.SearchField] = "%" + m.SearchWord + "%"
+				if m.SearchField == v.Field && m.SearchWord != "" {
+					h[m.SearchField+" LIKE"] = "%" + m.SearchWord + "%"
 				}
 			}
 			if v.IsOrder == 1 {
@@ -134,7 +133,7 @@ func ShowList(c *gin.Context) {
 		}
 
 		// 总数
-		total, err := dbc.Count("List", h)
+		total, err := dbc.Count("Content", h)
 		if err != nil {
 			c.Message("-1", "获取数量失败: "+err.Error())
 			return
@@ -229,6 +228,7 @@ func ShowList(c *gin.Context) {
 		}
 
 		c.Message("0", "success", gin.H{
+			"ruleName":     row.Name,
 			"totalContent": totalContent,
 			"totalList":    totalList,
 			"total":        total,
@@ -263,8 +263,8 @@ func ShowList(c *gin.Context) {
 			}
 			if v.IsSearch == 1 {
 				searchFields = append(searchFields, v.Field)
-				if m.SearchField == v.Field {
-					h[m.SearchField] = "%" + m.SearchWord + "%"
+				if m.SearchField == v.Field && m.SearchWord != "" {
+					h[m.SearchField+" LIKE"] = "%" + m.SearchWord + "%"
 				}
 			}
 			if v.IsOrder == 1 {
@@ -316,6 +316,7 @@ func ShowList(c *gin.Context) {
 		}
 
 		c.Message("0", "success", gin.H{
+			"ruleName":     row.Name,
 			"totalContent": totalContent,
 			"totalList":    totalList,
 			"total":        total,

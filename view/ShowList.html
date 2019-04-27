@@ -14,8 +14,13 @@
         <el-container>
             {{template "incHeader.html" .}}
             <el-main>
+                <el-breadcrumb separator-class="el-icon-arrow-right">
+                    <el-breadcrumb-item><a href="/">首页</a></el-breadcrumb-item>
+                    <el-breadcrumb-item>{[ruleName]}</el-breadcrumb-item>
+                </el-breadcrumb>
+
                 <!--导航-->
-                <div class="menu-list">
+                <div class="menu-list mt-1">
                     导航：
                     <el-radio-group v-model="menuValue" size="medium">
                         <el-radio-button v-for="v in menuList" :label="v.Key">
@@ -33,17 +38,6 @@
                     </el-radio-group>
                 </div>
 
-                <!--状态-->
-                <div class="mt-1">
-                    状态：
-                    <el-radio-group v-model="q.Status" @change="changeStatus" size="medium">
-                        <el-radio-button :label="0">全部</el-radio-button>
-                        <el-radio-button :label="1">待采集</el-radio-button>
-                        <el-radio-button :label="2">采集完成</el-radio-button>
-                        <el-radio-button :label="3">采集失败</el-radio-button>
-                    </el-radio-group>
-                </div>
-
                 <!--每页-->
                 <div class="mt-1">
                     每页：
@@ -53,14 +47,23 @@
                 </div>
 
                 <!--搜索-->
-                <div v-if="listKeywordsShow" class="mt-1">
+                <div v-if="searchFields.length > 0" class="mt-1">
                     搜索：
-                    <el-input placeholder="请输入内容" v-model="listKeywordsVal" style="max-width:400px">
-                        <el-select v-model="listKeywordsSel" slot="prepend" placeholder="请选择" style="width:120px">
-                            <el-option v-for="(v, k) in listKeywords" :label="k" :value="v"></el-option>
+                    <el-input placeholder="请输入内容" v-model="q.SearchWord" style="max-width:400px" clearable>
+                        <el-select v-model="q.SearchField" slot="prepend" placeholder="请选择" style="width:120px">
+                            <el-option v-for="v in searchFields" :label="v" :value="v"></el-option>
                         </el-select>
                         <el-button slot="append" icon="el-icon-search" @click="onSearch"></el-button>
                     </el-input>
+                </div>
+
+                <!--排序-->
+                <div v-if="orderFields.length > 0" class="mt-1">
+                    排序：
+                    <el-radio-group v-model="q.OrderField" @change="changeOrder" size="medium">
+                        <el-radio-button label="">默认</el-radio-button>
+                        <el-radio-button v-for="v in orderFields" :label="v">{[v]}</el-radio-button>
+                    </el-radio-group>
                 </div>
 
                 <!--分页-->
@@ -72,8 +75,8 @@
                 <el-row class="item-list mt-1">
                     <el-col :lg="4" :sm="6" :xs="24" v-for="v in listData">
                         <el-card :title="v.Name">
-                            <div v-if="isDown" class="img"><a :href="v.ReadUrl"><img :src="v.Image"/></a></div>
-                            <div class="info"><a :href="v.ReadUrl">{[v.Name]}</a></div>
+                            <div v-if="isImage" class="img"><a :href="v.ReadUrl"><img :src="v.Image"/></a></div>
+                            <div class="info"><a :href="v.ReadUrl">{[v.Name ? v.Name : '#'+v.Lid]}</a></div>
                         </el-card>
                     </el-col>
                 </el-row>
@@ -115,20 +118,19 @@
 				isMobile: document.body.getBoundingClientRect().width < 1024,
 				listTotal: 0,
 				listData: [],
-				listColumns: [],
+				searchFields: [],
+				orderFields: [],
 
-				listKeywords: {},
-				listKeywordsVal: '',
-				listKeywordsSel: 'Keyword1',
-				listKeywordsShow: false,
-
-				isDown: 0,
+				ruleName: '',
+				isImage: false,
 				pageType: 1,
 				pageSize: 120,
 				pageLayout: 'total, prev, pager, next, jumper',
 				q: {
 					Rid: Number('{{.Rid}}'),
-					Status: 0,
+					OrderField: '',
+					SearchField: '',
+					SearchWord: '',
 					PageSize: 120,
 					Page: 1,
 				},
@@ -175,6 +177,12 @@
 				this.getList();
 			},
 
+			// 排序
+			changeOrder() {
+				this.q.Page = 1;
+				this.getList();
+			},
+
 			// 加载更多
 			onMore() {
 				this.q.Page++;
@@ -191,19 +199,16 @@
 			getList() {
 				this.moreDisabled = true;
 				const cond = Object.assign({}, this.q);
-				cond[this.listKeywordsSel] = this.listKeywordsVal;
 				aPost('/ShowList', cond).then(r => {
-					this.isDown = r.isDown || 0;
+					this.ruleName = r.ruleName || '';
+					this.isImage = r.isImage || false;
 					this.listTotal = r.total || 0;
 
-					// 搜索框
-					this.listKeywords = r.keywords || {};
-					for (let k in this.listKeywords) {
-						this.listKeywordsShow = true;
-						break;
-					}
+					// 搜索&排序
+					this.orderFields = r.orderFields || [];
+					this.searchFields = r.searchFields || [];
+					if (this.searchFields[0]) this.q.SearchField = this.searchFields[0];
 
-					// this.listColumns = r.columns || [];
 					if (this.pageType === 1) {
 						if (this.q.Page === 1) {
 							this.listData = []
