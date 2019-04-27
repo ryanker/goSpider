@@ -17,3 +17,19 @@ function aPost(url, params) {
 		})
 	})
 }
+
+function humanSize(n) {
+	if (n < 1024) {
+		return n + ' B';
+	} else if (n < 1024 * 1024) {
+		return (n / 1024).toFixed(2) + ' K';
+	} else if (n < 1024 * 1024 * 1024) {
+		return (n / 1024 / 1024).toFixed(2) + ' M';
+	} else if (n < 1024 * 1024 * 1024 * 1024) {
+		return (n / 1024 / 1024 / 1024).toFixed(2) + ' G';
+	} else if (n < 1024 * 1024 * 1024 * 1024 * 1024) {
+		return (n / 1024 / 1024 / 1024 / 1024).toFixed(2) + ' T';
+	} else {
+		return (n / 1024 / 1024 / 1024 / 1024).toFixed(2) + ' P';
+	}
+}

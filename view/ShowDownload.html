@@ -38,6 +38,20 @@
                     </el-radio-group>
                 </div>
 
+                <!--每页-->
+                <div class="mt-1">
+                    每页：
+                    <el-input placeholder="请输入数量" v-model="pageSize" class="mw-1" size="medium">
+                        <el-button slot="append" icon="el-icon-d-arrow-right" @click="onPageSize"></el-button>
+                    </el-input>
+                </div>
+
+                <!--总数-->
+                <div class="mt-1">
+                    总数：
+                    <el-input v-model="listTotal" class="mw-1" size="medium" disabled></el-input>
+                </div>
+
                 <!--浏览-->
                 <div class="mt-1">
                     浏览：
@@ -76,20 +90,6 @@
                     </el-radio-group>
                 </div>
 
-                <!--每页-->
-                <div class="mt-1">
-                    每页：
-                    <el-input placeholder="请输入数量" v-model="pageSize" class="mw-1" size="medium">
-                        <el-button slot="append" icon="el-icon-d-arrow-right" @click="onPageSize"></el-button>
-                    </el-input>
-                </div>
-
-                <!--总数-->
-                <div class="mt-1">
-                    总数：
-                    <el-input v-model="listTotal" class="mw-1" size="medium" disabled></el-input>
-                </div>
-
                 <div v-if="listTotal > 0">
                     <!--分页-->
                     <el-row v-if="pageType === 2" type="flex" justify="end" class="mt-1">
@@ -110,10 +110,21 @@
 
                     <!--表格-->
                     <el-table v-else :data="listData" border class="mt-1">
-                        <el-table-column v-if="q.IsName" prop="Name" label="标题" min-width="250"></el-table-column>
-                        <el-table-column prop="OldUrl" label="下载地址" min-width="250"></el-table-column>
-                        <el-table-column prop="FileSize" label="文件大小" width="150"></el-table-column>
-                        <el-table-column prop="Status" label="状态" width="60" align="center"></el-table-column>
+                        <el-table-column v-if="q.IsName" prop="Name" label="标题" min-width="200"></el-table-column>
+                        <el-table-column prop="OldUrl" label="下载地址" min-width="200"></el-table-column>
+                        <el-table-column label="文件大小" width="100">
+                            <template slot-scope="scope">
+                                {[humanSize(scope.row.FileSize)]}
+                            </template>
+                        </el-table-column>
+                        <el-table-column label="状态" width="100" align="center">
+                            <template slot-scope="scope">
+                                <el-tag v-if="scope.row.Status === 1" type="info">待下载</el-tag>
+                                <el-tag v-else-if="scope.row.Status === 2" type="success">下载完成</el-tag>
+                                <el-tag v-else-if="scope.row.Status === 3" type="danger">下载失败</el-tag>
+                                <el-tag v-else type="danger">-</el-tag>
+                            </template>
+                        </el-table-column>
                     </el-table>
 
                     <!--分页-->
