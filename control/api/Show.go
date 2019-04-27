@@ -338,9 +338,11 @@ func ShowList(c *gin.Context) {
 func ShowDownload(c *gin.Context) {
 	m := struct {
 		Rid      int64
+		Lid      int64
+		Status   int64
+		Field    string
 		Table    string
 		IsName   int64
-		Status   int64
 		Page     int64
 		PageSize int64
 	}{}
@@ -371,9 +373,21 @@ func ShowDownload(c *gin.Context) {
 		return
 	}
 
+	// 每页数量
+	if m.PageSize == 0 {
+		m.PageSize = 20
+	}
+
+	// 筛选条件
 	h := dbs.H{}
+	if m.Lid > 0 {
+		h["Lid"] = m.Lid
+	}
 	if m.Status > 0 {
 		h["Status"] = m.Status
+	}
+	if m.Field != "" {
+		h["Field"] = m.Field
 	}
 
 	// 数量
@@ -384,14 +398,13 @@ func ShowDownload(c *gin.Context) {
 	}
 
 	// 列表
-	if m.PageSize == 0 {
-		m.PageSize = 20
-	}
 	list, _, err := dbc.FindMap(m.Table, "*", h, "Id DESC", m.Page, m.PageSize)
 	if err != nil {
 		c.Message("-1", "读取表失败: "+err.Error())
 		return
 	}
+
+	// 关联标题
 	if m.IsName == 1 {
 		table := "Content"
 		if m.Table != "ListDownload" {
