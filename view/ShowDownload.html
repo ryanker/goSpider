@@ -38,6 +38,15 @@
                     </el-radio-group>
                 </div>
 
+                <!--浏览-->
+                <div class="mt-1">
+                    浏览：
+                    <el-radio-group v-model="ViewType" size="medium">
+                        <el-radio-button :label="1">图片</el-radio-button>
+                        <el-radio-button :label="2">表格</el-radio-button>
+                    </el-radio-group>
+                </div>
+
                 <!--标题-->
                 <div class="mt-1">
                     标题：
@@ -75,40 +84,58 @@
                     </el-input>
                 </div>
 
-                <!--分页-->
-                <el-row v-if="pageType === 2 && listTotal > 0" type="flex" justify="end" class="mt-1">
-                    <el-pagination :current-page="q.Page" :page-size="q.PageSize" :total="listTotal"
-                                   background :layout="pageLayout" @current-change="changePage"/>
-                </el-row>
+                <!--总数-->
+                <div class="mt-1">
+                    总数：
+                    <el-input v-model="listTotal" class="mw-1" size="medium" disabled></el-input>
+                </div>
 
-                <el-row class="item-list mt-1" id="images">
-                    <el-col :lg="4" :sm="6" :xs="24" v-for="v in listData">
-                        <el-card>
-                            <div class="img">
-                                <a :href="v.ReadUrl"><img :src="v.Status === 2 ? v.NewUrl : v.OldUrl"/></a>
-                            </div>
-                            <div v-if="q.IsName" class="info"><a :href="v.ReadUrl">{[v.Name]}</a></div>
-                        </el-card>
-                    </el-col>
-                </el-row>
+                <div v-if="listTotal > 0">
+                    <!--分页-->
+                    <el-row v-if="pageType === 2" type="flex" justify="end" class="mt-1">
+                        <el-pagination :current-page="q.Page" :page-size="q.PageSize" :total="listTotal"
+                                       background :layout="pageLayout" @current-change="changePage"/>
+                    </el-row>
 
-                <!--分页-->
-                <el-row v-if="pageType === 2 && listTotal > 0" type="flex" justify="end" class="mt-1">
-                    <el-pagination :current-page="q.Page" :page-size="q.PageSize" :total="listTotal"
-                                   background :layout="pageLayout" @current-change="changePage"/>
-                </el-row>
+                    <el-row v-if="ViewType === 1" class="item-list mt-1" id="images">
+                        <el-col :lg="4" :sm="6" :xs="24" v-for="v in listData">
+                            <el-card>
+                                <div class="img">
+                                    <a :href="v.ReadUrl"><img :src="v.Status === 2 ? v.NewUrl : v.OldUrl"/></a>
+                                </div>
+                                <div v-if="q.IsName" class="info"><a :href="v.ReadUrl">{[v.Name]}</a></div>
+                            </el-card>
+                        </el-col>
+                    </el-row>
 
-                <!--加载更多-->
-                <div v-if="pageType === 1 && listTotal > 0" class="mt-1">
-                    <el-button v-if="q.Page < Math.ceil(listTotal/q.PageSize)" type="primary" class="more"
-                               :disabled="moreDisabled" @click="onMore">
-                        加载更多 ({[q.Page*q.PageSize]}/{[listTotal]})
-                    </el-button>
-                    <el-button v-else disabled class="more">加载完毕 (共 {[listTotal]} 条)</el-button>
+                    <!--表格-->
+                    <el-table v-else :data="listData" border class="mt-1">
+                        <el-table-column v-if="q.IsName" prop="Name" label="标题" min-width="250"></el-table-column>
+                        <el-table-column prop="OldUrl" label="下载地址" min-width="250"></el-table-column>
+                        <el-table-column prop="FileSize" label="文件大小" width="150"></el-table-column>
+                        <el-table-column prop="Status" label="状态" width="60" align="center"></el-table-column>
+                    </el-table>
+
+                    <!--分页-->
+                    <el-row v-if="pageType === 2" type="flex" justify="end" class="mt-1">
+                        <el-pagination :current-page="q.Page" :page-size="q.PageSize" :total="listTotal"
+                                       background :layout="pageLayout" @current-change="changePage"/>
+                    </el-row>
+
+                    <!--加载更多-->
+                    <div v-if="pageType === 1" class="mt-1">
+                        <el-button v-if="q.Page < Math.ceil(listTotal/q.PageSize)" type="primary" class="more"
+                                   :disabled="moreDisabled" @click="onMore">
+                            加载更多 ({[q.Page*q.PageSize]}/{[listTotal]})
+                        </el-button>
+                        <el-button v-else disabled class="more">加载完毕 (共 {[listTotal]} 条)</el-button>
+                    </div>
                 </div>
 
                 <!--暂无数据-->
-                <el-alert v-if="listTotal === 0" title="暂无数据" type="warning" :closable="false" show-icon></el-alert>
+                <div v-else class="mt-1">
+                    <el-alert title="暂无数据" type="warning" :closable="false" show-icon></el-alert>
+                </div>
             </el-main>
             <el-footer>@2019</el-footer>
         </el-container>
@@ -146,6 +173,7 @@
 				],
 
 				moreDisabled: false,
+				ViewType: 1,
 				ruleName: '',
 				pageType: 1,
 				pageSize: 120,
@@ -211,6 +239,15 @@
 						});
 						this.listData = r.list || [];
 					}
+
+					// 判断是否以表格形式展示
+					if (this.listData[0]) {
+						const suf = this.listData[0]['OldUrl'].substr(-4);
+						if (suf !== '.jpg' && suf !== 'jpeg' && suf !== '.gif' && suf !== '.png') {
+							this.ViewType = 2;
+						}
+					}
+
 					this.moreDisabled = false;
 				}).catch(error => {
 					this.$message.error(error);

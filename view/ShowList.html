@@ -46,6 +46,12 @@
                     </el-input>
                 </div>
 
+                <!--总数-->
+                <div class="mt-1">
+                    总数：
+                    <el-input v-model="listTotal" class="mw-1" size="medium" disabled></el-input>
+                </div>
+
                 <!--排序-->
                 <div v-if="orderFields.length > 0" class="mt-1">
                     排序：
