@@ -179,15 +179,16 @@ func ShowList(c *gin.Context) {
 
 					// 优先去"下载附件表"读取
 					if isImageDown {
-						v2, _, err := dbc.ReadMap("ListDownload", "`NewUrl`", dbs.H{"Lid": Lid, "Status": 1, "Field": "Image"})
+						v2, _, err := dbc.ReadMap("ListDownload", "`NewUrl`", dbs.H{"Lid": Lid, "Status": 2, "Field": "Image"})
 						if err != nil {
-							NewUrl, ok := v2["NewUrl"]
-							if ok {
-								NewUrl, ok := NewUrl.(string)
-								if ok && NewUrl != "" {
-									list[k]["Image"] = NewUrl
-									continue
-								}
+							continue
+						}
+						NewUrl, ok := v2["NewUrl"]
+						if ok {
+							NewUrl, ok := NewUrl.(string)
+							if ok && NewUrl != "" {
+								list[k]["Image"] = NewUrl
+								continue
 							}
 						}
 					}
@@ -195,12 +196,13 @@ func ShowList(c *gin.Context) {
 					// 如果没有下载完成，再到"列表页表"读取原始图片路径
 					v2, _, err := dbc.ReadMap("List", "`Image`", dbs.H{"Lid": Lid})
 					if err != nil {
-						url, ok := v2["Image"]
-						if ok {
-							url, ok := url.(string)
-							if ok && url != "" {
-								list[k]["Image"] = url
-							}
+						continue
+					}
+					url, ok := v2["Image"]
+					if ok {
+						url, ok := url.(string)
+						if ok && url != "" {
+							list[k]["Image"] = url
 						}
 					}
 				}
@@ -212,14 +214,15 @@ func ShowList(c *gin.Context) {
 				if !ok {
 					continue
 				}
-				v2, _, err := dbc.ReadMap("ContentDownload", "`NewUrl`", dbs.H{"Lid": Lid, "Status": 1, "Field": "Image"})
+				v2, _, err := dbc.ReadMap("ContentDownload", "`NewUrl`", dbs.H{"Lid": Lid, "Status": 2, "Field": "Image"})
 				if err != nil {
-					NewUrl, ok := v2["NewUrl"]
-					if ok {
-						NewUrl, ok := NewUrl.(string)
-						if ok && NewUrl != "" {
-							list[k]["Image"] = NewUrl
-						}
+					continue
+				}
+				NewUrl, ok := v2["NewUrl"]
+				if ok {
+					NewUrl, ok := NewUrl.(string)
+					if ok && NewUrl != "" {
+						list[k]["Image"] = NewUrl
 					}
 				}
 			}
@@ -298,14 +301,15 @@ func ShowList(c *gin.Context) {
 				if !ok {
 					continue
 				}
-				v2, _, err := dbc.ReadMap("ListDownload", "`NewUrl`", dbs.H{"Lid": Lid, "Status": 1, "Field": "Image"})
+				v2, _, err := dbc.ReadMap("ListDownload", "`NewUrl`", dbs.H{"Lid": Lid, "Status": 2, "Field": "Image"})
 				if err != nil {
-					NewUrl, ok := v2["NewUrl"]
-					if ok {
-						NewUrl, ok := NewUrl.(string)
-						if ok && NewUrl != "" {
-							list[k]["Image"] = NewUrl
-						}
+					continue
+				}
+				NewUrl, ok := v2["NewUrl"]
+				if ok {
+					NewUrl, ok := NewUrl.(string)
+					if ok && NewUrl != "" {
+						list[k]["Image"] = NewUrl
 					}
 				}
 			}
