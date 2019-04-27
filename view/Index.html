@@ -210,9 +210,10 @@
                                     <el-table-column label="字段名称" prop="Field"></el-table-column>
                                     <el-table-column label="字段备注" prop="Brief"></el-table-column>
                                     <el-table-column label="字段类型" prop="FieldType"></el-table-column>
-                                    <el-table-column label="排序" prop="Sort" width="80" align="center"></el-table-column>
-                                    <el-table-column label="搜索" prop="IsSearch" width="80" align="center"></el-table-column>
-                                    <el-table-column label="下载" prop="DownType" width="80" align="center"></el-table-column>
+                                    <el-table-column label="顺序" prop="Sort" width="80" align="center"></el-table-column>
+                                    <el-table-column label="可搜索" prop="IsSearch" width="80" align="center"></el-table-column>
+                                    <el-table-column label="可排序" prop="IsOrder" width="80" align="center"></el-table-column>
+                                    <el-table-column label="下载类型" prop="DownType" width="80" align="center"></el-table-column>
                                     <el-table-column label="添加时间" prop="CreateDate" width="180"></el-table-column>
                                     <el-table-column label="操作" width="100">
                                         <template slot-scope="scope">
@@ -247,9 +248,10 @@
                                     <el-table-column label="字段名称" prop="Field"></el-table-column>
                                     <el-table-column label="字段备注" prop="Brief"></el-table-column>
                                     <el-table-column label="字段类型" prop="FieldType"></el-table-column>
-                                    <el-table-column label="排序" prop="Sort" width="80" align="center"></el-table-column>
-                                    <el-table-column label="搜索" prop="IsSearch" width="80" align="center"></el-table-column>
-                                    <el-table-column label="下载" prop="DownType" width="80" align="center"></el-table-column>
+                                    <el-table-column label="顺序" prop="Sort" width="80" align="center"></el-table-column>
+                                    <el-table-column label="可搜索" prop="IsSearch" width="80" align="center"></el-table-column>
+                                    <el-table-column label="可排序" prop="IsOrder" width="80" align="center"></el-table-column>
+                                    <el-table-column label="下载类型" prop="DownType" width="80" align="center"></el-table-column>
                                     <el-table-column label="添加时间" prop="CreateDate" width="180"></el-table-column>
                                     <el-table-column label="操作" width="100">
                                         <template slot-scope="scope">
@@ -321,11 +323,17 @@
                                 <el-input v-model="ruleParamData.FilterRepl"/>
                             </el-form-item>
                         </div>
-                        <el-form-item label="排序">
+                        <el-form-item label="顺序">
                             <el-input-number v-model="ruleParamData.Sort" placeholder=""/>
                         </el-form-item>
                         <el-form-item label="是否可搜索">
                             <el-radio-group v-model="ruleParamData.IsSearch">
+                                <el-radio :label="0">否</el-radio>
+                                <el-radio :label="1">是</el-radio>
+                            </el-radio-group>
+                        </el-form-item>
+                        <el-form-item label="是否可排序">
+                            <el-radio-group v-model="ruleParamData.IsOrder">
                                 <el-radio :label="0">否</el-radio>
                                 <el-radio :label="1">是</el-radio>
                             </el-radio-group>
