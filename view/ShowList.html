@@ -46,6 +46,15 @@
                     </el-input>
                 </div>
 
+                <!--排序-->
+                <div v-if="orderFields.length > 0" class="mt-1">
+                    排序：
+                    <el-radio-group v-model="q.OrderField" @change="changeOrder" size="medium">
+                        <el-radio-button label="">默认</el-radio-button>
+                        <el-radio-button v-for="v in orderFields" :label="v">{[v]}</el-radio-button>
+                    </el-radio-group>
+                </div>
+
                 <!--搜索-->
                 <div v-if="searchFields.length > 0" class="mt-1">
                     搜索：
@@ -55,15 +64,6 @@
                         </el-select>
                         <el-button slot="append" icon="el-icon-search" @click="onSearch"></el-button>
                     </el-input>
-                </div>
-
-                <!--排序-->
-                <div v-if="orderFields.length > 0" class="mt-1">
-                    排序：
-                    <el-radio-group v-model="q.OrderField" @change="changeOrder" size="medium">
-                        <el-radio-button label="">默认</el-radio-button>
-                        <el-radio-button v-for="v in orderFields" :label="v">{[v]}</el-radio-button>
-                    </el-radio-group>
                 </div>
 
                 <!--分页-->
@@ -121,11 +121,6 @@
 				searchFields: [],
 				orderFields: [],
 
-				ruleName: '',
-				isImage: false,
-				pageType: 1,
-				pageSize: 120,
-				pageLayout: 'total, prev, pager, next, jumper',
 				q: {
 					Rid: Number('{{.Rid}}'),
 					OrderField: '',
@@ -134,14 +129,19 @@
 					PageSize: 120,
 					Page: 1,
 				},
+
 				menuValue: 1,
 				menuList: [
-					{Key: 1, Name: '列表', Url: '/Show?Rid={{.Rid}}'},
-					{Key: 2, Name: '内容', Url: '/Show?Rid={{.Rid}}&Table=Content'},
-					{Key: 3, Name: '列表下载', Url: '/Show?Rid={{.Rid}}&Table=ListDownload'},
-					{Key: 4, Name: '内容下载', Url: '/Show?Rid={{.Rid}}&Table=ContentDownload'},
+					{Key: 1, Name: '采集的数据', Url: '/Show?Rid={{.Rid}}'},
+					{Key: 2, Name: '下载的数据', Url: '/Show?Rid={{.Rid}}&Table=Download'},
 				],
+
 				moreDisabled: false,
+				ruleName: '',
+				isImage: false,
+				pageType: 1,
+				pageSize: 120,
+				pageLayout: 'total, prev, pager, next, jumper',
 			}
 		},
 		mounted() {
@@ -164,6 +164,12 @@
 				this.getList();
 			},
 
+			// 排序
+			changeOrder() {
+				this.q.Page = 1;
+				this.getList();
+			},
+
 			// 每页数量
 			onPageSize() {
 				this.q.PageSize = Number(this.pageSize);
@@ -173,12 +179,6 @@
 
 			// 搜索
 			onSearch() {
-				this.q.Page = 1;
-				this.getList();
-			},
-
-			// 排序
-			changeOrder() {
 				this.q.Page = 1;
 				this.getList();
 			},

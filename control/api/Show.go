@@ -333,6 +333,7 @@ func ShowDownload(c *gin.Context) {
 	m := struct {
 		Rid      int64
 		Table    string
+		IsName   int64
 		Status   int64
 		Page     int64
 		PageSize int64
@@ -380,11 +381,48 @@ func ShowDownload(c *gin.Context) {
 	if m.PageSize == 0 {
 		m.PageSize = 20
 	}
-	list, columns, err := dbc.FindMap(m.Table, "*", h, "Id DESC", m.Page, m.PageSize)
+	list, _, err := dbc.FindMap(m.Table, "*", h, "Id DESC", m.Page, m.PageSize)
 	if err != nil {
 		c.Message("-1", "读取表失败: "+err.Error())
 		return
 	}
+	if m.IsName == 1 {
+		table := "Content"
+		if m.Table != "ListDownload" {
+			table = "List"
+		}
 
-	c.Message("0", "success", gin.H{"total": total, "columns": columns, "list": list})
+		// 判断是否存在标题字段
+		n, err := model.RuleParamCount(dbs.H{"Rid": m.Rid, "Type": table, "Field": "Name"})
+		if err != nil {
+			c.Message("-1", err.Error())
+			return
+		}
+
+		// 循环赋值标题
+		if n > 0 {
+			tmp := make(map[int64]map[string]interface{})
+			for k, v := range list {
+				var name interface{}
+				Lid, ok := v["Lid"]
+				if ok {
+					Lid, ok := Lid.(int64)
+					if ok {
+						v2, ok := tmp[Lid]
+						if ok {
+							name, _ = v2["Name"]
+						} else {
+							v2, _, err := dbc.ReadMap(table, "`Name`", dbs.H{"Lid": Lid})
+							if err == nil {
+								name, _ = v2["Name"]
+							}
+						}
+					}
+				}
+				list[k]["Name"] = name
+			}
+		}
+	}
+
+	c.Message("0", "success", gin.H{"total": total, "list": list, "ruleName": row.Name})
 }

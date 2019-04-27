@@ -291,6 +291,7 @@ func RuleImport(c *gin.Context) {
 		return
 	}
 
+	m.Data = strings.Trim(m.Data, " \t\r\n")
 	m.Data = strings.TrimPrefix(m.Data, "[GO:BEGIN]\n")
 	m.Data = strings.TrimSuffix(m.Data, "\n[GO:END]")
 	m.Data = strings.Trim(m.Data, " \t\r\n")
