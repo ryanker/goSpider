@@ -24,7 +24,7 @@
                 <!--展示-->
                 <div class="mt-1">
                     展示：
-                    <el-radio-group v-model="pageType" size="medium">
+                    <el-radio-group v-model="pageType" @change="onPageType" size="medium">
                         <el-radio-button :label="1">可视</el-radio-button>
                         <el-radio-button :label="2">源码</el-radio-button>
                         <el-radio-button :label="3">图片</el-radio-button>
@@ -34,6 +34,7 @@
                 <el-card class="box-card mt-1">
                     <div slot="header" class="clearfix">
                         <span>{[data.Name]}</span>
+                        <span v-if="downList.length > 0">({[downList.length]}P)</span>
                     </div>
                     <div v-if="pageType === 1">
                         <el-form :label-position="p" label-width="120px">
@@ -50,7 +51,7 @@
                         <el-form :label-position="p" label-width="120px">
                             <el-form-item v-for="v in columns" :label="v">
                                 <el-input v-model="data[v]" :type="v.substr(-4) === 'Html' ? 'textarea' : 'text'"
-                                          :autosize="{ minRows: 2, maxRows: 100 }"></el-input>
+                                          :autosize="{ minRows: 1, maxRows: 100 }"></el-input>
                             </el-form-item>
                         </el-form>
                     </div>
@@ -59,7 +60,10 @@
                             <img v-for="v in downList" :src="v.Status === 2 ? v.NewUrl : v.OldUrl">
                         </div>
                         <div v-else>
-                            <div v-for="v in downList">{[v.NewUrl]}</div>
+                            <div v-for="v in downList">{[v.OldUrl]}</div>
+                        </div>
+                        <div v-if="downList.length === 0">
+                            <el-alert title="暂无图片" type="warning" :closable="false" show-icon></el-alert>
                         </div>
                     </div>
                 </el-card>
@@ -73,6 +77,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.7.2/index.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/js-cookie/2.2.0/js.cookie.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/video.js/7.5.4/video.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/video.js/7.5.4/lang/zh-CN.js"></script>
 <script src="/static/js/main.js"></script>
@@ -100,9 +105,15 @@
 			if (this.isMobile) {
 				this.p = 'top';
 			}
+			this.pageType = Number(Cookies.get('VG-PageType')) || 1;
 			this.ContentInit();
+			this.DownloadList();
 		},
 		methods: {
+			onPageType(val) {
+				Cookies.set('VG-PageType', val, {expires: 365});
+			},
+
 			ContentInit() {
 				aPost('/ShowRead', {Rid: this.Rid, Lid: this.Lid}).then(r => {
 					this.ruleName = r.ruleName || '';
@@ -115,9 +126,8 @@
 							if (/ipad|iphone|ipod|android/.test(navigator.userAgent.toLowerCase())) {
 								document.getElementById("my-player").play();
 							} else {
-								const options = {};
-								const player = videojs('my-player', options, function onPlayerReady() {
-									videojs.log('Your player is ready!');
+								const player = videojs('my-player', {}, function onPlayerReady() {
+									// videojs.log('Your player is ready!');
 
 									// In this context, `this` is the player that was created by Video.js.
 									this.play();
@@ -131,7 +141,9 @@
 						}, 2000);
 					}
 				});
+			},
 
+			DownloadList() {
 				aPost('/ShowDownload', {
 					Table: 'ContentDownload',
 					Rid: this.Rid,
@@ -148,7 +160,7 @@
 						}
 					}
 				});
-			},
+			}
 		}
 	})
 </script>
