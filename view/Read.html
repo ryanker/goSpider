@@ -47,7 +47,8 @@
                                     <div v-html="data[v]"></div>
                                 </div>
                             </div>
-                            <el-input v-else-if="pageType === 2" v-model="data[v]"></el-input>
+                            <el-input v-else-if="pageType === 2" :type="v.substr(-4) === 'Html' ? 'textarea' : 'text'"
+                                      :autosize="{ minRows: 2, maxRows: 100 }" v-model="data[v]"></el-input>
                         </el-form-item>
                     </el-form>
                 </el-card>
