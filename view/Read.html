@@ -15,15 +15,11 @@
         <el-container>
             {{template "incHeader.html" .}}
             <el-main>
-                <!--导航-->
-                <div class="menu-list">
-                    导航：
-                    <el-radio-group v-model="menuValue" size="medium">
-                        <el-radio-button v-for="v in menuList" :label="v.Key">
-                            <a :href="v.Url">{[v.Name]}</a>
-                        </el-radio-button>
-                    </el-radio-group>
-                </div>
+                <el-breadcrumb separator-class="el-icon-arrow-right">
+                    <el-breadcrumb-item><a href="/">首页</a></el-breadcrumb-item>
+                    <el-breadcrumb-item><a href="/Show?Rid={{.Rid}}">{[ruleName]}</a></el-breadcrumb-item>
+                    <el-breadcrumb-item>{[data.Name]}</el-breadcrumb-item>
+                </el-breadcrumb>
 
                 <!--展示-->
                 <div class="mt-1">
@@ -44,7 +40,7 @@
                                 <div v-if="v === 'PlayUrl'">
                                     <video id="my-player" class="video-js vjs-big-play-centered"
                                            controls preload="auto" data-setup='{}'>
-                                        <source :src="data[v]"></source>
+                                        <source :src="data[v]"/>
                                     </video>
                                 </div>
                                 <div v-else>
@@ -81,16 +77,9 @@
 				p: 'right',
 
 				pageType: 1,
+				ruleName: '',
 				data: {},
-				columns: {},
-
-				menuValue: 1,
-				menuList: [
-					{Key: 1, Name: '列表', Url: '/Show?Rid={{.Rid}}'},
-					{Key: 2, Name: '内容', Url: '/Show?Rid={{.Rid}}&Table=Content'},
-					{Key: 3, Name: '列表下载', Url: '/Show?Rid={{.Rid}}&Table=ListDownload'},
-					{Key: 4, Name: '内容下载', Url: '/Show?Rid={{.Rid}}&Table=ContentDownload'},
-				],
+				columns: [],
 			}
 		},
 		mounted() {
@@ -102,27 +91,32 @@
 		methods: {
 			ContentInit() {
 				aPost('/ShowRead', {Rid: this.Rid, Lid: this.Lid}).then(r => {
-					r.data && (this.data = r.data);
-					r.columns && (this.columns = r.columns);
+					this.ruleName = r.ruleName || '';
+					this.data = r.data || {};
+					this.columns = r.columns || [];
 
-					setTimeout(function () {
-						if (/ipad|iphone|ipod|android/.test(navigator.userAgent.toLowerCase())) {
-							document.getElementById("my-player").play();
-						} else {
-							const options = {};
-							const player = videojs('my-player', options, function onPlayerReady() {
-								videojs.log('Your player is ready!');
+					for (let k in this.columns) {
+						if (k === 'PlayUrl') {
+							setTimeout(function () {
+								if (/ipad|iphone|ipod|android/.test(navigator.userAgent.toLowerCase())) {
+									document.getElementById("my-player").play();
+								} else {
+									const options = {};
+									const player = videojs('my-player', options, function onPlayerReady() {
+										// videojs.log('Your player is ready!');
 
-								// In this context, `this` is the player that was created by Video.js.
-								this.play();
+										// In this context, `this` is the player that was created by Video.js.
+										this.play();
 
-								// How about an event listener?
-								this.on('ended', function () {
-									videojs.log('Awww...over so soon?!');
-								});
-							});
+										// How about an event listener?
+										this.on('ended', function () {
+											// videojs.log('Awww...over so soon?!');
+										});
+									});
+								}
+							}, 2000);
 						}
-					}, 2000)
+					}
 				});
 			},
 		}

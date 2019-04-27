@@ -21,7 +21,7 @@ body {
 }
 
 .el-form-item__content img {
-	width: 100%;
+	width: 96%;
 	height: auto;
 	min-height: 80px;
 	display: block;
@@ -122,6 +122,10 @@ body {
 	.item-list .el-card__body .img {
 		height: auto;
 		min-height: 80px;
+	}
+
+	.el-form-item__content img {
+		width: 98%;
 	}
 }
 

@@ -39,7 +39,7 @@ func ShowRead(c *gin.Context) {
 		return
 	}
 
-	c.Message("0", "success", gin.H{"columns": columns, "data": data})
+	c.Message("0", "success", gin.H{"columns": columns, "data": data, "ruleName": row.Name})
 }
 
 func ShowList(c *gin.Context) {
