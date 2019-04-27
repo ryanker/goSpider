@@ -20,17 +20,6 @@ body {
 	line-height: 23px;
 }
 
-.el-form-item__content img {
-	width: 96%;
-	height: auto;
-	min-height: 80px;
-	display: block;
-	padding: 5px;
-	border-radius: 3px;
-	border: 1px solid #e6e6e6;
-	margin-top: 10px;
-}
-
 .mt-1 {
 	margin-top: 20px;
 }
@@ -118,13 +107,28 @@ body {
 	border-radius: 3px;
 }
 
+.vg-img img {
+	width: 97%;
+	height: auto;
+	min-height: 80px;
+	display: block;
+	padding: 5px;
+	border-radius: 3px;
+	border: 1px solid #e6e6e6;
+	margin-bottom: 10px;
+}
+
+.vg-box img {
+	margin: 10px auto;
+}
+
 @media only screen and (max-width: 767px) {
 	.item-list .el-card__body .img {
 		height: auto;
 		min-height: 80px;
 	}
 
-	.el-form-item__content img {
+	.vg-img img {
 		width: 98%;
 	}
 }

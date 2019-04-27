@@ -27,6 +27,7 @@
                     <el-radio-group v-model="pageType" size="medium">
                         <el-radio-button :label="1">可视</el-radio-button>
                         <el-radio-button :label="2">源码</el-radio-button>
+                        <el-radio-button :label="3">图片</el-radio-button>
                     </el-radio-group>
                 </div>
 
@@ -34,23 +35,33 @@
                     <div slot="header" class="clearfix">
                         <span>{[data.Name]}</span>
                     </div>
-                    <el-form :label-position="p" label-width="120px">
-                        <el-form-item v-for="v in columns" :label="v">
-                            <div v-if="pageType === 1">
-                                <div v-if="v === 'PlayUrl'">
-                                    <video id="my-player" class="video-js vjs-big-play-centered"
-                                           controls preload="auto" data-setup='{}'>
-                                        <source :src="data[v]"/>
-                                    </video>
-                                </div>
-                                <div v-else>
-                                    <div v-html="data[v]"></div>
-                                </div>
-                            </div>
-                            <el-input v-else-if="pageType === 2" :type="v.substr(-4) === 'Html' ? 'textarea' : 'text'"
-                                      :autosize="{ minRows: 2, maxRows: 100 }" v-model="data[v]"></el-input>
-                        </el-form-item>
-                    </el-form>
+                    <div v-if="pageType === 1">
+                        <el-form :label-position="p" label-width="120px">
+                            <el-form-item v-for="v in columns" :label="v">
+                                <video v-if="v === 'PlayUrl'" id="my-player" class="video-js vjs-big-play-centered"
+                                       controls preload="auto" data-setup='{}'>
+                                    <source :src="data[v]"/>
+                                </video>
+                                <div v-else class="vg-img" v-html="data[v]"></div>
+                            </el-form-item>
+                        </el-form>
+                    </div>
+                    <div v-else-if="pageType === 2">
+                        <el-form :label-position="p" label-width="120px">
+                            <el-form-item v-for="v in columns" :label="v">
+                                <el-input v-model="data[v]" :type="v.substr(-4) === 'Html' ? 'textarea' : 'text'"
+                                          :autosize="{ minRows: 2, maxRows: 100 }"></el-input>
+                            </el-form-item>
+                        </el-form>
+                    </div>
+                    <div v-else-if="pageType === 3" class="vg-img vg-box">
+                        <div v-if="ViewType === 1">
+                            <img v-for="v in downList" :src="v.Status === 2 ? v.NewUrl : v.OldUrl">
+                        </div>
+                        <div v-else>
+                            <div v-for="v in downList">{[v.NewUrl]}</div>
+                        </div>
+                    </div>
                 </el-card>
             </el-main>
             <el-footer>@2019</el-footer>
@@ -77,10 +88,12 @@
 
 				p: 'right',
 
+				ViewType: 1,
 				pageType: 1,
 				ruleName: '',
 				data: {},
 				columns: [],
+				downList: [],
 			}
 		},
 		mounted() {
@@ -96,26 +109,42 @@
 					this.data = r.data || {};
 					this.columns = r.columns || [];
 
-					for (let k in this.columns) {
-						if (k === 'PlayUrl') {
-							setTimeout(function () {
-								if (/ipad|iphone|ipod|android/.test(navigator.userAgent.toLowerCase())) {
-									document.getElementById("my-player").play();
-								} else {
-									const options = {};
-									const player = videojs('my-player', options, function onPlayerReady() {
-										// videojs.log('Your player is ready!');
+					// 自动播放
+					if (this.pageType === 1 && this.data.PlayUrl) {
+						setTimeout(function () {
+							if (/ipad|iphone|ipod|android/.test(navigator.userAgent.toLowerCase())) {
+								document.getElementById("my-player").play();
+							} else {
+								const options = {};
+								const player = videojs('my-player', options, function onPlayerReady() {
+									videojs.log('Your player is ready!');
 
-										// In this context, `this` is the player that was created by Video.js.
-										this.play();
+									// In this context, `this` is the player that was created by Video.js.
+									this.play();
 
-										// How about an event listener?
-										this.on('ended', function () {
-											// videojs.log('Awww...over so soon?!');
-										});
+									// How about an event listener?
+									this.on('ended', function () {
+										// videojs.log('Awww...over so soon?!');
 									});
-								}
-							}, 2000);
+								});
+							}
+						}, 2000);
+					}
+				});
+
+				aPost('/ShowDownload', {
+					Table: 'ContentDownload',
+					Rid: this.Rid,
+					Lid: this.Lid,
+					PageSize: 200,
+				}).then(r => {
+					this.downList = r.list || [];
+
+					// 判断是否以表格形式展示
+					if (this.downList[0]) {
+						const suf = this.downList[0]['OldUrl'].substr(-4);
+						if (suf !== '.jpg' && suf !== 'jpeg' && suf !== '.gif' && suf !== '.png') {
+							this.ViewType = 2;
 						}
 					}
 				});
