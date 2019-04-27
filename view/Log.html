@@ -19,8 +19,8 @@
                     <el-input v-model="q.Message" placeholder="搜索日志" class="mb-1 mr-1 w-1" clearable>
                         <el-button slot="append" icon="el-icon-search" @click="searchClick"/>
                     </el-input>
-                    <el-button type="danger" class="mb-1" @click="deleteDialog">清空日志</el-button>
-                    <el-checkbox v-model="autoRefresh" label="自动刷新" border class="mb-1 ml-1"
+                    <el-button type="danger" class="mb-1 mr-1" @click="deleteDialog">清空日志</el-button>
+                    <el-checkbox v-model="autoRefresh" label="自动刷新" border class="mb-1"
                                  @change="autoChange"></el-checkbox>
                 </el-row>
 
