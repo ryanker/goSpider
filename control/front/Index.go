@@ -30,7 +30,7 @@ func Show(c *gin.Context) {
 	User := api.UserGet(c)
 	Rid := c.Query("Rid")
 	Table := c.Query("Table")
-	if Table != "Content" && Table != "ContentDownload" && Table != "ListDownload" {
+	if Table != "ContentDownload" && Table != "ListDownload" {
 		Table = "List"
 	}
 	c.HTML(http.StatusOK, "Show"+Table+".html", gin.H{
