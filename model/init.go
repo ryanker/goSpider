@@ -955,7 +955,7 @@ func ossUpload(objectName, localFileName string) error {
 	}
 
 	// 上传文件
-	err = bucket.PutObjectFromFile(objectName, localFileName)
+	err = bucket.PutObjectFromFile(strings.Trim(objectName, "/"), localFileName)
 	if err != nil {
 		return errors.New("上传文件到 OSS 失败: " + err.Error())
 	}
