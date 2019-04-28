@@ -28,6 +28,8 @@ CREATE TABLE Rule
   IsContentDownAna INTEGER      NOT NULL DEFAULT '0',               -- 是否分析内容页下载地址
   IsContentDownRun INTEGER      NOT NULL DEFAULT '0',               -- 是否抓取内容页资源
 
+  SaveType         INTEGER      NOT NULL DEFAULT '0',               -- 存放文件类型 1:本机存放 2:OSS存放
+
   LastStartDate    DATETIME              DEFAULT CURRENT_TIMESTAMP, -- 上次采集开始时间
   LastEndDate      DATETIME              DEFAULT CURRENT_TIMESTAMP, -- 上次采集结束时间
   NextStartDate    DATETIME              DEFAULT CURRENT_TIMESTAMP, -- 下次采集开始时间
@@ -54,6 +56,7 @@ CREATE TABLE RuleParam
   Sort          INTEGER      NOT NULL DEFAULT '0', -- 排序
   IsSearch      INTEGER      NOT NULL DEFAULT '0', -- 是否参与搜索
   IsOrder       INTEGER      NOT NULL DEFAULT '0', -- 是否参与排序
+  IsRequired    INTEGER      NOT NULL DEFAULT '0', -- 是否必须有值(采集入库时)
   DownType      INTEGER      NOT NULL DEFAULT '0', -- 下载类型 0:不用下载 1:直接下载 2:规则下载
   DownRule      TEXT                  DEFAULT '',  -- 下载地址匹配规则
   DownValueType VARCHAR(255) NOT NULL DEFAULT '',  -- 下载地址获取类型 值:Text Attr

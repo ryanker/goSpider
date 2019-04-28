@@ -22,6 +22,7 @@ type RuleParam struct {
 	Sort          int64
 	IsSearch      int64
 	IsOrder       int64
+	IsRequired    int64
 	DownType      int64
 	DownRule      string
 	DownValueType string
@@ -49,6 +50,7 @@ func RuleParamMap() (ptr *RuleParam, fields string, args *[]interface{}) {
 		"Sort":          &row.Sort,
 		"IsSearch":      &row.IsSearch,
 		"IsOrder":       &row.IsOrder,
+		"IsRequired":    &row.IsRequired,
 		"DownType":      &row.DownType,
 		"DownRule":      &row.DownRule,
 		"DownValueType": &row.DownValueType,
