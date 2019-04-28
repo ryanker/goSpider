@@ -222,9 +222,11 @@ func getListAll(dbc *dbs.DB, ParamList *[]RuleParam, row *Rule) {
 	}
 
 	// 规律列表 Url 抓取
-	for page := row.ListPageStart; page <= row.ListPageEnd; page += row.ListPageSize {
-		Url := strings.Replace(row.ListUrl, "{page}", strconv.FormatInt(page, 10), -1)
-		getList(dbc, ParamList, row, Url)
+	if row.ListUrl != "" {
+		for page := row.ListPageStart; page <= row.ListPageEnd; page += row.ListPageSize {
+			Url := strings.Replace(row.ListUrl, "{page}", strconv.FormatInt(page, 10), -1)
+			getList(dbc, ParamList, row, Url)
+		}
 	}
 }
 
