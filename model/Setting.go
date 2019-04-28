@@ -72,6 +72,6 @@ func SettingInit() (err error) {
 	var mu sync.Mutex
 	mu.Lock()
 	defer mu.Unlock()
-	setting, err = SettingList()
+	Settings, err = SettingList()
 	return err
 }

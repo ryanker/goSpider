@@ -20,17 +20,17 @@
                     </div>
                     <el-form :model="data" :label-position="p" label-width="150px" style="width:95%">
                         <el-form-item label="OSS 地域节点">
-                            <el-input v-model="data.ossEndpoint"
+                            <el-input v-model="data.OssEndpoint"
                                       placeholder="如：http://oss-cn-hangzhou.aliyuncs.com"></el-input>
                         </el-form-item>
                         <el-form-item label="OSS 密钥ID">
-                            <el-input v-model="data.ossAccessKeyId" placeholder="<yourAccessKeyId>"></el-input>
+                            <el-input v-model="data.OssAccessKeyId" placeholder="<yourAccessKeyId>"></el-input>
                         </el-form-item>
                         <el-form-item label="OSS 密钥密码">
-                            <el-input v-model="data.ossAccessKeySecret" placeholder="<yourAccessKeySecret>"></el-input>
+                            <el-input v-model="data.OssAccessKeySecret" placeholder="<yourAccessKeySecret>"></el-input>
                         </el-form-item>
                         <el-form-item label="OSS 存储空间">
-                            <el-input v-model="data.ossBucketName" placeholder="<yourBucketName>"></el-input>
+                            <el-input v-model="data.OssBucketName" placeholder="<yourBucketName>"></el-input>
                         </el-form-item>
                         <el-form-item>
                             <el-button type="primary" @click="onSubmit">保存</el-button>

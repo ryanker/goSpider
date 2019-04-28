@@ -1,27 +1,63 @@
 package api
 
 import (
+	"github.com/aliyun/aliyun-oss-go-sdk/oss"
 	"github.com/xiuno/gin"
 
 	"../../model"
 )
 
-func SettingList(c *gin.Context) {
-	data, err := model.SettingList()
+func SettingSave(c *gin.Context) {
+	m := struct {
+		OssEndpoint        string
+		OssAccessKeyId     string
+		OssAccessKeySecret string
+		OssBucketName      string
+	}{}
+	err := c.ShouldBind(&m)
 	if err != nil {
-		c.Message("-1", err.Error())
+		c.Message("-1", "参数不正确: "+err.Error())
 		return
 	}
-	c.Message("0", "success", gin.H{"data": data})
-}
 
-func SettingInit(c *gin.Context) {
-	err := model.SettingInit()
+	mp := make(map[string]string)
+	mp["OssEndpoint"] = m.OssEndpoint
+	mp["OssAccessKeyId"] = m.OssAccessKeyId
+	mp["OssAccessKeySecret"] = m.OssAccessKeySecret
+	mp["OssBucketName"] = m.OssBucketName
+
+	for k, v := range mp {
+		err = model.SettingSet(k, v)
+		if err != nil {
+			c.Message("-1", err.Error())
+			return
+		}
+	}
+
+	// 创建 OSSClient 实例
+	client, err := oss.New(m.OssEndpoint, m.OssAccessKeyId, m.OssAccessKeySecret)
 	if err != nil {
-		c.Message("-1", err.Error())
+		c.Message("-1", "创建 OSSClient 实例失败: "+err.Error())
 		return
 	}
-	c.Message("0", "success")
+
+	// 检测存储空间是否存在
+	isExist, err := client.IsBucketExist(m.OssBucketName)
+	if err != nil {
+		c.Message("-1", "检测存储空间是否存在失败: "+err.Error())
+		return
+	}
+
+	if !isExist {
+		// 创建存储空间
+		err = client.CreateBucket(m.OssBucketName)
+		if err != nil {
+			c.Message("-1", "创建存储空间失败: "+err.Error())
+			return
+		}
+	}
+
+	c.Message("0", "保存成功")
 }
 
 func SettingSet(c *gin.Context) {
@@ -57,4 +93,22 @@ func SettingGet(c *gin.Context) {
 		return
 	}
 	c.Message("0", "success", gin.H{"Value": Value})
+}
+
+func SettingList(c *gin.Context) {
+	data, err := model.SettingList()
+	if err != nil {
+		c.Message("-1", err.Error())
+		return
+	}
+	c.Message("0", "success", gin.H{"data": data})
+}
+
+func SettingInit(c *gin.Context) {
+	err := model.SettingInit()
+	if err != nil {
+		c.Message("-1", err.Error())
+		return
+	}
+	c.Message("0", "success")
 }

@@ -159,10 +159,11 @@ func StartGin() {
 	adminApi.POST("/LogDeleteDB", api.LogDeleteDB)
 
 	// Setting
-	adminApi.POST("/SettingList", api.SettingList)
-	adminApi.POST("/SettingInit", api.SettingInit)
+	adminApi.POST("/SettingSave", api.SettingSave)
 	adminApi.POST("/SettingSet", api.SettingSet)
 	adminApi.POST("/SettingGet", api.SettingGet)
+	adminApi.POST("/SettingList", api.SettingList)
+	adminApi.POST("/SettingInit", api.SettingInit)
 
 	// 内存信息 && 磁盘信息
 	adminApi.POST("/MemStatsInfo", api.MemStatsInfo)

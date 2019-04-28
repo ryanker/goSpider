@@ -39,7 +39,7 @@ type ListDown struct {
 var err error
 var db *dbs.DB
 var dbLog *dbs.DB
-var setting map[string]string
+var Settings map[string]string
 
 var logSql = `CREATE TABLE Log
 (
@@ -87,7 +87,7 @@ func InitDB() {
 
 // 加载系统配置信息
 func InitSetting() {
-	setting, err = SettingList()
+	Settings, err = SettingList()
 	if err != nil {
 		panic(err)
 	}
@@ -933,10 +933,10 @@ func downContent(dbc *dbs.DB, row *Rule) {
 }
 
 func ossUpload(objectName, localFileName string) error {
-	endpoint, ok := setting["ossEndpoint"]
-	accessKeyId, ok2 := setting["ossAccessKeyId"]
-	accessKeySecret, ok3 := setting["ossAccessKeySecret"]
-	bucketName, ok4 := setting["ossBucketName"]
+	endpoint, ok := Settings["OssEndpoint"]
+	accessKeyId, ok2 := Settings["OssAccessKeyId"]
+	accessKeySecret, ok3 := Settings["OssAccessKeySecret"]
+	bucketName, ok4 := Settings["OssBucketName"]
 
 	if !ok || !ok2 || !ok3 || !ok4 {
 		return errors.New("OSS 配置信息未设置正确")
