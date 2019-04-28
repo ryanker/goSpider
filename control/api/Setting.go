@@ -57,6 +57,13 @@ func SettingSave(c *gin.Context) {
 		}
 	}
 
+	// 加载配置信息到内存
+	err = model.SettingInit()
+	if err != nil {
+		c.Message("-1", err.Error())
+		return
+	}
+
 	c.Message("0", "保存成功")
 }
 
