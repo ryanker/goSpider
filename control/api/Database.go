@@ -127,7 +127,10 @@ CREATE TABLE ContentDownload
   Sort         INTEGER      NOT NULL DEFAULT '0',
   DownloadDate DATETIME              DEFAULT CURRENT_TIMESTAMP,
   CreateDate   DATETIME              DEFAULT CURRENT_TIMESTAMP
-);`
+);
+
+CREATE INDEX ListDownload_Lid on ListDownload (Lid);
+CREATE INDEX ContentDownload_Lid on ContentDownload (Lid);`
 	// fmt.Println(s)
 	return
 }
