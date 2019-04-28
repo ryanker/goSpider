@@ -352,6 +352,7 @@ func getContent(dbc *dbs.DB, ParamContent *[]RuleParam, row *Rule) {
 			}
 
 			// 匹配字段
+			isRequired := false
 			data := dbs.H{}
 			data["Lid"] = lv.Lid
 			data["Url"] = lv.Url
@@ -368,7 +369,19 @@ func getContent(dbc *dbs.DB, ParamContent *[]RuleParam, row *Rule) {
 					value, _ = dom.Html()
 				}
 				value = misc.StrClear(value, v.FilterType, v.FilterRegexp, v.FilterRepl)
+
+				// 入库必须项，必须有值
+				if v.IsRequired == 1 && value == "" {
+					isRequired = true
+					continue
+				}
+
 				data[v.Field] = value
+			}
+
+			// 入库必须项，如果没有值，跳过入库
+			if isRequired {
+				continue
 			}
 
 			// 写入数据库
