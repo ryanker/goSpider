@@ -30,9 +30,6 @@ func SettingSet(Key string, Value string) (err error) {
 	} else if err == sql.ErrNoRows {
 		_, err = db.Insert("Setting", dbs.H{"Key": Key, "Value": Value})
 	}
-	if err == nil {
-		err = SettingInit()
-	}
 	return
 }
 

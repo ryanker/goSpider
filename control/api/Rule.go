@@ -63,6 +63,7 @@ func RuleCreate(c *gin.Context) {
 		"IsContent":        1,
 		"IsContentDownAna": 1,
 		"IsContentDownRun": 1,
+		"SaveType":         1,
 	})
 	if err != nil {
 		c.Message("-1", err.Error())
@@ -110,24 +111,18 @@ func RuleUpdate(c *gin.Context) {
 	}
 
 	err = model.RuleUpdate(dbs.H{
-		"Name":             m.Name,
-		"Brief":            m.Brief,
-		"Database":         m.Database,
-		"Cookie":           m.Cookie,
-		"Charset":          m.Charset,
-		"ListSpecialUrl":   m.ListSpecialUrl,
-		"ListUrl":          m.ListUrl,
-		"ListPageStart":    m.ListPageStart,
-		"ListPageEnd":      m.ListPageEnd,
-		"ListPageSize":     m.ListPageSize,
-		"ListRule":         m.ListRule,
-		"ContentUrl":       m.ContentUrl,
-		"IsList":           m.IsList,
-		"IsListDownAna":    m.IsListDownAna,
-		"IsListDownRun":    m.IsListDownRun,
-		"IsContent":        m.IsContent,
-		"IsContentDownAna": m.IsContentDownAna,
-		"IsContentDownRun": m.IsContentDownRun,
+		"Name":           m.Name,
+		"Brief":          m.Brief,
+		"Database":       m.Database,
+		"Cookie":         m.Cookie,
+		"Charset":        m.Charset,
+		"ListSpecialUrl": m.ListSpecialUrl,
+		"ListUrl":        m.ListUrl,
+		"ListPageStart":  m.ListPageStart,
+		"ListPageEnd":    m.ListPageEnd,
+		"ListPageSize":   m.ListPageSize,
+		"ListRule":       m.ListRule,
+		"ContentUrl":     m.ContentUrl,
 	}, m.Rid)
 	if err != nil {
 		c.Message("-1", "更新数据库失败："+err.Error())
@@ -222,7 +217,7 @@ func RuleList(c *gin.Context) {
 		h["Status"] = m.Status
 	}
 	if m.Name != "" {
-		h["Name LIKE"] = m.Name
+		h["Name LIKE"] = "%" + m.Name + "%"
 	}
 
 	total, err := model.RuleCount(h)
