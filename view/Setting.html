@@ -65,7 +65,12 @@
 		},
 		methods: {
 			onSubmit() {
-				!(async () => {
+				aPost('/SettingSave', this.data).then(r => {
+					this.$message.success(r.message);
+				}).catch(error => {
+					this.$message.error(error);
+				});
+				/*!(async () => {
 					const failDate = []; // 记录失败
 					for (const k in this.data) {
 						const v = this.data[k];
@@ -82,7 +87,7 @@
 						this.$message.success('保存成功');
 						this.SettingInit();
 					}
-				})()
+				})();*/
 			},
 
 			SettingInit() {
