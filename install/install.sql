@@ -56,7 +56,7 @@ CREATE TABLE RuleParam
   Sort          INTEGER      NOT NULL DEFAULT '0', -- 排序
   IsSearch      INTEGER      NOT NULL DEFAULT '0', -- 是否参与搜索
   IsOrder       INTEGER      NOT NULL DEFAULT '0', -- 是否参与排序
-  IsRequired    INTEGER      NOT NULL DEFAULT '0', -- 是否必须有值(采集入库时)
+  IsRequired    INTEGER      NOT NULL DEFAULT '0', -- 入库必须有值(采集入库时)
   DownType      INTEGER      NOT NULL DEFAULT '0', -- 下载类型 0:不用下载 1:直接下载 2:规则下载
   DownRule      TEXT                  DEFAULT '',  -- 下载地址匹配规则
   DownValueType VARCHAR(255) NOT NULL DEFAULT '',  -- 下载地址获取类型 值:Text Attr
@@ -85,3 +85,14 @@ CREATE TABLE `User`
 );
 INSERT INTO `User` (`uid`, `gid`, `name`, `email`, `mobile`, `password`, `salt`)
 VALUES (1, 1, 'dog', 'dog@dog.com', '18812345678', 'ea7ac79f95e032b0c73eec73ba6d1263', '12345678'); -- 密码: 88888888
+
+-- 系统设置表
+CREATE TABLE `Setting`
+(
+  `Key`   VARCHAR(255) NOT NULL PRIMARY KEY, -- 健
+  `Value` TEXT DEFAULT ''                    -- 值
+);
+
+-- 索引
+CREATE INDEX User_Gid on User (Gid);
+CREATE INDEX RuleParam_Rid on RuleParam (Rid);
