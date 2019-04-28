@@ -1,6 +1,7 @@
 package model
 
 import (
+	"errors"
 	"fmt"
 	"math"
 	"os"
@@ -10,6 +11,7 @@ import (
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
+	"github.com/aliyun/aliyun-oss-go-sdk/oss"
 
 	"../lib/dbs"
 	"../lib/misc"
@@ -781,7 +783,8 @@ func downList(dbc *dbs.DB, row *Rule) {
 		for _, lv := range list {
 			// 下载文件
 			t2 := time.Now() // 记时开始
-			FileSize, err := misc.DownloadFile(lv.OldUrl, "."+lv.NewUrl)
+			localFileName := "." + lv.NewUrl
+			FileSize, err := misc.DownloadFile(lv.OldUrl, localFileName)
 			if err != nil {
 				errorNum++
 				cronErrorLog(time.Since(t2), "下载文件失败: %v, 大小: %v, File: %v, Url: %v", err.Error(), FileSize, lv.NewUrl, lv.OldUrl)
@@ -797,8 +800,27 @@ func downList(dbc *dbs.DB, row *Rule) {
 			cronLog(time.Since(t2), "下载文件完成, 大小: %v, File: %v, Url: %v", FileSize, lv.NewUrl, lv.OldUrl)
 
 			// 存放 OSS
-			if row.SaveType == 1 {
+			if row.SaveType == 2 {
+				err = ossUpload(lv.NewUrl, localFileName)
+				if err != nil {
+					errorNum++
+					cronErrorLog(0, err.Error())
 
+					// 上传失败
+					_, err = dbc.Update("ListDownload", dbs.H{"Status": 3}, dbs.H{"Id": lv.Id})
+					if err != nil {
+						errorNum++
+						cronErrorLog(0, "更新数据库失败: %v", err.Error())
+					}
+					continue
+				}
+
+				// 删除本地文件，出错时只记录日志，不影响流程
+				err = os.Remove(localFileName)
+				if err != nil {
+					errorNum++
+					cronErrorLog(0, "删除本地文件失败: %v", err.Error())
+				}
 			}
 
 			// 更新
@@ -850,7 +872,8 @@ func downContent(dbc *dbs.DB, row *Rule) {
 		for _, lv := range list {
 			// 下载文件
 			t2 := time.Now() // 记时开始
-			FileSize, err := misc.DownloadFile(lv.OldUrl, "."+lv.NewUrl)
+			localFileName := "." + lv.NewUrl
+			FileSize, err := misc.DownloadFile(lv.OldUrl, localFileName)
 			if err != nil {
 				errorNum++
 				cronErrorLog(time.Since(t2), "下载文件失败: %v, 大小: %v, File: %v, Url: %v", err.Error(), FileSize, lv.NewUrl, lv.OldUrl)
@@ -864,6 +887,30 @@ func downContent(dbc *dbs.DB, row *Rule) {
 				continue
 			}
 			cronLog(time.Since(t2), "下载文件完成, 大小: %v, File: %v, Url: %v", FileSize, lv.NewUrl, lv.OldUrl)
+
+			// 存放 OSS
+			if row.SaveType == 2 {
+				err = ossUpload(lv.NewUrl, localFileName)
+				if err != nil {
+					errorNum++
+					cronErrorLog(0, err.Error())
+
+					// 上传失败
+					_, err = dbc.Update("ListDownload", dbs.H{"Status": 3}, dbs.H{"Id": lv.Id})
+					if err != nil {
+						errorNum++
+						cronErrorLog(0, "更新数据库失败: %v", err.Error())
+					}
+					continue
+				}
+
+				// 删除本地文件，出错时只记录日志，不影响流程
+				err = os.Remove(localFileName)
+				if err != nil {
+					errorNum++
+					cronErrorLog(0, "删除本地文件失败: %v", err.Error())
+				}
+			}
 
 			// 更新
 			_, err = dbc.Update("ContentDownload", dbs.H{
@@ -881,4 +928,34 @@ func downContent(dbc *dbs.DB, row *Rule) {
 	}
 
 	cronLog(time.Since(t), "内容页下载资源完成, 总数: %v, 错误: %v", n, errorNum)
+}
+
+func ossUpload(objectName, localFileName string) error {
+	endpoint, ok := setting["ossEndpoint"]
+	accessKeyId, ok2 := setting["ossAccessKeyId"]
+	accessKeySecret, ok3 := setting["ossAccessKeySecret"]
+	bucketName, ok4 := setting["ossBucketName"]
+
+	if !ok || !ok2 || !ok3 || !ok4 {
+		return errors.New("OSS 配置信息未设置正确")
+	}
+
+	// 创建 OSSClient 实例
+	client, err := oss.New(endpoint, accessKeyId, accessKeySecret)
+	if err != nil {
+		return errors.New("创建 OSSClient 实例失败: " + err.Error())
+	}
+
+	// 获取存储空间
+	bucket, err := client.Bucket(bucketName)
+	if err != nil {
+		return errors.New("获取 OSS 存储空间失败: " + err.Error())
+	}
+
+	// 上传文件
+	err = bucket.PutObjectFromFile(objectName, localFileName)
+	if err != nil {
+		return errors.New("上传文件到 OSS 失败: " + err.Error())
+	}
+	return nil
 }
