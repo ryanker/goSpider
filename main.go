@@ -160,6 +160,7 @@ func StartGin() {
 
 	// Setting
 	adminApi.POST("/SettingList", api.SettingList)
+	adminApi.POST("/SettingInit", api.SettingInit)
 	adminApi.POST("/SettingSet", api.SettingSet)
 	adminApi.POST("/SettingGet", api.SettingGet)
 

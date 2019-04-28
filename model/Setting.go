@@ -2,6 +2,7 @@ package model
 
 import (
 	"database/sql"
+	"sync"
 
 	"../lib/dbs"
 )
@@ -29,6 +30,9 @@ func SettingSet(Key string, Value string) (err error) {
 	} else if err == sql.ErrNoRows {
 		_, err = db.Insert("Setting", dbs.H{"Key": Key, "Value": Value})
 	}
+	if err == nil {
+		err = SettingInit()
+	}
 	return
 }
 
@@ -49,7 +53,8 @@ func SettingRead(Key string) (row Setting, err error) {
 	return
 }
 
-func SettingList() (list []Setting, err error) {
+func SettingList() (r map[string]string, err error) {
+	var list []Setting
 	data, fields, scanArr := SettingMap()
 	err = db.Find("Setting", fields, *scanArr, dbs.H{}, "", 0, 1000, func() {
 		list = append(list, *data)
@@ -57,5 +62,19 @@ func SettingList() (list []Setting, err error) {
 	if err != nil {
 		return
 	}
+	tmp := make(map[string]string)
+	for _, k := range list {
+		tmp[k.Key] = k.Value
+	}
+	r = tmp
 	return
+}
+
+// 加载配置信息到内存
+func SettingInit() (err error) {
+	var mu sync.Mutex
+	mu.Lock()
+	defer mu.Unlock()
+	setting, err = SettingList()
+	return err
 }

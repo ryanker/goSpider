@@ -7,16 +7,21 @@ import (
 )
 
 func SettingList(c *gin.Context) {
-	list, err := model.SettingList()
+	data, err := model.SettingList()
 	if err != nil {
 		c.Message("-1", err.Error())
 		return
 	}
-	data := make(map[string]string)
-	for _, k := range list {
-		data[k.Key] = k.Value
-	}
 	c.Message("0", "success", gin.H{"data": data})
+}
+
+func SettingInit(c *gin.Context) {
+	err := model.SettingInit()
+	if err != nil {
+		c.Message("-1", err.Error())
+		return
+	}
+	c.Message("0", "success")
 }
 
 func SettingSet(c *gin.Context) {

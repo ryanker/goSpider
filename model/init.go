@@ -37,6 +37,7 @@ type ListDown struct {
 var err error
 var db *dbs.DB
 var dbLog *dbs.DB
+var setting map[string]string
 
 var logSql = `CREATE TABLE Log
 (
@@ -53,8 +54,9 @@ func init() {
 	dbs.LogFile = "./log/db.log"
 	dbs.ErrorLogFile = "./log/db.error.log"
 
-	InitDB()    // 打开主库
-	InitDbLog() // 打开日志库
+	InitDB()      // 打开主库
+	InitDbLog()   // 打开日志库
+	InitSetting() // 加载系统配置
 
 	go cron()
 }
@@ -77,6 +79,14 @@ func InitDB() {
 	}
 
 	if err = db.Ping(); err != nil {
+		panic(err)
+	}
+}
+
+// 加载系统配置信息
+func InitSetting() {
+	setting, err = SettingList()
+	if err != nil {
 		panic(err)
 	}
 }
@@ -785,6 +795,11 @@ func downList(dbc *dbs.DB, row *Rule) {
 				continue
 			}
 			cronLog(time.Since(t2), "下载文件完成, 大小: %v, File: %v, Url: %v", FileSize, lv.NewUrl, lv.OldUrl)
+
+			// 存放 OSS
+			if row.SaveType == 1 {
+
+			}
 
 			// 更新
 			_, err = dbc.Update("ListDownload", dbs.H{
