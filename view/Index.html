@@ -213,6 +213,7 @@
                                     <el-table-column label="顺序" prop="Sort" width="80" align="center"></el-table-column>
                                     <el-table-column label="可搜索" prop="IsSearch" width="80" align="center"></el-table-column>
                                     <el-table-column label="可排序" prop="IsOrder" width="80" align="center"></el-table-column>
+                                    <el-table-column label="入库必须" prop="IsRequired" width="80" align="center"></el-table-column>
                                     <el-table-column label="下载类型" prop="DownType" width="80" align="center"></el-table-column>
                                     <el-table-column label="添加时间" prop="CreateDate" width="180"></el-table-column>
                                     <el-table-column label="操作" width="100">
@@ -251,6 +252,7 @@
                                     <el-table-column label="顺序" prop="Sort" width="80" align="center"></el-table-column>
                                     <el-table-column label="可搜索" prop="IsSearch" width="80" align="center"></el-table-column>
                                     <el-table-column label="可排序" prop="IsOrder" width="80" align="center"></el-table-column>
+                                    <el-table-column label="入库必须" prop="IsRequired" width="80" align="center"></el-table-column>
                                     <el-table-column label="下载类型" prop="DownType" width="80" align="center"></el-table-column>
                                     <el-table-column label="添加时间" prop="CreateDate" width="180"></el-table-column>
                                     <el-table-column label="操作" width="100">
@@ -334,6 +336,12 @@
                         </el-form-item>
                         <el-form-item label="是否可排序">
                             <el-radio-group v-model="ruleParamData.IsOrder">
+                                <el-radio :label="0">否</el-radio>
+                                <el-radio :label="1">是</el-radio>
+                            </el-radio-group>
+                        </el-form-item>
+                        <el-form-item label="入库必须项">
+                            <el-radio-group v-model="ruleParamData.IsRequired">
                                 <el-radio :label="0">否</el-radio>
                                 <el-radio :label="1">是</el-radio>
                             </el-radio-group>
@@ -887,6 +895,8 @@
 					FilterType: 'Trim',
 					Sort: 1,
 					IsSearch: 0,
+					IsOrder: 0,
+					IsRequired: 0,
 					DownType: 0,
 					DownRule: 'a',
 					DownValueType: 'Attr',
