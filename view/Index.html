@@ -139,6 +139,13 @@
                             </el-checkbox>
                         </el-form-item>
 
+                        <el-form-item label="下载存放">
+                            <el-radio-group v-model="cronData.SaveType">
+                                <el-radio :label="1">本机存储</el-radio>
+                                <el-radio :label="2">OSS存储</el-radio>
+                            </el-radio-group>
+                        </el-form-item>
+
                         <el-form-item>
                             <el-button :disabled="cronButtonDisabled" type="primary" @click="cronDataSubmit">
                                 确认
@@ -535,6 +542,7 @@
 						IsContent: d.IsContent,
 						IsContentDownAna: d.IsContentDownAna,
 						IsContentDownRun: d.IsContentDownRun,
+						SaveType: d.SaveType,
 					};
 				}).catch(error => {
 					this.$message.error(error)

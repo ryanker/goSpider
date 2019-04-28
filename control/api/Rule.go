@@ -161,6 +161,7 @@ func RuleUpdateCron(c *gin.Context) {
 		"IsContent":        m.IsContent,
 		"IsContentDownAna": m.IsContentDownAna,
 		"IsContentDownRun": m.IsContentDownRun,
+		"SaveType":         m.SaveType,
 	}, m.Rid)
 	if err != nil {
 		c.Message("-1", "更新数据库失败："+err.Error())
