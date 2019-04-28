@@ -65,6 +65,11 @@ func Sys(c *gin.Context) {
 	c.HTML(http.StatusOK, "Sys.html", gin.H{"User": User})
 }
 
+func Setting(c *gin.Context) {
+	User := api.UserGet(c)
+	c.HTML(http.StatusOK, "Setting.html", gin.H{"User": User})
+}
+
 func Table(c *gin.Context) {
 	User := api.UserGet(c)
 	c.HTML(http.StatusOK, "Table.html", gin.H{

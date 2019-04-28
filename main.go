@@ -104,6 +104,7 @@ func StartGin() {
 	admin.GET("/Log", front.Log)
 	admin.GET("/User", front.User)
 	admin.GET("/Sys", front.Sys)
+	admin.GET("/Setting", front.Setting)
 	admin.GET("/Table", front.Table)
 
 	// ========== 管理员接口 ==========

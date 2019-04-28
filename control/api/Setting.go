@@ -12,7 +12,11 @@ func SettingList(c *gin.Context) {
 		c.Message("-1", err.Error())
 		return
 	}
-	c.Message("0", "success", gin.H{"list": list})
+	data := make(map[string]string)
+	for _, k := range list {
+		data[k.Key] = k.Value
+	}
+	c.Message("0", "success", gin.H{"data": data})
 }
 
 func SettingSet(c *gin.Context) {

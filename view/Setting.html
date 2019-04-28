@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>小白采集器</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.7.2/theme-chalk/index.css">
+    <link rel="stylesheet" href="/static/css/main.css">
+</head>
+<body>
+<div id="app">
+    <template>
+        <el-container>
+            {{template "incHeader.html" .}}
+            <el-main>
+                <el-card class="box-card">
+                    <div slot="header" class="clearfix">
+                        <span>系统设置</span>
+                    </div>
+                    <el-form :model="data" :label-position="p" label-width="150px" style="width:95%">
+                        <el-form-item label="OSS 地域节点">
+                            <el-input v-model="data.ossEndpoint"
+                                      placeholder="如：http://oss-cn-hangzhou.aliyuncs.com"></el-input>
+                        </el-form-item>
+                        <el-form-item label="OSS 密钥ID">
+                            <el-input v-model="data.ossAccessKeyId" placeholder="<yourAccessKeyId>"></el-input>
+                        </el-form-item>
+                        <el-form-item label="OSS 密钥密码">
+                            <el-input v-model="data.ossAccessKeySecret" placeholder="<yourAccessKeySecret>"></el-input>
+                        </el-form-item>
+                        <el-form-item label="OSS 存储空间">
+                            <el-input v-model="data.ossBucketName" placeholder="<yourBucketName>"></el-input>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-button type="primary" @click="onSubmit">保存</el-button>
+                        </el-form-item>
+                    </el-form>
+                </el-card>
+            </el-main>
+            <el-footer>@2019</el-footer>
+        </el-container>
+    </template>
+</div>
+</body>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.7.2/index.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
+<script src="/static/js/main.js"></script>
+<script>
+	new Vue({
+		el: '#app',
+		data() {
+			return {
+				isMobile: document.body.getBoundingClientRect().width < 1024,
+				p: 'right',
+				data: {},
+			}
+		},
+		mounted() {
+			this.p = this.isMobile ? 'top' : 'right';
+			this.SettingInit();
+		},
+		methods: {
+			onSubmit() {
+				!(async () => {
+					const failDate = []; // 记录失败
+					for (const k in this.data) {
+						const v = this.data[k];
+						const cond = {Key: k, Value: v};
+						await aPost('/SettingSet', cond).catch(error => {
+							failDate.push(Object.assign({error: error}, cond));
+							this.$message.error(error);
+						});
+					}
+
+					if (failDate.length > 0) {
+						this.$message.error('保存失败 ' + failDate.length + ' 次');
+					} else {
+						this.$message.success('保存成功');
+						this.SettingInit();
+					}
+				})()
+			},
+
+			SettingInit() {
+				aPost('/SettingList').then(r => {
+					this.data = r.data || {};
+				}).catch(error => {
+					this.$message.error(error);
+				});
+			},
+		}
+	})
+</script>
+</body>
+</html>

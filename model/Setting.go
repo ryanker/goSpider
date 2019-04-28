@@ -51,7 +51,7 @@ func SettingRead(Key string) (row Setting, err error) {
 
 func SettingList() (list []Setting, err error) {
 	data, fields, scanArr := SettingMap()
-	err = db.Find("Setting", fields, *scanArr, dbs.H{}, "Sort ASC", 0, 1000, func() {
+	err = db.Find("Setting", fields, *scanArr, dbs.H{}, "", 0, 1000, func() {
 		list = append(list, *data)
 	})
 	if err != nil {
