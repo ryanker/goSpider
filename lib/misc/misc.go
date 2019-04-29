@@ -116,6 +116,13 @@ func DownloadFile(Url string, DstFile string) (size int64, err error) {
 		if err != nil {
 			continue
 		}
+
+		// 重新获取文件大小
+		if resp.Size < 1 {
+			fileInfo, _ := os.Stat(DstFile)
+			resp.Size = fileInfo.Size()
+		}
+
 		return resp.Size, err
 	}
 	return resp.Size, err
