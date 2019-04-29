@@ -117,6 +117,11 @@
                             <el-button type="danger">秒</el-button>
                         </el-form-item>
 
+                        <el-form-item label="抓取间隔">
+                            <el-input-number v-model="cronData.RequestInterval" :min="0"></el-input-number>
+                            <el-button type="danger">秒</el-button>
+                        </el-form-item>
+
                         <el-form-item label="任务开关">
                             <el-checkbox :true-label="1" :false-label="0" v-model="cronData.IsList">
                                 列表页: 抓取
@@ -218,10 +223,14 @@
                                     <el-table-column label="字段备注" prop="Brief"></el-table-column>
                                     <el-table-column label="字段类型" prop="FieldType"></el-table-column>
                                     <el-table-column label="顺序" prop="Sort" width="80" align="center"></el-table-column>
-                                    <el-table-column label="可搜索" prop="IsSearch" width="80" align="center"></el-table-column>
-                                    <el-table-column label="可排序" prop="IsOrder" width="80" align="center"></el-table-column>
-                                    <el-table-column label="入库必须" prop="IsRequired" width="80" align="center"></el-table-column>
-                                    <el-table-column label="下载类型" prop="DownType" width="80" align="center"></el-table-column>
+                                    <el-table-column label="可搜索" prop="IsSearch" width="80"
+                                                     align="center"></el-table-column>
+                                    <el-table-column label="可排序" prop="IsOrder" width="80"
+                                                     align="center"></el-table-column>
+                                    <el-table-column label="入库必须" prop="IsRequired" width="80"
+                                                     align="center"></el-table-column>
+                                    <el-table-column label="下载类型" prop="DownType" width="80"
+                                                     align="center"></el-table-column>
                                     <el-table-column label="添加时间" prop="CreateDate" width="180"></el-table-column>
                                     <el-table-column label="操作" width="100">
                                         <template slot-scope="scope">
@@ -257,10 +266,14 @@
                                     <el-table-column label="字段备注" prop="Brief"></el-table-column>
                                     <el-table-column label="字段类型" prop="FieldType"></el-table-column>
                                     <el-table-column label="顺序" prop="Sort" width="80" align="center"></el-table-column>
-                                    <el-table-column label="可搜索" prop="IsSearch" width="80" align="center"></el-table-column>
-                                    <el-table-column label="可排序" prop="IsOrder" width="80" align="center"></el-table-column>
-                                    <el-table-column label="入库必须" prop="IsRequired" width="80" align="center"></el-table-column>
-                                    <el-table-column label="下载类型" prop="DownType" width="80" align="center"></el-table-column>
+                                    <el-table-column label="可搜索" prop="IsSearch" width="80"
+                                                     align="center"></el-table-column>
+                                    <el-table-column label="可排序" prop="IsOrder" width="80"
+                                                     align="center"></el-table-column>
+                                    <el-table-column label="入库必须" prop="IsRequired" width="80"
+                                                     align="center"></el-table-column>
+                                    <el-table-column label="下载类型" prop="DownType" width="80"
+                                                     align="center"></el-table-column>
                                     <el-table-column label="添加时间" prop="CreateDate" width="180"></el-table-column>
                                     <el-table-column label="操作" width="100">
                                         <template slot-scope="scope">
@@ -536,6 +549,7 @@
 						Status: d.Status,
 						IntervalHour: d.IntervalHour,
 						Timeout: d.Timeout,
+						RequestInterval: d.RequestInterval,
 						IsList: d.IsList,
 						IsListDownAna: d.IsListDownAna,
 						IsListDownRun: d.IsListDownRun,
