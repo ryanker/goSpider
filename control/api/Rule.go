@@ -330,6 +330,7 @@ func RuleImport(c *gin.Context) {
 		"IsContent":        1,
 		"IsContentDownAna": 1,
 		"IsContentDownRun": 1,
+		"SaveType":         1,
 	})
 	if err != nil {
 		c.Message("-1", err.Error())
