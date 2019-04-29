@@ -1,7 +1,6 @@
 package api
 
 import (
-	"errors"
 	"net/http"
 	"path/filepath"
 	"strings"
@@ -11,15 +10,23 @@ import (
 	"../../model"
 )
 
-func OssRead(c *gin.Context) error {
+func OssFile(c *gin.Context) {
+	_, err := UserTokenGet(c)
+	if err != nil {
+		c.String(http.StatusNotFound, "404 page not found")
+		return
+	}
+
 	if model.Settings["OssBucketName"] == "" {
-		return errors.New("OssBucketName is empty")
+		c.String(http.StatusNotFound, "404 page not found")
+		return
 	}
 
 	path := strings.Trim(c.Request.URL.Path, "/")
 	body, err := model.OssGetObject(path)
 	if err != nil {
-		return err
+		c.String(http.StatusNotFound, "404 page not found")
+		return
 	}
 
 	mp := make(map[string]string)
@@ -42,6 +49,4 @@ func OssRead(c *gin.Context) error {
 	}
 
 	c.DataFromReader(http.StatusOK, int64(len(body)), contentType, strings.NewReader(string(body)), extraHeaders)
-	c.Abort()
-	return nil
 }

@@ -41,6 +41,9 @@ func StartGin() {
 	r := gin.Default()
 	r.Static("/static", "./static")
 
+	// OSS 文件
+	r.GET("/file/*filepath", api.OssFile)
+
 	// 附件目录，登录后才能查看
 	upload := r.Group("/", func(c *gin.Context) {
 		_, err := api.UserTokenGet(c)
@@ -48,10 +51,6 @@ func StartGin() {
 			// c.Writer.Header().Add("Author", "goSpider 1.0")
 			c.String(http.StatusNotFound, "404 page not found")
 			c.Abort()
-			return
-		}
-		err = api.OssRead(c)
-		if err != nil {
 			return
 		}
 	})
