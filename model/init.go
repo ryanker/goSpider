@@ -803,6 +803,7 @@ func downList(dbc *dbs.DB, row *Rule) {
 
 			// 存放 OSS
 			if row.SaveType == 2 {
+				t2 = time.Now()
 				err = ossUpload(lv.NewUrl, localFileName)
 				if err != nil {
 					errorNum++
@@ -816,6 +817,7 @@ func downList(dbc *dbs.DB, row *Rule) {
 					}
 					continue
 				}
+				cronLog(time.Since(t2), "上传 OSS 完成, object: %v", lv.NewUrl)
 
 				// 删除本地文件，出错时只记录日志，不影响流程
 				err = os.Remove(localFileName)
@@ -892,6 +894,7 @@ func downContent(dbc *dbs.DB, row *Rule) {
 
 			// 存放 OSS
 			if row.SaveType == 2 {
+				t2 = time.Now()
 				err = ossUpload(lv.NewUrl, localFileName)
 				if err != nil {
 					errorNum++
@@ -905,6 +908,7 @@ func downContent(dbc *dbs.DB, row *Rule) {
 					}
 					continue
 				}
+				cronLog(time.Since(t2), "上传 OSS 完成, object: %v", lv.NewUrl)
 
 				// 删除本地文件，出错时只记录日志，不影响流程
 				err = os.Remove(localFileName)
