@@ -476,7 +476,7 @@ func downInitList(dbc *dbs.DB, ParamList *[]RuleParam, row *Rule) {
 					// 效验链接
 					if lv.Url == "" {
 						errorNum++
-						cronErrorLog(0, "下载 Url 为空")
+						cronErrorLog(0, "下载 Url 为空, Lid: %v", lv.Lid)
 						continue
 					}
 					lv.Url = misc.UrlFix(lv.Url, row.ListUrl) // 修正链接
@@ -560,7 +560,7 @@ func downInitList(dbc *dbs.DB, ParamList *[]RuleParam, row *Rule) {
 						}
 						if Url == "" {
 							errorNum++
-							cronErrorLog(0, "下载 Url 为空")
+							cronErrorLog(0, "下载 Url 为空, Lid: %v", lv.Lid)
 							return
 						}
 						Url = misc.UrlFix(Url, row.ListUrl) // 修正链接
@@ -640,7 +640,7 @@ func downInitContent(dbc *dbs.DB, ParamContent *[]RuleParam, row *Rule) {
 					// 效验链接
 					if lv.Url == "" {
 						errorNum++
-						cronErrorLog(0, "下载 Url 为空")
+						cronErrorLog(0, "下载 Url 为空, Lid: %v", lv.Lid)
 						continue
 					}
 					lv.Url = misc.UrlFix(lv.Url, row.ContentUrl) // 修正链接
@@ -724,7 +724,7 @@ func downInitContent(dbc *dbs.DB, ParamContent *[]RuleParam, row *Rule) {
 						}
 						if Url == "" {
 							errorNum++
-							cronErrorLog(0, "下载 Url 为空")
+							cronErrorLog(0, "下载 Url 为空, Lid: %v", lv.Lid)
 							return
 						}
 						Url = misc.UrlFix(Url, row.ContentUrl) // 修正链接
