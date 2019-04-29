@@ -249,6 +249,8 @@ func getList(dbc *dbs.DB, ParamList *[]RuleParam, row *Rule, Url string) {
 
 	// 代码匹配
 	doc.Find(row.ListRule).Each(func(i int, s *goquery.Selection) {
+		isRequired := false
+		isRequiredField := ""
 		data := dbs.H{}
 		data["Status"] = 1 // 待采集
 		for _, v := range *ParamList {
@@ -266,7 +268,21 @@ func getList(dbc *dbs.DB, ParamList *[]RuleParam, row *Rule, Url string) {
 				value, _ = dom.Html()
 			}
 			value = misc.StrClear(value, v.FilterType, v.FilterRegexp, v.FilterRepl)
+
+			// 入库必须项，必须有值
+			if v.IsRequired == 1 && value == "" {
+				isRequired = true
+				isRequiredField = v.Field
+				continue
+			}
+
 			data[v.Field] = value
+		}
+
+		// 入库必须项，如果没有值，跳过入库
+		if isRequired {
+			cronErrorLog(0, "字段 %v 为空", isRequiredField)
+			return
 		}
 
 		// 根据Url，判断是否重复
@@ -365,6 +381,7 @@ func getContent(dbc *dbs.DB, ParamContent *[]RuleParam, row *Rule) {
 
 			// 匹配字段
 			isRequired := false
+			isRequiredField := ""
 			data := dbs.H{}
 			data["Lid"] = lv.Lid
 			data["Url"] = lv.Url
@@ -385,6 +402,7 @@ func getContent(dbc *dbs.DB, ParamContent *[]RuleParam, row *Rule) {
 				// 入库必须项，必须有值
 				if v.IsRequired == 1 && value == "" {
 					isRequired = true
+					isRequiredField = v.Field
 					continue
 				}
 
@@ -393,6 +411,7 @@ func getContent(dbc *dbs.DB, ParamContent *[]RuleParam, row *Rule) {
 
 			// 入库必须项，如果没有值，跳过入库
 			if isRequired {
+				cronErrorLog(0, "字段 %v 为空", isRequiredField)
 				continue
 			}
 
