@@ -11,6 +11,7 @@ CREATE TABLE Rule
   Cookie           TEXT                  DEFAULT '',                -- 登录抓取 Cookie
   Charset          VARCHAR(255) NOT NULL DEFAULT '',                -- 抓取网页的编码
   Timeout          INTEGER      NOT NULL DEFAULT '0',               -- 抓取超时时间(秒)
+  RequestInterval  INTEGER      NOT NULL DEFAULT '0',               -- 抓取间隔时间(秒)
 
   ListSpecialUrl   TEXT                  DEFAULT '',                -- 抓取列表网址(特殊路径)
   ListUrl          VARCHAR(255) NOT NULL DEFAULT '',                -- 抓取列表网址

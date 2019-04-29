@@ -16,10 +16,11 @@ type Rule struct {
 	Name  string
 	Brief string
 
-	Database string
-	Cookie   string
-	Charset  string
-	Timeout  int64
+	Database        string
+	Cookie          string
+	Charset         string
+	Timeout         int64
+	RequestInterval int64
 
 	ListSpecialUrl string
 	ListUrl        string
@@ -59,6 +60,7 @@ func RuleMap() (ptr *Rule, fields string, args *[]interface{}) {
 		"Cookie":           &row.Cookie,
 		"Charset":          &row.Charset,
 		"Timeout":          &row.Timeout,
+		"RequestInterval":  &row.RequestInterval,
 		"ListSpecialUrl":   &row.ListSpecialUrl,
 		"ListUrl":          &row.ListUrl,
 		"ListPageStart":    &row.ListPageStart,
