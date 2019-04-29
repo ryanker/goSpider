@@ -50,6 +50,10 @@ func StartGin() {
 			c.Abort()
 			return
 		}
+		err = api.OssRead(c)
+		if err != nil {
+			return
+		}
 	})
 	upload.Static("/upload", "./upload")
 

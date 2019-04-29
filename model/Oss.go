@@ -2,7 +2,7 @@ package model
 
 import (
 	"errors"
-	"io"
+	"io/ioutil"
 	"strings"
 
 	"github.com/aliyun/aliyun-oss-go-sdk/oss"
@@ -60,18 +60,23 @@ func OssUpload(objectName, localFileName string) error {
 	return nil
 }
 
-func OssGetObject(objectName string) (body io.ReadCloser, err error) {
+func OssGetObject(objectName string) (b []byte, err error) {
 	// 获取存储空间
 	bucket, err := OssNewBucket()
 	if err != nil {
-		return body, err
+		return b, err
 	}
 
 	// 下载文件到流
-	body, err = bucket.GetObject(strings.Trim(objectName, "/"))
+	body, err := bucket.GetObject(strings.Trim(objectName, "/"))
 	if err != nil {
-		return body, errors.New("从 OSS 下载文件失败: " + err.Error())
+		return b, errors.New("从 OSS 下载文件失败: " + err.Error())
 	}
-	body.Close() // 数据读取完成后，获取的流必须关闭
+	defer body.Close()
+
+	b, err = ioutil.ReadAll(body)
+	if err != nil {
+		return b, err
+	}
 	return
 }
