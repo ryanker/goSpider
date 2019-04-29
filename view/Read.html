@@ -60,7 +60,33 @@
                             <img v-for="v in downList" :src="v.Status === 2 ? v.NewUrl : v.OldUrl">
                         </div>
                         <div v-else>
-                            <div v-for="v in downList">{[v.OldUrl]}</div>
+                            <!--表格-->
+                            <el-table :data="downList" border>
+                                <el-table-column label="原始地址" min-width="200">
+                                    <template slot-scope="scope">
+                                        <a :href="scope.row.OldUrl" target="_blank">{[scope.row.OldUrl]}</a>
+                                    </template>
+                                </el-table-column>
+                                <el-table-column label="存放地址" min-width="200">
+                                    <template slot-scope="scope">
+                                        <a v-if="scope.row.Status === 2" :href="scope.row.NewUrl" target="_blank">{[scope.row.NewUrl]}</a>
+                                        <span v-else>{[scope.row.NewUrl]}</span>
+                                    </template>
+                                </el-table-column>
+                                <el-table-column label="文件大小" width="100">
+                                    <template slot-scope="scope">
+                                        {[humanSize(scope.row.FileSize)]}
+                                    </template>
+                                </el-table-column>
+                                <el-table-column label="状态" width="100" align="center">
+                                    <template slot-scope="scope">
+                                        <el-tag v-if="scope.row.Status === 1" type="info">待下载</el-tag>
+                                        <el-tag v-else-if="scope.row.Status === 2" type="success">下载完成</el-tag>
+                                        <el-tag v-else-if="scope.row.Status === 3" type="danger">下载失败</el-tag>
+                                        <el-tag v-else type="danger">-</el-tag>
+                                    </template>
+                                </el-table-column>
+                            </el-table>
                         </div>
                         <div v-if="downList.length === 0">
                             <el-alert title="暂无图片" type="warning" :closable="false" show-icon></el-alert>
