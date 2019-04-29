@@ -1,7 +1,6 @@
 package model
 
 import (
-	"errors"
 	"fmt"
 	"math"
 	"os"
@@ -11,7 +10,6 @@ import (
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
-	"github.com/aliyun/aliyun-oss-go-sdk/oss"
 
 	"../lib/dbs"
 	"../lib/misc"
@@ -804,7 +802,7 @@ func downList(dbc *dbs.DB, row *Rule) {
 			// 存放 OSS
 			if row.SaveType == 2 {
 				t2 = time.Now()
-				err = ossUpload(lv.NewUrl, localFileName)
+				err = OssUpload(lv.NewUrl, localFileName)
 				if err != nil {
 					errorNum++
 					cronErrorLog(0, err.Error())
@@ -895,7 +893,7 @@ func downContent(dbc *dbs.DB, row *Rule) {
 			// 存放 OSS
 			if row.SaveType == 2 {
 				t2 = time.Now()
-				err = ossUpload(lv.NewUrl, localFileName)
+				err = OssUpload(lv.NewUrl, localFileName)
 				if err != nil {
 					errorNum++
 					cronErrorLog(0, err.Error())
@@ -934,34 +932,4 @@ func downContent(dbc *dbs.DB, row *Rule) {
 	}
 
 	cronLog(time.Since(t), "内容页下载资源完成, 总数: %v, 错误: %v", n, errorNum)
-}
-
-func ossUpload(objectName, localFileName string) error {
-	endpoint, ok := Settings["OssEndpoint"]
-	accessKeyId, ok2 := Settings["OssAccessKeyId"]
-	accessKeySecret, ok3 := Settings["OssAccessKeySecret"]
-	bucketName, ok4 := Settings["OssBucketName"]
-
-	if !ok || !ok2 || !ok3 || !ok4 {
-		return errors.New("OSS 配置信息未设置正确")
-	}
-
-	// 创建 OSSClient 实例
-	client, err := oss.New(endpoint, accessKeyId, accessKeySecret)
-	if err != nil {
-		return errors.New("创建 OSSClient 实例失败: " + err.Error())
-	}
-
-	// 获取存储空间
-	bucket, err := client.Bucket(bucketName)
-	if err != nil {
-		return errors.New("获取 OSS 存储空间失败: " + err.Error())
-	}
-
-	// 上传文件
-	err = bucket.PutObjectFromFile(strings.Trim(objectName, "/"), localFileName)
-	if err != nil {
-		return errors.New("上传文件到 OSS 失败: " + err.Error())
-	}
-	return nil
 }
