@@ -36,6 +36,7 @@ func OssRead(c *gin.Context) error {
 	contentType, ok := mp[ext]
 	extraHeaders := map[string]string{}
 	if !ok {
+		contentType = "application/octet-stream"
 		filename := filepath.Base(path)
 		extraHeaders = map[string]string{"Content-Disposition": `attachment; filename="` + filename + `"`}
 	}
