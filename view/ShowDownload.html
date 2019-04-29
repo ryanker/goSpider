@@ -110,13 +110,17 @@
 
                     <!--表格-->
                     <el-table v-else :data="listData" border class="mt-1">
-                        <el-table-column v-if="q.IsName" prop="Name" label="标题" min-width="150"></el-table-column>
-                        <el-table-column prop="OldUrl" label="原始地址" min-width="200">
+                        <el-table-column v-if="q.IsName" label="标题" min-width="150">
+                            <template slot-scope="scope">
+                                <a :href="scope.row.ReadUrl">{[scope.row.Name]}</a>
+                            </template>
+                        </el-table-column>
+                        <el-table-column label="原始地址" min-width="200">
                             <template slot-scope="scope">
                                 <a :href="scope.row.OldUrl" target="_blank">{[scope.row.OldUrl]}</a>
                             </template>
                         </el-table-column>
-                        <el-table-column prop="NewUrl" label="存放地址" min-width="200">
+                        <el-table-column label="存放地址" min-width="200">
                             <template slot-scope="scope">
                                 <a v-if="scope.row.Status === 2" :href="scope.row.NewUrl" target="_blank">{[scope.row.NewUrl]}</a>
                                 <span v-else>{[scope.row.NewUrl]}</span>
