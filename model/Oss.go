@@ -3,7 +3,6 @@ package model
 import (
 	"errors"
 	"io/ioutil"
-	"strings"
 
 	"github.com/aliyun/aliyun-oss-go-sdk/oss"
 )
@@ -53,7 +52,7 @@ func OssUpload(objectName, localFileName string) error {
 	}
 
 	// 上传文件
-	err = bucket.PutObjectFromFile(strings.Trim(objectName, "/"), localFileName)
+	err = bucket.PutObjectFromFile(objectName, localFileName)
 	if err != nil {
 		return errors.New("上传文件到 OSS 失败: " + err.Error())
 	}
@@ -68,7 +67,7 @@ func OssGetObject(objectName string) (b []byte, err error) {
 	}
 
 	// 下载文件到流
-	body, err := bucket.GetObject(strings.Trim(objectName, "/"))
+	body, err := bucket.GetObject(objectName)
 	if err != nil {
 		return b, errors.New("从 OSS 下载文件失败: " + err.Error())
 	}

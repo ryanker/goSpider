@@ -801,8 +801,10 @@ func downList(dbc *dbs.DB, row *Rule) {
 
 			// 存放 OSS
 			if row.SaveType == 2 {
+				objectName := lv.NewUrl
+				objectName = "file" + strings.TrimPrefix(objectName, "/upload")
 				t2 = time.Now()
-				err = OssUpload(lv.NewUrl, localFileName)
+				err = OssUpload(objectName, localFileName)
 				if err != nil {
 					errorNum++
 					cronErrorLog(0, err.Error())
@@ -815,7 +817,8 @@ func downList(dbc *dbs.DB, row *Rule) {
 					}
 					continue
 				}
-				cronLog(time.Since(t2), "上传 OSS 完成, object: %v", lv.NewUrl)
+				cronLog(time.Since(t2), "上传 OSS 完成, object: %v", objectName)
+				lv.NewUrl = "/" + objectName
 
 				// 删除本地文件，出错时只记录日志，不影响流程
 				err = os.Remove(localFileName)
@@ -828,6 +831,7 @@ func downList(dbc *dbs.DB, row *Rule) {
 			// 更新
 			_, err = dbc.Update("ListDownload", dbs.H{
 				"Status":       2, // 下载完成
+				"NewUrl":       lv.NewUrl,
 				"FileSize":     FileSize,
 				"DownloadDate": time.Now().Format("2006-01-02 15:04:05"),
 			}, dbs.H{
@@ -892,8 +896,10 @@ func downContent(dbc *dbs.DB, row *Rule) {
 
 			// 存放 OSS
 			if row.SaveType == 2 {
+				objectName := lv.NewUrl
+				objectName = "file" + strings.TrimPrefix(objectName, "/upload")
 				t2 = time.Now()
-				err = OssUpload(lv.NewUrl, localFileName)
+				err = OssUpload(objectName, localFileName)
 				if err != nil {
 					errorNum++
 					cronErrorLog(0, err.Error())
@@ -906,7 +912,8 @@ func downContent(dbc *dbs.DB, row *Rule) {
 					}
 					continue
 				}
-				cronLog(time.Since(t2), "上传 OSS 完成, object: %v", lv.NewUrl)
+				cronLog(time.Since(t2), "上传 OSS 完成, object: %v", objectName)
+				lv.NewUrl = "/" + objectName
 
 				// 删除本地文件，出错时只记录日志，不影响流程
 				err = os.Remove(localFileName)
@@ -919,6 +926,7 @@ func downContent(dbc *dbs.DB, row *Rule) {
 			// 更新
 			_, err = dbc.Update("ContentDownload", dbs.H{
 				"Status":       2, // 下载完成
+				"NewUrl":       lv.NewUrl,
 				"FileSize":     FileSize,
 				"DownloadDate": time.Now().Format("2006-01-02 15:04:05"),
 			}, dbs.H{
