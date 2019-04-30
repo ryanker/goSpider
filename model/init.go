@@ -247,14 +247,17 @@ func getList(dbc *dbs.DB, ParamList *[]RuleParam, row *Rule, Url string) {
 	}
 
 	// 代码匹配
-	doc.Find(row.ListRule).Each(func(i int, dom *goquery.Selection) {
+	doc.Find(row.ListRule).Each(func(i int, s *goquery.Selection) {
 		isRequired := false
 		isRequiredField := ""
 		data := dbs.H{}
 		data["Status"] = 1 // 待采集
 		for _, v := range *ParamList {
-			if v.Rule != "" {
-				dom = dom.Find(v.Rule)
+			var dom *goquery.Selection
+			if v.Rule == "" {
+				dom = s
+			} else {
+				dom = s.Find(v.Rule)
 			}
 
 			// 匹配字段
