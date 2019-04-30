@@ -50,3 +50,30 @@ func OssFile(c *gin.Context) {
 
 	c.DataFromReader(http.StatusOK, int64(len(body)), contentType, strings.NewReader(string(body)), extraHeaders)
 }
+
+// ================================================
+func OssBucketList(c *gin.Context) {
+	list, err := model.OssBucketList()
+	if err != nil {
+		c.Message("-1", err.Error())
+		return
+	}
+	c.Message("0", "success", gin.H{"list": list})
+}
+
+func OssObjectList(c *gin.Context) {
+	m := struct {
+		BucketName string
+	}{}
+	err := c.ShouldBind(&m)
+	if err != nil {
+		c.Message("-1", "参数不正确："+err.Error())
+		return
+	}
+	list, err := model.OssObjectList(m.BucketName)
+	if err != nil {
+		c.Message("-1", err.Error())
+		return
+	}
+	c.Message("0", "success", gin.H{"list": list})
+}

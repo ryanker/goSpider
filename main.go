@@ -168,6 +168,10 @@ func StartGin() {
 	adminApi.POST("/SettingList", api.SettingList)
 	adminApi.POST("/SettingInit", api.SettingInit)
 
+	// Oss
+	adminApi.POST("/OssBucketList", api.OssBucketList)
+	adminApi.POST("/OssObjectList", api.OssObjectList)
+
 	// 内存信息 && 磁盘信息
 	adminApi.POST("/MemStatsInfo", api.MemStatsInfo)
 	adminApi.POST("/DiskInfo", api.DiskInfo)

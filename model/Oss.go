@@ -79,3 +79,64 @@ func OssGetObject(objectName string) (b []byte, err error) {
 	}
 	return
 }
+
+// ===================================================================
+func OssBucketList() (list []oss.BucketProperties, err error) {
+	client, err := OssNew()
+	if err != nil {
+		return list, err
+	}
+
+	marker := ""
+	for {
+		lsRes, err := client.ListBuckets(oss.Marker(marker))
+		if err != nil {
+			return list, err
+		}
+
+		// 默认每次返回100条
+		for _, bucket := range lsRes.Buckets {
+			list = append(list, bucket)
+		}
+
+		if lsRes.IsTruncated {
+			marker = lsRes.NextMarker
+		} else {
+			break
+		}
+	}
+	return
+}
+
+func OssObjectList(bucketName string) (list []oss.ObjectProperties, err error) {
+	client, err := OssNew()
+	if err != nil {
+		return list, err
+	}
+
+	// 获取存储空间。
+	bucket, err := client.Bucket(bucketName)
+	if err != nil {
+		return list, err
+	}
+
+	// 列举所有文件。
+	marker := ""
+	for {
+		lsRes, err := bucket.ListObjects(oss.Marker(marker))
+		if err != nil {
+			return list, err
+		}
+
+		for _, object := range lsRes.Objects {
+			list = append(list, object)
+		}
+
+		if lsRes.IsTruncated {
+			marker = lsRes.NextMarker
+		} else {
+			break
+		}
+	}
+	return
+}
