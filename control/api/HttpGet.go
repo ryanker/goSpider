@@ -100,8 +100,8 @@ func HttpGetListRule(c *gin.Context) {
 	}
 
 	var dom *goquery.Selection
-	if m.ListRule == "" {
-		dom = doc.Find(m.ParamRule).Eq(0)
+	if m.ParamRule == "" {
+		dom = doc.Find(m.ListRule).Eq(0)
 	} else {
 		dom = doc.Find(m.ListRule).Find(m.ParamRule).Eq(0)
 	}
