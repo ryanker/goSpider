@@ -99,7 +99,13 @@ func HttpGetListRule(c *gin.Context) {
 		return
 	}
 
-	dom := doc.Find(m.ListRule).Find(m.ParamRule).Eq(0)
+	var dom *goquery.Selection
+	if m.ListRule == "" {
+		dom = doc.Find(m.ParamRule).Eq(0)
+	} else {
+		dom = doc.Find(m.ListRule).Find(m.ParamRule).Eq(0)
+	}
+
 	value := ""
 	if m.ValueType == "Html" {
 		value, _ = dom.Html()
