@@ -342,7 +342,7 @@ func getContent(dbc *dbs.DB, ParamContent *[]RuleParam, row *Rule) {
 			// 效验链接
 			if lv.Url == "" {
 				errorNum++
-				cronErrorLog(0, "内容页 Url 为空")
+				cronErrorLog(0, "内容页 Url 为空, Lid: %v", lv.Lid)
 				continue
 			}
 			lv.Url = misc.UrlFix(lv.Url, row.ListUrl) // 修正链接
@@ -496,7 +496,7 @@ func downInitList(dbc *dbs.DB, ParamList *[]RuleParam, row *Rule) {
 
 					// 存放路径
 					NumDir := int64(math.Floor(float64(lv.Lid / 1000)))
-					NewUrl := fmt.Sprintf("/upload/%s/list/%s/%03d/%d%s", row.Database, v.Field, NumDir, lv.Lid, filepath.Ext(lv.Url))
+					NewUrl := fmt.Sprintf("/upload/%s/list/%s/%03d/%d%s", row.Database, v.Field, NumDir, lv.Lid, misc.UrlExt(lv.Url))
 
 					// 写入数据库
 					_, err = dbc.Insert("ListDownload", dbs.H{
@@ -581,7 +581,7 @@ func downInitList(dbc *dbs.DB, ParamList *[]RuleParam, row *Rule) {
 						// 存放路径
 						NumDir := int64(math.Floor(float64(lv.Lid / 1000)))
 						Sort := i + 1
-						NewUrl := fmt.Sprintf("/upload/%s/list/%s/%03d/%d/%02d%s", row.Database, v.Field, NumDir, lv.Lid, Sort, filepath.Ext(Url))
+						NewUrl := fmt.Sprintf("/upload/%s/list/%s/%03d/%d/%02d%s", row.Database, v.Field, NumDir, lv.Lid, Sort, misc.UrlExt(Url))
 
 						// 写入数据库
 						_, err = dbc.Insert("ListDownload", dbs.H{
@@ -660,7 +660,7 @@ func downInitContent(dbc *dbs.DB, ParamContent *[]RuleParam, row *Rule) {
 
 					// 存放路径
 					NumDir := int64(math.Floor(float64(lv.Lid / 1000)))
-					NewUrl := fmt.Sprintf("/upload/%s/list/%s/%03d/%d%s", row.Database, v.Field, NumDir, lv.Lid, filepath.Ext(lv.Url))
+					NewUrl := fmt.Sprintf("/upload/%s/list/%s/%03d/%d%s", row.Database, v.Field, NumDir, lv.Lid, misc.UrlExt(lv.Url))
 
 					// 写入数据库
 					_, err = dbc.Insert("ContentDownload", dbs.H{
@@ -745,7 +745,7 @@ func downInitContent(dbc *dbs.DB, ParamContent *[]RuleParam, row *Rule) {
 						// 存放路径
 						NumDir := int64(math.Floor(float64(lv.Lid / 1000)))
 						Sort := i + 1
-						NewUrl := fmt.Sprintf("/upload/%s/list/%s/%03d/%d/%02d%s", row.Database, v.Field, NumDir, lv.Lid, Sort, filepath.Ext(Url))
+						NewUrl := fmt.Sprintf("/upload/%s/list/%s/%03d/%d/%02d%s", row.Database, v.Field, NumDir, lv.Lid, Sort, misc.UrlExt(Url))
 
 						// 写入数据库
 						_, err = dbc.Insert("ContentDownload", dbs.H{

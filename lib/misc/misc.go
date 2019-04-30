@@ -152,8 +152,16 @@ func UrlFix(Url string, BaseUrl string) string {
 	if Url[0:1] == "/" {
 		u, _ := url.Parse(BaseUrl)
 		Url = u.Scheme + "://" + u.Host + Url
+	} else if Url[0:4] != "http" {
+		u, _ := url.Parse(BaseUrl)
+		Url = u.Scheme + "://" + u.Host + filepath.Dir(u.Path) + "/" + Url
 	}
 	return Url
+}
+
+func UrlExt(Url string) string {
+	u, _ := url.Parse(Url)
+	return filepath.Ext(u.Path)
 }
 
 func StrClear(value, FilterType, FilterRegexp, FilterRepl string) string {
