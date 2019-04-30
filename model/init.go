@@ -275,6 +275,10 @@ func getList(dbc *dbs.DB, ParamList *[]RuleParam, row *Rule, Url string) {
 				continue
 			}
 
+			if v.Field == "Image" || v.Field == "Url" {
+				value = misc.UrlFix(value, Url)
+			}
+
 			data[v.Field] = value
 		}
 
@@ -403,6 +407,10 @@ func getContent(dbc *dbs.DB, ParamContent *[]RuleParam, row *Rule) {
 					isRequired = true
 					isRequiredField = v.Field
 					continue
+				}
+
+				if v.Field == "Image" || v.Field == "Url" {
+					value = misc.UrlFix(value, lv.Url)
 				}
 
 				data[v.Field] = value
