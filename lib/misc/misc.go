@@ -161,7 +161,9 @@ func UrlFix(Url string, BaseUrl string) string {
 	if Url[0:1] == "/" {
 		return u.Scheme + "://" + u.Host + Url
 	}
-
+	if len(Url) > 2 && Url[0:2] == "//" {
+		return u.Scheme + ":" + Url
+	}
 	return u.Scheme + "://" + u.Host + filepath.Dir(u.Path) + "/" + Url
 }
 
