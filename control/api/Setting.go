@@ -41,19 +41,21 @@ func SettingSave(c *gin.Context) {
 		return
 	}
 
-	// 检测存储空间是否存在
-	isExist, err := client.IsBucketExist(m.OssBucketName)
-	if err != nil {
-		c.Message("-1", "检测存储空间是否存在失败: "+err.Error())
-		return
-	}
-
-	if !isExist {
-		// 创建存储空间
-		err = client.CreateBucket(m.OssBucketName)
+	if m.OssBucketName != "" {
+		// 检测存储空间是否存在
+		isExist, err := client.IsBucketExist(m.OssBucketName)
 		if err != nil {
-			c.Message("-1", "创建存储空间失败: "+err.Error())
+			c.Message("-1", "检测存储空间是否存在失败: "+err.Error())
 			return
+		}
+
+		if !isExist {
+			// 创建存储空间
+			err = client.CreateBucket(m.OssBucketName)
+			if err != nil {
+				c.Message("-1", "创建存储空间失败: "+err.Error())
+				return
+			}
 		}
 	}
 

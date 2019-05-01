@@ -60,6 +60,11 @@ func User(c *gin.Context) {
 	c.HTML(http.StatusOK, "User.html", gin.H{"User": User})
 }
 
+func Oss(c *gin.Context) {
+	User := api.UserGet(c)
+	c.HTML(http.StatusOK, "Oss.html", gin.H{"User": User})
+}
+
 func Sys(c *gin.Context) {
 	User := api.UserGet(c)
 	c.HTML(http.StatusOK, "Sys.html", gin.H{"User": User})
