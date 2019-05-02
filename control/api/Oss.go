@@ -7,6 +7,7 @@ import (
 
 	"github.com/xiuno/gin"
 
+	"../../lib/misc"
 	"../../model"
 )
 
@@ -61,7 +62,7 @@ func OssBucketList(c *gin.Context) {
 	c.Message("0", "success", gin.H{"list": list})
 }
 
-func OssObjectList(c *gin.Context) {
+func OssBucketInfo(c *gin.Context) {
 	m := struct {
 		BucketName string
 	}{}
@@ -70,10 +71,47 @@ func OssObjectList(c *gin.Context) {
 		c.Message("-1", "参数不正确："+err.Error())
 		return
 	}
-	list, err := model.OssObjectList(m.BucketName)
+	info, err := model.OssBucketInfo(m.BucketName)
 	if err != nil {
 		c.Message("-1", err.Error())
 		return
 	}
-	c.Message("0", "success", gin.H{"list": list})
+	c.Message("0", "success", gin.H{"info": info})
+}
+
+func OssObjectList(c *gin.Context) {
+	m := struct {
+		Endpoint   string
+		BucketName string
+		Prefix     string
+	}{}
+	err := c.ShouldBind(&m)
+	if err != nil {
+		c.Message("-1", "参数不正确："+err.Error())
+		return
+	}
+	files, dirs, err := model.OssObjectList(m.Endpoint, m.BucketName, m.Prefix)
+	if err != nil {
+		c.Message("-1", err.Error())
+		return
+	}
+	c.Message("0", "success", gin.H{"files": files, "dirs": dirs})
+}
+
+func OssObjectCount(c *gin.Context) {
+	m := struct {
+		Endpoint   string
+		BucketName string
+	}{}
+	err := c.ShouldBind(&m)
+	if err != nil {
+		c.Message("-1", "参数不正确："+err.Error())
+		return
+	}
+	size, fileNum, requests, err := model.OssObjectCount(m.Endpoint, m.BucketName)
+	if err != nil {
+		c.Message("-1", err.Error())
+		return
+	}
+	c.Message("0", "success", gin.H{"size": misc.HumanSize(uint64(size)), "fileNum": fileNum, "requests": requests})
 }

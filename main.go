@@ -171,7 +171,9 @@ func StartGin() {
 
 	// Oss
 	adminApi.POST("/OssBucketList", api.OssBucketList)
+	adminApi.POST("/OssBucketInfo", api.OssBucketInfo)
 	adminApi.POST("/OssObjectList", api.OssObjectList)
+	adminApi.POST("/OssObjectCount", api.OssObjectCount)
 
 	// 内存信息 && 磁盘信息
 	adminApi.POST("/MemStatsInfo", api.MemStatsInfo)

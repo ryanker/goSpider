@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>小白采集器</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.7.2/theme-chalk/index.css">
+    <link rel="stylesheet" href="/static/css/main.css">
+</head>
+<body>
+<div id="app">
+    <template>
+        <el-container>
+            {{template "incHeader.html" .}}
+            <el-main>
+                <el-breadcrumb>
+                    <el-breadcrumb-item><a href="/Oss">OSS管理</a></el-breadcrumb-item>
+                    <el-breadcrumb-item v-if="fileViewParam.BucketName">
+                        <span @click="onBreadcrumb('')" class="pointer">{[fileViewParam.BucketName]}</span>
+                    </el-breadcrumb-item>
+                    <el-breadcrumb-item v-for="v in breadcrumbs">
+                        <span @click="onBreadcrumb(v.dir)" class="pointer">{[v.name]}</span>
+                    </el-breadcrumb-item>
+                </el-breadcrumb>
+
+                <!--存储空间-->
+                <el-table v-if="tableShow" v-loading="tableLoading" :data="tableData" border class="mt-1">
+                    <el-table-column label="名称" width="200">
+                        <template slot-scope="v">
+                            <span @click="onObjectList(v.row.Endpoint, v.row.Name, '')"
+                                  class="pointer">{[v.row.Name]}</span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="EndpointInternal" label="地域节点"></el-table-column>
+                    <el-table-column prop="StorageClass" label="存储类型" width="180"></el-table-column>
+                    <el-table-column prop="CreationDate" label="创建时间" width="170"></el-table-column>
+                </el-table>
+
+                <!--文件管理-->
+                <div v-else v-loading="tableLoading" style="min-height:300px">
+                    <el-table v-if="fileViewDirs.length>0" :data="fileViewDirs" border class="mt-1">
+                        <el-table-column type="index" width="55"></el-table-column>
+                        <el-table-column label="目录名称">
+                            <template slot-scope="scope">
+                                <span @click="onObjectList('', '', scope.row)" class="pointer">{[scope.row]}</span>
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                    <el-table v-if="fileViewFiles.length>0" :data="fileViewFiles" border class="mt-1">
+                        <el-table-column type="index" width="55"></el-table-column>
+                        <el-table-column prop="Key" label="文件名称" min-width="200"></el-table-column>
+                        <el-table-column prop="Size" label="大小" width="100"></el-table-column>
+                        <el-table-column prop="LastModified" label="创建时间" width="170"></el-table-column>
+                    </el-table>
+                </div>
+            </el-main>
+            <el-footer>@2019</el-footer>
+        </el-container>
+    </template>
+</div>
+</body>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/element-ui/2.7.2/index.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
+<script src="/static/js/main.js"></script>
+<script>
+	new Vue({
+		el: '#app',
+		delimiters: ['{[', ']}'],
+		data() {
+			return {
+				tableLoading: false,
+				tableShow: true,
+				tableData: [],
+				breadcrumbs: [],
+
+				fileViewParam: {
+					Endpoint: '',
+					BucketName: '',
+					Prefix: '',
+				},
+				fileViewFiles: [],
+				fileViewDirs: [],
+			}
+		},
+		mounted() {
+			this.BucketList();
+		},
+		methods: {
+			BucketList() {
+				this.tableLoading = true;
+				aPost('/OssBucketList').then(r => {
+					r.list && r.list.map(v => {
+						v.Endpoint = v.Location + '.aliyuncs.com';
+						v.EndpointInternal = v.Location + '-internal.aliyuncs.com';
+						v.CreationDate = moment(v.CreationDate).format('YYYY-MM-DD HH:mm:ss');
+					});
+					this.tableData = r.list || [];
+					this.tableLoading = false;
+				});
+			},
+
+			onObjectList(Endpoint, BucketName, Prefix) {
+				this.tableLoading = true;
+				this.tableShow = false;
+				this.fileViewFiles = [];
+				this.fileViewDirs = [];
+				if (Endpoint) this.fileViewParam.Endpoint = Endpoint;
+				if (BucketName) this.fileViewParam.BucketName = BucketName;
+				this.fileViewParam.Prefix = Prefix;
+				this.setBreadcrumb(Prefix);
+
+				aPost('/OssObjectList', this.fileViewParam).then(r => {
+					r.files && r.files.map(v => {
+						v.Size = humanSize(v.Size);
+					});
+					this.fileViewFiles = r.files || [];
+					this.fileViewDirs = r.dirs || [];
+					this.tableLoading = false;
+				});
+			},
+
+			// 设置导航
+			setBreadcrumb(Prefix) {
+				let arr = Prefix.split('/');
+				let dir = '';
+				let r = [];
+				for (let k in arr) {
+					let v = arr[k];
+					if (v) {
+						dir += v + '/';
+						r.push({
+							name: v,
+							dir: dir,
+						})
+					}
+				}
+				this.breadcrumbs = r;
+			},
+
+			// 切换导航
+			onBreadcrumb(Prefix) {
+				this.onObjectList('', '', Prefix);
+			},
+		}
+	})
+</script>
+</body>
+</html>

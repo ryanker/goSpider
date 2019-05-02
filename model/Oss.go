@@ -3,6 +3,8 @@ package model
 import (
 	"errors"
 	"io/ioutil"
+	"strings"
+	"time"
 
 	"github.com/aliyun/aliyun-oss-go-sdk/oss"
 )
@@ -108,22 +110,146 @@ func OssBucketList() (list []oss.BucketProperties, err error) {
 	return
 }
 
-func OssObjectList(bucketName string) (list []oss.ObjectProperties, err error) {
+func OssBucketInfo(bucketName string) (info oss.BucketInfo, err error) {
 	client, err := OssNew()
 	if err != nil {
-		return list, err
+		return info, err
+	}
+	res, err := client.GetBucketInfo(bucketName)
+	if err != nil {
+		return info, err
+	}
+	return res.BucketInfo, err
+}
+
+func OssObjectList(endpoint, bucketName, prefix string) (files []map[string]interface{}, dirs []string, err error) {
+	accessKeyId, ok := Settings["OssAccessKeyId"]
+	accessKeySecret, ok2 := Settings["OssAccessKeySecret"]
+	if !ok || !ok2 {
+		err = errors.New("OSS 配置信息未设置")
+		return
 	}
 
-	// 获取存储空间。
+	// 创建 OSSClient 实例
+	var client *oss.Client
+	client, err = oss.New(endpoint, accessKeyId, accessKeySecret)
+	if err != nil {
+		return
+	}
+
+	// 获取存储空间
+	var bucket *oss.Bucket
+	bucket, err = client.Bucket(bucketName)
+	if err != nil {
+		return
+	}
+
+	// 列举所有文件
+	marker := oss.Marker("")
+	maxKeys := oss.MaxKeys(1000)
+	delimiter := oss.Delimiter("/")
+	Prefix := oss.Prefix(prefix)
+	for {
+		var lsRes oss.ListObjectsResult
+		lsRes, err = bucket.ListObjects(marker, maxKeys, delimiter, Prefix)
+		if err != nil {
+			return
+		}
+
+		for _, object := range lsRes.Objects {
+			files = append(files, map[string]interface{}{
+				"Key":          strings.Replace(object.Key, prefix, "", -1),
+				"Size":         object.Size,
+				"LastModified": object.LastModified.Add(8 * time.Hour).Format("2006-01-02 15:04:05"),
+			})
+		}
+
+		for _, dir := range lsRes.CommonPrefixes {
+			dirs = append(dirs, dir)
+		}
+
+		if lsRes.IsTruncated {
+			marker = oss.Marker(lsRes.NextMarker)
+		} else {
+			break
+		}
+	}
+	return
+}
+
+// 统计全部 存储用量 文件数量 请求次数 (文件多，耗时特别长)
+func OssObjectCount(endpoint, bucketName string) (size, fileNum, requests int64, err error) {
+	accessKeyId, ok := Settings["OssAccessKeyId"]
+	accessKeySecret, ok2 := Settings["OssAccessKeySecret"]
+	if !ok || !ok2 {
+		err = errors.New("OSS 配置信息未设置")
+		return
+	}
+
+	// 创建 OSSClient 实例
+	var client *oss.Client
+	client, err = oss.New(endpoint, accessKeyId, accessKeySecret)
+	if err != nil {
+		return
+	}
+
+	// 获取存储空间
+	var bucket *oss.Bucket
+	bucket, err = client.Bucket(bucketName)
+	if err != nil {
+		return
+	}
+
+	// 列举所有文件
+	marker := ""
+	maxKeys := 1000
+	for {
+		requests++
+		var lsRes oss.ListObjectsResult
+		lsRes, err = bucket.ListObjects(oss.Marker(marker), oss.MaxKeys(maxKeys))
+		if err != nil {
+			return
+		}
+
+		for _, object := range lsRes.Objects {
+			size += object.Size
+			fileNum++
+		}
+
+		if lsRes.IsTruncated {
+			marker = lsRes.NextMarker
+		} else {
+			break
+		}
+	}
+	return
+}
+
+// 列出全部文件，可以用于全部删除，或者全部下载
+func OssObjectListAll(endpoint, bucketName string) (list []oss.ObjectProperties, err error) {
+	accessKeyId, ok := Settings["OssAccessKeyId"]
+	accessKeySecret, ok2 := Settings["OssAccessKeySecret"]
+	if !ok || !ok2 {
+		return list, errors.New("OSS 配置信息未设置")
+	}
+
+	// 创建 OSSClient 实例
+	client, err := oss.New(endpoint, accessKeyId, accessKeySecret)
+	if err != nil {
+		return list, errors.New("创建 OSSClient 实例失败: " + err.Error())
+	}
+
+	// 获取存储空间
 	bucket, err := client.Bucket(bucketName)
 	if err != nil {
 		return list, err
 	}
 
-	// 列举所有文件。
+	// 列举所有文件
 	marker := ""
+	maxKeys := 1000
 	for {
-		lsRes, err := bucket.ListObjects(oss.Marker(marker))
+		lsRes, err := bucket.ListObjects(oss.Marker(marker), oss.MaxKeys(maxKeys))
 		if err != nil {
 			return list, err
 		}
