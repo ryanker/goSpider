@@ -130,6 +130,14 @@ func OssObjectList(endpoint, bucketName, prefix string) (files []map[string]inte
 		return
 	}
 
+	// 优化是否走内网
+	Endpoint, ok := Settings["OssEndpoint"]
+	if ok && strings.Contains(Endpoint, "-internal.aliyuncs.com") {
+		if Endpoint == strings.Replace(endpoint, ".aliyuncs.com", "-internal.aliyuncs.com", -1) {
+			endpoint = Endpoint
+		}
+	}
+
 	// 创建 OSSClient 实例
 	var client *oss.Client
 	client, err = oss.New(endpoint, accessKeyId, accessKeySecret)
