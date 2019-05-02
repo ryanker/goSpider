@@ -122,7 +122,7 @@ func OssBucketInfo(bucketName string) (info oss.BucketInfo, err error) {
 	return res.BucketInfo, err
 }
 
-func OssObjectList(endpoint, bucketName, prefix string) (files []map[string]interface{}, dirs []string, err error) {
+func OssObjectList(endpoint, bucketName, prefix string) (files, dirs []map[string]interface{}, err error) {
 	accessKeyId, ok := Settings["OssAccessKeyId"]
 	accessKeySecret, ok2 := Settings["OssAccessKeySecret"]
 	if !ok || !ok2 {
@@ -173,7 +173,10 @@ func OssObjectList(endpoint, bucketName, prefix string) (files []map[string]inte
 		}
 
 		for _, dir := range lsRes.CommonPrefixes {
-			dirs = append(dirs, strings.TrimPrefix(dir, prefix))
+			dirs = append(dirs, map[string]interface{}{
+				"Dir":  dir,
+				"Name": strings.TrimPrefix(dir, prefix),
+			})
 		}
 
 		if lsRes.IsTruncated {

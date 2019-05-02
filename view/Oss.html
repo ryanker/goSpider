@@ -43,7 +43,8 @@
                         <el-table-column type="index" width="55"></el-table-column>
                         <el-table-column label="目录名称">
                             <template slot-scope="scope">
-                                <span @click="onObjectList('', '', scope.row)" class="pointer">{[scope.row]}</span>
+                                <span @click="onObjectList('', '', scope.row.Dir)"
+                                      class="pointer">{[scope.row.Name]}</span>
                             </template>
                         </el-table-column>
                     </el-table>
