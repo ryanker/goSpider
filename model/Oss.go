@@ -166,14 +166,14 @@ func OssObjectList(endpoint, bucketName, prefix string) (files []map[string]inte
 
 		for _, object := range lsRes.Objects {
 			files = append(files, map[string]interface{}{
-				"Key":          strings.Replace(object.Key, prefix, "", -1),
+				"Key":          strings.TrimPrefix(object.Key, prefix),
 				"Size":         object.Size,
 				"LastModified": object.LastModified.Add(8 * time.Hour).Format("2006-01-02 15:04:05"),
 			})
 		}
 
 		for _, dir := range lsRes.CommonPrefixes {
-			dirs = append(dirs, dir)
+			dirs = append(dirs, strings.TrimPrefix(dir, prefix))
 		}
 
 		if lsRes.IsTruncated {
