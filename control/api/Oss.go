@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/xiuno/gin"
+	"github.com/ryanker/gin_v1"
 
 	"../../lib/misc"
 	"../../model"

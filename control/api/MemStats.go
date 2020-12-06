@@ -7,7 +7,7 @@ import (
 
 	"../../lib/misc"
 
-	"github.com/xiuno/gin"
+	"github.com/ryanker/gin_v1"
 )
 
 type MemStats struct {

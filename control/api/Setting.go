@@ -2,7 +2,7 @@ package api
 
 import (
 	"github.com/aliyun/aliyun-oss-go-sdk/oss"
-	"github.com/xiuno/gin"
+	"github.com/ryanker/gin_v1"
 
 	"../../model"
 )

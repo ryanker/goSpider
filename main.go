@@ -8,7 +8,7 @@ import (
 	"os"
 	"runtime"
 
-	"github.com/xiuno/gin"
+	"github.com/ryanker/gin_v1"
 
 	"./control/api"
 	"./control/front"
